@@ -2031,9 +2031,20 @@ var Transcript = (function (Rules) {
   var TERM_RE = /^(20\d{2})\s*(?:[-–]\s*(?:([1-4])|(겨울|여름|계절)\S*)|학년도\s*(?:([1-4])\s*학기)?)?/;
 
   /** 요약 표의 한 행인가 — 과목 행으로 세면 안 되는 줄 (예: "전공선택 51", "2022-1 19") */
+  var CATEGORY_ONLY_RE = /^(전필|전선|교필|교선|교직|일선|일반선택|전공필수|전공선택|전공기초|중점교양|기초학업|기초교양|균형교양|교양선택|교양필수|핵심교양|계|소계|합계|총계)/;
+
   function isSummaryTableRow(line) {
     var text = trimCell(line);
     if (!text) return false;
+
+    /* 탭 표(학년도·학기·이수구분·교과목명·학점·등급·평점)의 과목 행은 요약 행이 아니다.
+       과목명처럼 보이는 칸(이수구분이 아닌 글자 칸)이 하나라도 있으면 과목 행으로 본다. */
+    if (String(line).indexOf('\t') >= 0) {
+      var tf = String(line).split('\t').map(trimCell).filter(function (x) { return !!x; });
+      for (var ti = 0; ti < tf.length; ti++) {
+        if (/[가-힣A-Za-z]/.test(tf[ti]) && !CATEGORY_ONLY_RE.test(tf[ti]) && tf[ti].length >= 2) return false;
+      }
+    }
 
     for (var a = 0; a < SUMMARY_ALIASES.length; a++) {
       var hit = text.match(SUMMARY_ALIASES[a].re);
