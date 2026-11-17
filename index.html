@@ -2453,7 +2453,8 @@ var Grader = (function (Rules) {
             var miss = f._jp.missing || [];
             out.push({
               t: f._jp.n === 0 ? ('전공필수 ' + f._jp.need + '과목 확인 필요') : ('전공필수 ' + (f._jp.need - f._jp.n) + '과목 미이수'),
-              b: '미이수: <b>' + miss.slice(0, 4).join(', ') + '</b>' + (miss.length > 4 ? ' 외 ' + (miss.length - 4) + '과목' : '')
+              b: (f._jp.n === 0 ? '아직 체크된 전필 과목이 없습니다 — 체크할 과목: <b>' : '미이수: <b>')
+                + miss.slice(0, 4).join(', ') + '</b>' + (miss.length > 4 ? ' 외 ' + (miss.length - 4) + '과목' : '')
                 + '. 학과 교과과정표에 <b>전필</b>로 지정된 과목은 모두 이수해야 졸업됩니다(전선 학점으로 대체되지 않음).'
             });
           } else {
