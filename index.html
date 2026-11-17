@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>서원대 졸업요건 계산기 · 22~27학번</title>
+<!--
+  서원대학교 졸업요건 계산기 (22~27학번 · 단과대학별 기준 자동 적용 · 단일 파일 · 완전 오프라인)
+  · 외부 서버·CDN·폰트·추적 코드 없음. 모든 계산과 저장은 이 브라우저 안에서만 일어납니다.
+  · 기준: 서원대학교 졸업인증제 기준표(2022·2023학번 / 2024학번 이후 개편 기준)
+-->
+<style>
+:root{
+  --bg:#f3f5fa; --panel:#ffffff; --panel2:#f7f9fc; --text:#121826; --muted:#667085;
+  --line:#e3e8ef; --line2:#eef2f7; --accent:#2563eb; --accent2:#7c3aed; --accent-soft:#e9f0ff;
+  --ok:#0b8a4b; --ok-soft:#e6f7ee; --warn:#b45309; --warn-soft:#fff5e6; --bad:#d92d20; --bad-soft:#fdeceb;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 10px 28px rgba(16,24,40,.06);
+  --radius:16px;
+}
+html[data-theme="dark"]{
+  --bg:#0b0f14; --panel:#141a21; --panel2:#1a222c; --text:#e8eef6; --muted:#93a1b3;
+  --line:#26303c; --line2:#1f2833; --accent:#5b9bff; --accent2:#a78bfa; --accent-soft:#15233a;
+  --ok:#3ecf8e; --ok-soft:#10241a; --warn:#e5a13a; --warn-soft:#2a2113; --bad:#ff6b63; --bad-soft:#2b1516;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.55; font-size:15px;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 88px}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+p{margin:0}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none !important}
+.muted{color:var(--muted)}
+
+/* 터치 반응 — iOS/Android에서 300ms 지연·탭 하이라이트 제거 */
+button,.btn,.tab,.chip,.mini,.icon-btn,.linklike,summary,.check,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* JS 미실행 경고 (QuickLook·인앱 뷰어·기본 HTML 뷰어). 스크립트가 돌면 즉시 숨겨진다. */
+.jswarn{background:#fff7e8;border-bottom:3px solid #f59e0b;color:#7a2e0e;padding:14px 16px 15px;font-size:14px;line-height:1.65}
+.jswarn .t{display:block;font-size:15px;font-weight:800;margin-bottom:6px}
+.jswarn b{font-weight:800}
+.jswarn .os{font-weight:800}
+.jserr{background:#fdeceb;border-bottom-color:#d92d20;color:#7a1c16}
+html[data-theme="dark"] .jswarn{background:#2a2113;border-bottom-color:#b45309;color:#f6dcb4}
+html[data-theme="dark"] .jserr{background:#2b1516;color:#ffc9c4}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.mark{width:46px;height:46px;flex:0 0 auto;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:grid;place-items:center;font-size:23px;box-shadow:0 8px 18px rgba(37,99,235,.32)}
+.brand h1{font-size:19px;line-height:1.25}
+.brand p{margin-top:3px;font-size:12.5px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.save{font-size:11.5px;color:var(--muted);padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel);white-space:nowrap}
+.icon-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:13px;font-weight:600}
+.icon-btn:hover{border-color:var(--accent)}
+
+/* profile bar */
+.profilebar{display:grid;grid-template-columns:170px minmax(190px,1fr) minmax(180px,1.3fr);gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;margin-bottom:12px;align-items:end}
+.profilebar label{display:block;font-size:11.5px;color:var(--muted);font-weight:650}
+.profilebar select{margin-top:4px;font-weight:700;font-size:13.5px}
+.pinfo{font-size:12px;color:var(--muted);line-height:1.6;padding-bottom:4px}
+.pinfo b{color:var(--text)}
+.pinfo .notice-mini{display:block;margin-top:4px;color:var(--warn);font-weight:600}
+
+/* summary */
+.summary{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:grid;grid-template-columns:132px 1fr;gap:20px;align-items:center;margin-bottom:14px}
+.ring-wrap{position:relative;width:132px;height:132px;display:grid;place-items:center;justify-self:center}
+.ring{width:132px;height:132px;display:block}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .bg{stroke:var(--line2)}
+.ring .fg{stroke:url(#grad);transition:stroke-dashoffset .35s ease;transform:rotate(-90deg);transform-origin:66px 66px}
+.ring-center{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-center b{font-size:26px;line-height:1;letter-spacing:-.03em}
+.ring-center span{font-size:11px;color:var(--muted);margin-top:3px;display:block}
+.sum-body{min-width:0}
+.verdict{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px;padding:6px 12px;border-radius:999px;margin-bottom:10px}
+.verdict.pass{background:var(--ok-soft);color:var(--ok)}
+.verdict.fail{background:var(--bad-soft);color:var(--bad)}
+.verdict.idle{background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.stat{background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:8px 10px;min-width:0}
+.stat .k{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .v{font-size:14px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .v small{font-weight:500;color:var(--muted);font-size:11px}
+.deficits{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.deficits li{font-size:12px;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:4px 9px;font-weight:600}
+
+/* tabs */
+.tabs{display:flex;gap:5px;padding:5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{flex:1 0 auto;white-space:nowrap;padding:9px 14px;border-radius:10px;border:0;background:transparent;color:var(--muted);font-weight:650;font-size:13.5px}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 18px;margin-bottom:12px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.card-head h2{font-size:15px}
+.card-head .meta{font-size:12px;color:var(--muted);margin-top:3px}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+
+/* form bits */
+.field{display:grid;grid-template-columns:1fr 118px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line2)}
+.field:first-of-type{border-top:0}
+.field .lbl{font-size:13.5px;font-weight:600}
+.field .lbl small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:1px}
+.numbox{display:flex;align-items:center;gap:6px}
+input[type="number"],input[type="text"],select,textarea{
+  width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);
+  font-size:14px;font-weight:600;transition:border-color .15s, box-shadow .15s;
+}
+input[type="number"]{text-align:right;font-variant-numeric:tabular-nums}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.unit{font-size:12px;color:var(--muted);white-space:nowrap}
+.checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.check{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--text);font-weight:600}
+.check input{width:15px;height:15px;accent-color:var(--accent);margin:0}
+.chip{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chip small{display:block;font-size:10px;font-weight:400;opacity:.8}
+
+/* bars */
+.bar{height:8px;border-radius:99px;background:var(--line2);overflow:hidden;margin-top:9px}
+.bar > i{display:block;height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .3s ease}
+.bar.ok > i{background:var(--ok)}
+.bar.bad > i{background:var(--warn)}
+.barlabel{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:5px}
+
+/* paste tab */
+.notice{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:12px}
+.pubnotice{background:var(--accent-soft);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.65;color:var(--text)}
+.pubnotice b{color:var(--accent);font-weight:800}
+.pubnotice p{margin:3px 0 0}
+.pubnotice p.pt{margin:0}
+.pubnotice p.pt b{color:var(--accent);font-size:13px}
+.pubnotice p b{color:var(--text)}
+html[data-theme="dark"] .pubnotice{background:var(--accent-soft);border-left-color:var(--accent)}
+.notice b{color:var(--accent)}
+.notice ol{margin:7px 0 0;padding-left:20px}
+.notice li{margin:3px 0;color:var(--muted)}
+.notice li b{color:var(--text);font-weight:650}
+textarea#pasteBox{
+  min-height:190px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Droid Sans Mono",monospace;
+  font-size:12.5px;font-weight:400;line-height:1.6;white-space:pre;overflow:auto;text-align:left;
+}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:13.5px;font-weight:650}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.07);color:#fff}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad);border-color:var(--line)}
+.btn.danger:hover{border-color:var(--bad);background:var(--bad-soft)}
+.btn.sm{padding:6px 11px;font-size:12.5px;border-radius:9px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+details.map{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:0 14px;background:var(--panel2)}
+details.map summary{cursor:pointer;padding:11px 0;font-size:13px;font-weight:650;color:var(--muted)}
+details.map[open] summary{color:var(--text)}
+.mapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding-bottom:12px}
+.mapgrid label{font-size:11.5px;color:var(--muted);font-weight:600;display:block}
+.mapgrid select{font-weight:500;font-size:12.5px;margin-top:4px}
+.mapgrid .span2{grid-column:1/-1}
+
+/* table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:13px}
+table.plain{min-width:0}
+thead th{background:var(--panel2);color:var(--muted);font-size:11.5px;font-weight:650;text-align:left;padding:9px 10px;white-space:nowrap;position:sticky;top:0;border-bottom:1px solid var(--line)}
+tbody td{padding:5px 7px;border-top:1px solid var(--line2);vertical-align:middle}
+tbody tr.suspect td{background:var(--warn-soft)}
+tbody tr.excluded td{opacity:.55}
+tbody td input[type="text"],tbody td input[type="number"],tbody td select{padding:6px 8px;font-size:12.5px;border-radius:8px;background:var(--panel)}
+tbody td.c-check{width:34px;text-align:center}
+tbody td.c-check input{width:16px;height:16px;accent-color:var(--accent)}
+tbody td.c-name{min-width:180px}
+tbody td.c-credit{width:76px}
+tbody td.c-del{width:34px;text-align:center}
+tbody td select{min-width:128px}
+.mini{border:1px solid var(--line);background:var(--panel);border-radius:8px;width:26px;height:26px;line-height:1;font-size:12px;color:var(--muted);display:inline-grid;place-items:center;padding:0}
+.mini:hover{color:var(--bad);border-color:var(--bad)}
+tr.empty td{text-align:center;color:var(--muted);padding:26px 10px;font-size:13px;background:transparent}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--warn-soft);color:var(--warn);margin-left:4px;white-space:nowrap}
+
+.readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:12.5px}
+.readout span{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:5px 10px;color:var(--muted)}
+.readout span b{color:var(--text)}
+.readout span.warnchip{color:var(--warn);border-color:var(--warn)}
+
+/* guide panel */
+.guide{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;padding:0 16px}
+.guide summary{cursor:pointer;padding:15px 0;font-size:14px;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary .arw{margin-left:auto;transition:transform .2s;color:var(--muted);font-size:11px}
+.guide[open] summary .arw{transform:rotate(180deg)}
+.guide-body{padding-bottom:16px}
+.gformula{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:12px;line-height:1.5}
+.gformula b{font-weight:800}
+.gformula .sum{background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:3px 8px;font-weight:800;font-size:11.5px}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gitem{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--panel2)}
+.gtop{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px}
+.gtop b{font-size:13.5px}
+.gcred{margin-left:auto;font-size:12px;font-weight:800;color:var(--accent);white-space:nowrap}
+.gbadge{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.gbadge.sel{background:var(--warn-soft);color:var(--warn)}
+.gitem p{font-size:12px;color:var(--muted);line-height:1.55}
+.gitem p b{color:var(--text)}
+.gtip{font-size:12px;color:var(--muted);margin-top:10px;border-left:3px solid var(--accent);padding-left:10px;line-height:1.6}
+.gtip b{color:var(--text)}
+.linklike{background:none;border:0;padding:0;color:var(--accent);font-weight:800;font-size:12px;text-decoration:underline;text-underline-offset:2px}
+
+/* 요건 기준표 */
+.reqtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:0}
+.reqtable th{background:var(--panel2);color:var(--muted);font-size:11.5px;padding:7px 9px;text-align:left;border-bottom:1px solid var(--line)}
+.reqtable td{padding:7px 9px;border-top:1px solid var(--line2)}
+.reqtable td.num{text-align:right;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.reqtable tr.sub td:first-child{padding-left:20px;color:var(--muted);font-weight:500}
+
+/* 수강신청 가이드 */
+.grow{display:grid;gap:9px}
+.gcard{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:11px 13px;background:var(--panel2)}
+.gcard .gt{font-size:13.5px;font-weight:800;color:var(--warn);margin-bottom:3px}
+html[data-theme="dark"] .gcard .gt{color:var(--warn)}
+.gcard .gb{font-size:12.5px;color:var(--text);line-height:1.6}
+.gcard .gb code{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:0 4px;font-size:11.5px}
+.gdone{border:1px solid transparent;border-radius:12px;padding:18px 14px;text-align:center;font-weight:800;color:var(--ok);background:var(--ok-soft);font-size:14.5px;line-height:1.5}
+.gidle{border:1px dashed var(--line);border-radius:12px;padding:16px 14px;text-align:center;color:var(--muted);font-size:13px}
+
+/* export */
+#mdPreview{min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.65;white-space:pre;overflow:auto;font-weight:400}
+.memo{min-height:78px;resize:vertical;font-weight:400;font-size:13.5px;white-space:pre-wrap}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tip{font-size:12px;color:var(--muted);margin-top:8px}
+.tip code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:11.5px}
+
+/* footer & toast */
+.foot{margin-top:22px;font-size:11.5px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,18px);background:#111827;color:#fff;padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.22s;z-index:50;max-width:calc(100vw - 32px);text-align:center}
+html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.undobar{position:fixed;left:50%;bottom:66px;transform:translate(-50%,18px);display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--accent);color:var(--text);padding:8px 10px 8px 14px;border-radius:12px;font-size:13px;font-weight:650;box-shadow:var(--shadow);z-index:49;max-width:calc(100vw - 24px);opacity:0;pointer-events:none;transition:.22s}
+.undobar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.undobar .btn{white-space:nowrap;flex:0 0 auto}
+
+@media (max-width:760px){
+  .summary{grid-template-columns:1fr;gap:12px;padding:16px}
+  .ring-wrap{width:112px;height:112px}
+  .ring{width:112px;height:112px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .stats .stat:nth-child(5){grid-column:1/-1}
+  .field{grid-template-columns:1fr 106px}
+  .split{grid-template-columns:1fr}
+  .ggrid{grid-template-columns:1fr}
+  .profilebar{grid-template-columns:1fr;align-items:stretch}
+  .wrap{padding:16px 12px 80px}
+  .brand h1{font-size:17px}
+  .undobar{bottom:72px}
+}
+/* iOS Safari 입력 시 자동 확대(zoom) 방지 — 입력 요소 글자를 16px 이상으로 */
+@media (max-width:900px), (hover:none){
+  input[type="number"],input[type="text"],select,textarea,
+  tbody td input[type="text"],tbody td input[type="number"],tbody td select,
+  textarea#pasteBox,#mdPreview,.memo{font-size:16px !important}
+}
+@media print{
+  body{background:#fff}
+  .jswarn,.undobar,.tabs,.top-actions,.actions,.toast,.profilebar{display:none !important}
+  .card,.summary{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<!-- 스크립트가 실행되지 않는 뷰어(아이폰 파일 미리보기 QuickLook · 앱 내 HTML 뷰어 · 메일 첨부 미리보기)에서만 이 배너가 보입니다. -->
+<div class="jswarn" id="jsWarn" role="alert">
+  <span class="t">⚠️ 지금은 미리보기 화면이라 버튼이 작동하지 않습니다 — 브라우저에서 열어 주세요</span>
+  <span class="os">아이폰 · 아이패드</span> 공유 버튼 <b>□↑</b> → <b>‘Safari에서 열기’</b> (또는 파일 앱에서 이 파일을 길게 눌러 <b>Safari</b>·<b>Chrome</b>으로 열기)<br>
+  <span class="os">안드로이드</span> 파일을 다운로드한 뒤 <b>Chrome</b> 또는 <b>삼성 인터넷</b>으로 열기 — 기본 HTML 뷰어에서는 버튼이 작동하지 않습니다<br>
+  <span class="os">윈도우 · 맥</span> 내려받은 파일을 <b>Chrome</b>·<b>Edge</b>·<b>Safari</b>에서 더블클릭해 열기 (메일·메신저 미리보기 창에서는 안 됩니다)
+</div>
+<div class="jswarn jserr hidden" id="jsErr" role="alert">
+  <span class="t">⚠️ 스크립트 오류가 발생해 일부 버튼이 동작하지 않습니다</span>
+  <span id="jsErrMsg">이 파일을 Chrome·Edge·Safari에서 다시 열어 주세요.</span>
+</div>
+<script id="js-guard">
+(function () {
+  try { var w = document.getElementById('jsWarn'); if (w) w.style.display = 'none'; } catch (e) {}
+  window.addEventListener('error', function (e) {
+    try {
+      var b = document.getElementById('jsErr');
+      if (!b) return;
+      b.classList.remove('hidden');
+      var msg = (e && (e.message || (e.error && e.error.message))) || '알 수 없는 오류';
+      var m = document.getElementById('jsErrMsg');
+      if (m) m.textContent = '오류: ' + msg + ' — Chrome·Edge·Safari에서 다시 열어 주세요.';
+    } catch (x) {}
+  });
+})();
+</script>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">🎓</div>
+      <div>
+        <h1>서원대 졸업요건 계산기</h1>
+        <p id="brandSub">2022~2027학번 · 단과대학별 졸업 기준 자동 적용</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="save" id="saveState">자동 저장 준비</span>
+      <button class="btn sm" id="loadExampleBtn" type="button" title="가상의 예시 화면(2024학번 · 글로컬공공서비스대학 · 65학점)을 불러옵니다">👀 예시 화면 체험</button>
+      <button class="btn sm danger" id="resetTopBtn" type="button" title="모든 입력을 0으로 되돌립니다">🧹 초기화</button>
+      <button class="icon-btn" id="themeBtn" type="button" title="다크/라이트 전환">🌙 다크</button>
+    </div>
+  </header>
+
+  <section class="pubnotice" aria-label="배포용 안내">
+    <p class="pt"><b>📢 서원대 재학생 공유용 · 비공식 도우미</b></p>
+    <p>본 계산기는 서원대학교 공식 졸업인증제·교육과정 이수 안내를 바탕으로 제작된 <b>비공식 도우미</b>입니다. 입력한 성적 데이터는 서버로 전송되지 않고 <b>내 브라우저에만 저장</b>됩니다.</p>
+  </section>
+
+  <section class="profilebar" aria-label="학번·단과대학 선택">
+    <label for="yearSel">학번 (입학년도)
+      <select id="yearSel"></select>
+    </label>
+    <label for="schoolSel">단과대학
+      <select id="schoolSel"></select>
+    </label>
+    <div class="pinfo" id="profileInfo"></div>
+  </section>
+
+  <section class="summary" aria-label="전체 요약">
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 132 132" aria-hidden="true">
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2563eb"/>
+            <stop offset="100%" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+        <circle class="bg" cx="66" cy="66" r="52"></circle>
+        <circle class="fg" id="ringFg" cx="66" cy="66" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+      </svg>
+      <div class="ring-center"><b id="ringPct">0%</b><span>요건 충족률</span></div>
+    </div>
+    <div class="sum-body">
+      <div class="verdict idle" id="verdict"><span>📝</span><span id="verdictText">학점을 입력하면 판정이 나옵니다</span></div>
+      <div class="stats">
+        <div class="stat"><div class="k">총 이수학점</div><div class="v" id="sumTotal">0 <small>/ 130</small></div></div>
+        <div class="stat"><div class="k">평점평균</div><div class="v" id="sumGpa">— <small>/ 1.50</small></div></div>
+        <div class="stat"><div class="k">교양</div><div class="v" id="sumLiberal">0 <small>/ 40</small></div></div>
+        <div class="stat"><div class="k">전공</div><div class="v" id="sumMajor">0 <small>/ 60</small></div></div>
+        <div class="stat"><div class="k">CUKI 마일리지</div><div class="v" id="sumCuki">0 <small>/ 150</small></div></div>
+      </div>
+      <ul class="deficits" id="deficits"></ul>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="작업 선택">
+    <button class="tab" id="tabBtn-paste" role="tab" aria-selected="false" aria-controls="panel-paste" data-tab="paste">① 성적표 붙여넣기</button>
+    <button class="tab" id="tabBtn-input" role="tab" aria-selected="true" aria-controls="panel-input" data-tab="input">② 직접 입력 · 대시보드</button>
+    <button class="tab" id="tabBtn-export" role="tab" aria-selected="false" aria-controls="panel-export" data-tab="export">③ 옵시디언 내보내기</button>
+  </nav>
+
+  <main>
+  <!-- ============ TAB 2 : 직접 입력 · 대시보드 ============ -->
+  <section id="panel-input" role="tabpanel" aria-labelledby="tabBtn-input">
+
+    <details class="guide" id="guideBox">
+      <summary>🧭 교양 구분 한눈에 보기 <span class="arw">▼</span></summary>
+      <div class="guide-body">
+        <div class="gformula" id="gFormula">
+          <span>교양 <b id="gfLib">40</b>학점 =</span>
+          <span>교양필수 <b id="gfReq">21</b>학점 <span class="muted" id="gfParts">(중점 9 + 기초공통 6 + 기초계열 6)</span></span>
+          <span>+</span>
+          <span>균형교양 <b id="gfBal">19</b>학점 이상</span>
+          <span class="sum">교필 = 중점·기초 / 교선 = 균형</span>
+        </div>
+        <div class="ggrid">
+          <div class="gitem">
+            <div class="gtop"><span class="gbadge">교필</span><b>중점교양</b><span class="gcred" id="gcredCore">9학점</span></div>
+            <p>학교가 <b>모든 학생에게 지정한</b> 인성·진로·봉사 프로그램입니다. <b>사회봉사Ⅰ(1)</b>, <b>드림프로젝트(2)</b>, <b>SU진로코칭 1~3(각 1)</b>, <b>SU인성코칭 1~3(각 1)</b> 중 학기별로 배정된 과목을 이수하면 채워집니다. 성적표에는 <b>중점교양</b> 또는 <b>교필</b>로 찍힙니다.</p>
+          </div>
+          <div class="gitem">
+            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(공통)</b><span class="gcred" id="gcredCommon">6학점</span></div>
+            <p>사고와표현(글쓰기·말하기), 영어회화처럼 <b>모든 학과가 공통으로</b> 듣는 기초 과목입니다. 1학년 때 대부분 채우고, F를 받으면 졸업이 막힙니다.</p>
+          </div>
+          <div class="gitem" id="gitemFusion">
+            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(융합)</b><span class="gcred" id="gcredFusion">0학점</span></div>
+            <p>2024학번 이후 교육과정에서 생긴 <b>SW·AI·융합 기초</b> 영역입니다. 성적표에 <b>기초학업(융합)</b>·<b>기초융합</b>으로 표기됩니다.</p>
+          </div>
+          <div class="gitem">
+            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(계열)</b><span class="gcred" id="gcredDept">6학점</span></div>
+            <p>인문·사회과학 / 자연과학 / 예체능 <b>3개 계열 중 자기계열 1과목 + 타계열 1과목</b>입니다. 보통 1학년 정규학기에만 열리니 이미 들었는지 성적표에서 확인하세요.</p>
+          </div>
+          <div class="gitem">
+            <div class="gtop"><span class="gbadge sel">교선</span><b>균형교양</b><span class="gcred" id="gcredBal">19학점 이상</span></div>
+            <p>내가 골라 듣는 교양(교선)입니다. <span id="gcredArea">2022~2023학번은 6개 영역 중 4개 영역 이상에서 각 1과목</span>이 필요하고, <b>2024학번 이후는 영역별 이수 제한이 폐지</b>되어 학점만 채우면 됩니다.</p>
+          </div>
+        </div>
+        <p class="gtip">성적표에 <b>교필</b>로만 적혀 있으면 → ① 탭 미리보기에서 그 행의 <b>분류</b>를 눌러 중점교양 / 기초공통 / 기초융합 / 기초계열 중 하나로 골라 주세요. <b>교선</b>은 <b>균형교양</b>으로 고르면 합산에 바로 반영됩니다.</p>
+      </div>
+    </details>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>📋 내 기준 요건표</h2>
+          <p class="meta" id="reqMeta">선택한 학번·단과대학 기준입니다.</p>
+        </div>
+      </div>
+      <div class="tbl-wrap" style="border:0;margin-top:4px">
+        <table class="reqtable" id="reqTable">
+          <thead><tr><th>항목</th><th style="text-align:right">기준</th></tr></thead>
+          <tbody id="reqBody"></tbody>
+        </table>
+      </div>
+      <p class="tip" id="reqNote"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>교양필수</h2>
+          <p class="meta" id="metaLibReq">중점교양 9 + 기초학업(공통) 6 + 기초학업(계열) 6 = 21학점</p>
+        </div>
+        <span class="pill" id="pillLibReq">0 / 21</span>
+      </div>
+      <div class="bar" id="barLibReq"><i></i></div>
+
+      <div style="margin-top:10px">
+        <div class="field">
+          <div class="lbl">중점교양 <small id="hintCore">기준 9학점 · 사회봉사Ⅰ(1), 드림프로젝트(2), SU진로코칭 1~3(각 1), SU인성코칭 1~3(각 1)</small></div>
+          <div class="numbox"><input type="number" id="f-core" min="0" max="40" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field">
+          <div class="lbl">기초학업(공통) <small>사고와표현(글쓰기·말하기), 영어회화 등</small></div>
+          <div class="numbox"><input type="number" id="f-common" min="0" max="40" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field" id="rowFusion">
+          <div class="lbl">기초학업(융합) <small>SW·AI·융합 기초 (2024학번 이후 교육과정)</small></div>
+          <div class="numbox"><input type="number" id="f-fusion" min="0" max="40" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field">
+          <div class="lbl">기초학업(계열) <small>자기계열 1과목 + 타계열 1과목</small></div>
+          <div class="numbox"><input type="number" id="f-dept" min="0" max="40" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-deptSelf"> 자기계열 1과목 이수</label>
+        <label class="check"><input type="checkbox" id="c-deptOther"> 타계열 1과목 이수</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>균형교양 (교양선택)</h2>
+          <p class="meta" id="metaBalance">19학점 이상 + 6개 영역 중 4개 영역 이상 각 1과목</p>
+        </div>
+        <span class="pill" id="pillBalance">0 / 19</span>
+      </div>
+      <div class="bar" id="barBalance"><i></i></div>
+      <div class="field" style="margin-top:8px">
+        <div class="lbl">균형교양 이수 학점</div>
+        <div class="numbox"><input type="number" id="f-balance" min="0" max="80" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+      </div>
+      <div class="field" style="grid-template-columns:1fr" id="rowAreas">
+        <div>
+          <div class="lbl" style="margin-bottom:8px">영역별 1과목 이상 — <span id="areaCount">0</span>/<span id="areaNeed">4</span>개 영역 충족</div>
+          <div class="checks" id="areaChips"></div>
+          <p class="tip" id="areaTip">영역 이름은 학과·연도에 따라 다를 수 있습니다. 성적표에 적힌 영역이 몇 개인지만 세면 됩니다.</p>
+        </div>
+      </div>
+      <p class="tip hidden" id="areaNone">이 학번·단과대학은 <b>영역별 이수 제한이 없습니다</b> — 균형교양 학점만 채우면 됩니다.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>전공</h2>
+          <p class="meta" id="metaMajor">60학점 이상 (권장 60~70학점)</p>
+        </div>
+        <span class="pill" id="pillMajor">0 / 60</span>
+      </div>
+      <div class="bar" id="barMajor"><i></i></div>
+      <div style="margin-top:8px">
+        <div class="field">
+          <div class="lbl">전공필수 <small>전필</small></div>
+          <div class="numbox"><input type="number" id="f-majorReq" min="0" max="90" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field">
+          <div class="lbl">전공선택 <small>전선</small></div>
+          <div class="numbox"><input type="number" id="f-majorElec" min="0" max="90" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-majorAll"> 전공필수 지정과목을 모두 이수</label>
+      </div>
+      <p class="tip" id="majorHint"></p>
+    </div>
+
+    <div class="card hidden" id="cardTeaching">
+      <div class="card-head">
+        <div>
+          <h2>교직</h2>
+          <p class="meta" id="metaTeaching">사범대학 교직 과목 22학점 이상 (교직이론·교직소양·교육실습)</p>
+        </div>
+        <span class="pill" id="pillTeaching">0 / 22</span>
+      </div>
+      <div class="bar" id="barTeaching"><i></i></div>
+      <div class="field" style="margin-top:8px">
+        <div class="lbl">교직 이수 학점 <small>성적표의 ‘교직’ 과목 합계</small></div>
+        <div class="numbox"><input type="number" id="f-teaching" min="0" max="60" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>총 이수학점 · 성적</h2>
+          <p class="meta" id="metaTotal">졸업 130학점 이상 · 평점평균 1.50 이상</p>
+        </div>
+        <span class="pill" id="pillTotal">0 / 130</span>
+      </div>
+      <div class="bar" id="barTotal"><i></i></div>
+      <div style="margin-top:8px">
+        <div class="field">
+          <div class="lbl">교양필수(미분류) <small>‘교필’로만 표기돼 중점/기초 구분이 안 된 학점</small></div>
+          <div class="numbox"><input type="number" id="f-libUnknown" min="0" max="60" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field">
+          <div class="lbl">기타 학점 <small>일반선택·교직 외 기타 (총계가 안 맞으면 여기서 조정)</small></div>
+          <div class="numbox"><input type="number" id="f-etc" min="0" max="90" step="1" inputmode="decimal"><span class="unit">학점</span></div>
+        </div>
+        <div class="field">
+          <div class="lbl">평점평균 <small>4.5 만점 기준</small></div>
+          <div class="numbox"><input type="number" id="f-gpa" min="0" max="4.5" step="0.01" inputmode="decimal"><span class="unit">/ 4.5</span></div>
+        </div>
+      </div>
+      <div class="barlabel"><span>합계</span><span id="totalFormula">0학점</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>비교과 (졸업인증제)</h2>
+          <p class="meta">민주시민 · 창의인재 · 실용인 각 1개 프로그램 + CUKI 마일리지 150점</p>
+        </div>
+        <span class="pill" id="pillNoncur">0 / 4</span>
+      </div>
+      <div class="bar" id="barNoncur"><i></i></div>
+      <div class="checks" style="margin-top:10px">
+        <label class="check"><input type="checkbox" id="c-progDem"> 민주시민 1개 이상</label>
+        <label class="check"><input type="checkbox" id="c-progCre"> 창의인재 1개 이상</label>
+        <label class="check"><input type="checkbox" id="c-progPra"> 실용인 1개 이상</label>
+      </div>
+      <div class="field" style="margin-top:6px">
+        <div class="lbl">CUKI 마일리지 <small>기준 150점</small></div>
+        <div class="numbox"><input type="number" id="f-cuki" min="0" max="9999" step="1" inputmode="numeric"><span class="unit">점</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>졸업논문 · 졸업시험</h2>
+          <p class="meta">논문 또는 대체(졸업시험·작품·실기 등) 통과</p>
+        </div>
+        <span class="pill" id="pillThesis">미통과</span>
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-thesis"> 졸업논문/졸업시험(대체 포함) 통과</label>
+      </div>
+    </div>
+
+    <div class="card" id="guideCard">
+      <div class="card-head">
+        <div>
+          <h2>🧭 부족한 과목 유형 &amp; 수강신청 가이드</h2>
+          <p class="meta">지금 학점 기준으로 <b>무엇을 더 들어야 하는지</b> 과목 유형까지 알려드립니다.</p>
+        </div>
+        <span class="pill" id="pillGuide">—</span>
+      </div>
+      <div class="grow" id="guideList"></div>
+    </div>
+
+  </section>
+
+  <!-- ============ TAB 1 : 파싱 ============ -->
+  <section id="panel-paste" role="tabpanel" aria-labelledby="tabBtn-paste" class="hidden">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>성적 취득현황 붙여넣기</h2>
+          <p class="meta">PDF에서 복사한 텍스트든, 종합정보시스템 표를 드래그해 복사한 탭 구분 텍스트든 자동으로 읽습니다.</p>
+        </div>
+      </div>
+
+      <div class="notice">
+        <b>📄 PDF에서 복사하는 방법</b> — <b>“성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요.”</b>
+        <ol>
+          <li>종합정보시스템에서 <b>성적 취득현황</b>을 PDF로 열거나 저장합니다. (맥은 <b>⌘+A → ⌘+C</b>)</li>
+          <li>PDF 화면 아무 곳이나 한 번 클릭한 뒤 <b>Ctrl+A</b>로 전체 선택, <b>Ctrl+C</b>로 복사합니다.</li>
+          <li>아래 상자에 붙여넣고 <b>[분석]</b>을 누르세요. 공백·줄바꿈만 있어도 이수구분·학점·등급을 찾아냅니다.</li>
+        </ol>
+      </div>
+
+      <label for="pasteBox" class="muted" style="font-size:12px;font-weight:650">성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요</label>
+      <textarea id="pasteBox" spellcheck="false" placeholder="성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요.
+
+예)
+2022학년도 1학기 성적 취득현황
+순번 이수구분 교과목명 학점 등급 평점
+1 전필 경영학원론 3 A+ 4.5
+2 교필 사고와표현Ⅰ-글쓰기 2 A0 4.0
+3 중점교양 SU인성코칭1 1 P
+4 기초학업 (계열) 인간과자연 3 B+ 3.5
+5 교선 영화로보는세상 2 A+ 4.5
+합계 14 3.9"></textarea>
+
+      <div class="actions">
+        <button class="btn primary" id="parseBtn" type="button">🔍 분석</button>
+        <button class="btn" id="samplePdfBtn" type="button">PDF 복사 예시</button>
+        <button class="btn" id="sampleTabBtn" type="button">표(탭) 예시</button>
+        <button class="btn ghost" id="clearPasteBtn" type="button">붙여넣은 내용 지우기</button>
+      </div>
+
+      <details class="map" id="mapBox">
+        <summary>열 지정 — 표 형식이 자동 인식과 다를 때만</summary>
+        <div class="mapgrid" id="mapGrid">
+          <div><label for="mapCat">이수구분 열</label><select id="mapCat" data-map="cat"><option value="-1">자동</option></select></div>
+          <div><label for="mapName">교과목명 열</label><select id="mapName" data-map="name"><option value="-1">자동</option></select></div>
+          <div><label for="mapCredits">학점 열</label><select id="mapCredits" data-map="credits"><option value="-1">자동</option></select></div>
+          <div><label for="mapGrade">등급 열</label><select id="mapGrade" data-map="grade"><option value="-1">자동</option></select></div>
+          <div class="span2"><button class="btn sm" id="reparseBtn" type="button">지정한 열로 다시 분석</button>
+            <span class="tip" id="mapTip">표를 붙여넣고 [분석]을 누르면 열 목록이 채워집니다.</span></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="card" id="previewCard">
+      <div class="card-head">
+        <div>
+          <h2>분석 결과 미리보기</h2>
+          <p class="meta">인식이 틀린 칸은 그 자리에서 고치면 됩니다. 체크를 끄면 합산에서 빠집니다.</p>
+        </div>
+        <span class="pill" id="previewCount">0과목</span>
+      </div>
+
+      <div class="readout" id="readout"></div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>포함</th><th>분류 (교필·교선 세부)</th><th>교과목명</th><th>학점</th><th>등급</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="courseBody"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="applyBtn" type="button">⬆️ 합산해서 대시보드에 반영</button>
+        <button class="btn" id="addRowBtn" type="button">+ 빈 행 추가</button>
+        <button class="btn ghost" id="toggleAllBtn" type="button">전체 포함/제외</button>
+        <button class="btn ghost" id="clearRowsBtn" type="button">분석 결과 비우기</button>
+      </div>
+      <p class="tip">💡 소계·합계·총계 줄은 자동으로 체크가 꺼집니다. <b>교필</b>·<b>교선</b>으로만 적힌 과목은 각 행의 <b>분류</b> 드롭다운에서 세부 구분을 고르면 바로 합산됩니다.</p>
+      <p class="tip">🧭 교양의 중점·기초·균형이 헷갈리면 ② 탭 위쪽 <b>‘교양 구분 한눈에 보기’</b>를 펼쳐 보세요.</p>
+      <div id="skippedBox" class="tip hidden"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3 : 내보내기 ============ -->
+  <section id="panel-export" role="tabpanel" aria-labelledby="tabBtn-export" class="hidden">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>옵시디언 마크다운으로 내보내기</h2>
+          <p class="meta">지금 계산된 현황을 그대로 노트로 만듭니다. 복사해서 볼트에 붙이거나 .md로 저장하세요.</p>
+        </div>
+      </div>
+
+      <div class="field" style="grid-template-columns:1fr;border-top:0">
+        <div>
+          <div class="lbl" style="margin-bottom:6px">메모 (선택 — 노트 맨 아래에 들어갑니다)</div>
+          <textarea id="memoBox" class="memo" placeholder="예) 2027-1학기 계절학기로 균형교양 3학점 채우기 / 2월에 졸업논문 신청"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="copyBtn" type="button">📋 마크다운 복사</button>
+        <button class="btn" id="downloadBtn" type="button">💾 .md 파일로 저장</button>
+        <button class="btn ghost" id="refreshMdBtn" type="button">🔄 미리보기 새로고침</button>
+      </div>
+      <p class="tip">옵시디언에서 <code>Ctrl+N</code> → <code>Ctrl+V</code>로 붙여넣으면 frontmatter·표·체크박스가 그대로 노트가 됩니다.</p>
+
+      <label for="mdPreview" class="muted" style="display:block;font-size:12px;font-weight:650;margin:14px 0 6px">미리보기</label>
+      <textarea id="mdPreview" readonly spellcheck="false"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>데이터 관리</h2>
+          <p class="meta">입력한 내용은 이 브라우저에만 자동 저장됩니다. 서버로 보내지 않습니다.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="loadExampleBtn2" type="button">👀 예시 화면 체험하기 (가상 데이터)</button>
+        <button class="btn danger" id="resetBtn" type="button">🧹 초기화 (0으로)</button>
+      </div>
+      <p class="tip">처음 열었다면 <b>👀 예시 화면 체험하기</b>로 동작을 먼저 볼 수 있습니다. 예시는 실존 인물의 성적이 아닌 가상의 2024학번 샘플이며, 체험한 뒤 <b>🧹 초기화</b>로 지우고 내 학점을 입력하면 됩니다.</p>
+      <p class="tip">초기화는 <b>버튼을 두 번</b> 누르면 됩니다(한 번 누르면 5초 안에 한 번 더 누르라고 알려 줍니다). 초기화하면 학점·과목·메모가 모두 0이 됩니다. 다른 학생에게 파일을 그대로 건네도 처음에는 빈 상태로 열립니다.</p>
+    </div>
+  </section>
+  </main>
+
+  <footer class="foot">
+    <p><b>안내</b> · 본 계산기는 서원대학교 공식 졸업인증제·교육과정 이수 안내를 바탕으로 제작된 비공식 도우미입니다. 입력한 성적 데이터는 서버로 전송되지 않고 내 브라우저에만 저장됩니다.</p>
+    <p><b>개인정보</b> · 이 파일은 인터넷에 연결하지 않습니다(외부 서버·CDN·폰트·추적 코드 없음). 성적표를 붙여넣어도 외부로 전송되지 않고, 자동 저장도 이 브라우저의 로컬 저장소(<code>seowon-grad-calc-public-v1</code>)에만 됩니다. 브라우저 저장 데이터를 지우면 입력도 함께 사라집니다.</p>
+    <p><b>기준</b> · 서원대학교 졸업인증제 기준표(2022·2023학번 / 2024학번 이후 개편). 학번·단과대학을 고르면 총 졸업학점·교양·전공·교직 기준이 자동으로 바뀝니다. 비교과(민주시민·창의인재·실용인 각 1개 + CUKI 150점)와 졸업논문(대체 포함)은 공통입니다.</p>
+    <p>학과·입학년도·교육과정 개편에 따라 세부 기준이 다를 수 있습니다. 최종 확인은 학사지원팀 043-299-8016 · 비교과는 교육혁신원 043-299-8287.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="undobar" id="undoBar" role="status" aria-live="polite">
+  <span id="undoMsg">예시 화면을 불러왔어요</span>
+  <button class="btn sm" id="undoBtn" type="button">↩️ 되돌리기</button>
+</div>
+
+<script id="core-src">
+/* ============================================================
+   GradCore — 순수 계산/파싱 로직 (DOM 의존 없음)
+   ============================================================ */
+var GradCore = (function () {
+  'use strict';
+
+  var AREAS = ['역사·철학', '과학·기술', '실용·실천', '문학·예술·문화', '사회·공동체', '기타 영역'];
+
+  var CATS = {
+    core:         { label: '중점교양',        group: 'liberal' },
+    common:       { label: '기초학업(공통)',  group: 'liberal' },
+    fusion:       { label: '기초학업(융합)',  group: 'liberal' },
+    dept:         { label: '기초학업(계열)',  group: 'liberal' },
+    libUnknown:   { label: '교양필수(미분류)', group: 'liberal' },
+    balance:      { label: '균형교양',        group: 'liberal' },
+    majorReq:     { label: '전공필수',        group: 'major' },
+    majorElec:    { label: '전공선택',        group: 'major' },
+    etc:          { label: '일반선택',        group: 'etc' },
+    teaching:     { label: '교직',            group: 'etc' },
+    none:         { label: '미분류',          group: 'none' }
+  };
+
+  var CAT_ORDER = ['core','common','fusion','dept','libUnknown','balance','majorReq','majorElec','teaching','etc','none'];
+
+  var GRADE_POINT = {
+    'A+': 4.5, 'A0': 4.0, 'A': 4.0,
+    'B+': 3.5, 'B0': 3.0, 'B': 3.0,
+    'C+': 2.5, 'C0': 2.0, 'C': 2.0,
+    'D+': 1.5, 'D0': 1.0, 'D': 1.0,
+    'F': 0
+  };
+  var GRADES = ['A+','A0','B+','B0','C+','C0','D+','D0','D','F','P','NP'];
+
+  /* ---------- helpers ---------- */
+  function normalizeText(s) {
+    if (s === null || s === undefined) return '';
+    return String(s)
+      .replace(/\r\n?/g, '\n')
+      .replace(/\u00a0/g, ' ')
+      .replace(/\u3000/g, ' ')
+      .replace(/\ufeff/g, '');
+  }
+
+  function stripBrackets(t) {
+    return String(t).replace(/[\[\](){}（）〈〉<>「」『』]/g, '').replace(/[·:;,.]+$/g, '');
+  }
+
+  function trimCell(s) {
+    return String(s).replace(/^[\s]+|[\s]+$/g, '');
+  }
+
+  function fmt(v) {
+    var n = Number(v) || 0;
+    if (Math.abs(n - Math.round(n)) < 0.001) return String(Math.round(n));
+    return (Math.round(n * 100) / 100).toFixed(n * 10 % 1 === 0 ? 1 : 2);
+  }
+
+  function fmtGpa(v) {
+    var n = Number(v) || 0;
+    return n.toFixed(2);
+  }
+
+  function gradeToPoint(g) {
+    if (g === null || g === undefined) return null;
+    var k = String(g).toUpperCase().replace(/\s+/g, '');
+    if (k === 'P' || k === 'NP' || k === 'S' || k === 'U') return null;
+    if (GRADE_POINT.hasOwnProperty(k)) return GRADE_POINT[k];
+    return null;
+  }
+
+  function isGradeToken(t) {
+    if (!t) return false;
+    var k = String(t).toUpperCase();
+    return /^(A\+|A0|A|B\+|B0|B|C\+|C0|C|D\+|D0|D|F|P|NP|S|U)$/.test(k);
+  }
+
+  function normalizeGrade(t) {
+    if (!t) return '';
+    var k = String(t).toUpperCase();
+    return isGradeToken(k) ? k : '';
+  }
+
+  /* ---------- 이수구분 분류 ---------- */
+  function classifyToken(tok) {
+    var t = stripBrackets(trimCell(tok));
+    if (!t) return null;
+    if (t.indexOf('중점') >= 0) return 'core';
+    if (t.indexOf('균형') >= 0) return 'balance';
+    if (t.indexOf('기초융합') >= 0) return 'fusion';
+    if (t.indexOf('기초학업') === 0 || t.indexOf('기초교양') === 0) {
+      if (t.indexOf('공통') >= 0) return 'common';
+      if (t.indexOf('융합') >= 0) return 'fusion';
+      if (t.indexOf('계열') >= 0) return 'dept';
+      return 'libUnknown';
+    }
+    if (t.indexOf('전공필수') === 0 || t === '전필') return 'majorReq';
+    if (t.indexOf('전공선택') === 0 || t === '전선') return 'majorElec';
+    if (t.indexOf('교양필수') === 0 || t === '교필') return 'libUnknown';
+    if (t.indexOf('교양선택') === 0 || t === '교선') return 'balance';
+    if (t.indexOf('일반선택') === 0 || t === '일선' || t.indexOf('자유선택') === 0 || t === '자선') return 'etc';
+    if (t.indexOf('교직') === 0) return 'teaching';
+    return null;
+  }
+
+  function findCategoryInTokens(tokens) {
+    for (var i = 0; i < tokens.length; i++) {
+      var k = classifyToken(tokens[i]);
+      if (!k) continue;
+      var t = stripBrackets(tokens[i]);
+      var span = 1;
+      if (t.indexOf('기초학업') === 0 || t.indexOf('기초교양') === 0) {
+        var nxt = tokens[i + 1] ? stripBrackets(tokens[i + 1]) : '';
+        if (/^공통/.test(nxt)) { k = 'common'; span = 2; }
+        else if (/^융합/.test(nxt)) { k = 'fusion'; span = 2; }
+        else if (/^계열/.test(nxt)) { k = 'dept'; span = 2; }
+      }
+      return { key: k, idx: i, span: span };
+    }
+    return null;
+  }
+
+  /* ---------- 줄 분류 ---------- */
+  function isHeaderLine(line) {
+    var t = String(line).replace(/\s+/g, ' ').replace(/^[\s]+|[\s]+$/g, '');
+    if (!t) return false;
+    var has = function (s) { return t.indexOf(s) >= 0; };
+    if ((has('교과목') || has('과목명')) && (has('학점') || has('등급') || has('성적'))) return true;
+    if (has('이수구분') && (has('학점') || has('교과목') || has('등급'))) return true;
+    if (/^순\s*번/.test(t)) return true;
+    if (/^교과목명/.test(t) || /^이수구분/.test(t)) return true;
+    if (!/\d/.test(t) && (has('학점') || has('평점') || has('등급')) && t.split(/\s+/).length >= 3) return true;
+    if (/^20\d{2}\s*학년도/.test(t) && !/\d\s*(A\+|A0|B\+|B0|C\+|C0|P|NP)\b/.test(t)) {
+      // "2022학년도 1학기" 같은 제목줄
+      if (!/\s\d{1,2}\s/.test(t.replace(/^20\d{2}\s*학년도/, ''))) return true;
+      return true;
+    }
+    if (/^(성적\s*취득|취득\s*성적|성적표|학적\s*사항)/.test(t)) return true;
+    return false;
+  }
+
+  var SUMMARY_WORDS = ['소계', '소 계', '합계', '합 계', '총계', '총 계', '누계', '누 계',
+    '총이수', '총 이수', '이수학점 계', '취득학점', '신청학점', '평점평균', '이수구분별', '학기별', '계절학기 계'];
+
+  function isSummaryLine(line) {
+    var t = String(line).replace(/\s+/g, ' ').replace(/^[\s]+|[\s]+$/g, '');
+    if (!t) return false;
+    for (var i = 0; i < SUMMARY_WORDS.length; i++) {
+      if (t.indexOf(SUMMARY_WORDS[i]) >= 0) return true;
+    }
+    if (/^(소|합|총|누)\s*계/.test(t)) return true;
+    if (/^계$/.test(t) || /^계\s/.test(t)) return true;
+    return false;
+  }
+
+  function isNoiseLine(line) {
+    var t = String(line).replace(/[\s]+/g, '');
+    if (!t) return true;
+    if (/^[\d\/\.\-–—]+$/.test(t)) return true;
+    if (/^[-–—]{2,}$/.test(t)) return true;
+    if (/^(페이지|page)[\d\/]*$/i.test(t)) return true;
+    if (/^(출력일|발급일|인쇄일)[:\d\-.]+$/.test(t)) return true;
+    return false;
+  }
+
+  function isYearToken(t) {
+    return /^(19|20)\d{2}$/.test(t) || /^\d{1,2}학기$/.test(t) || /^\d{4}-\d$/.test(t) ||
+      /^[A-Z]{0,3}\d{3,}(-\d+)?$/.test(t) || /^\(\d+\)$/.test(t);
+  }
+
+  function isNumericToken(t) {
+    return /^\d{1,2}(\.\d{1,2})?$/.test(t);
+  }
+
+  /* ---------- 행 파싱 ---------- */
+  function parseSpaceLine(line) {
+    var tokens = String(line).replace(/\s+/g, ' ').replace(/^[\s]+|[\s]+$/g, '').split(' ').filter(Boolean);
+    var out = { name: '', cat: null, credits: 0, grade: '', area: -1, hasNumbers: false };
+    if (!tokens.length) return out;
+
+    var cat = findCategoryInTokens(tokens);
+    if (cat) out.cat = cat.key;
+
+    var gradeIdx = -1;
+    for (var i = tokens.length - 1; i >= 0; i--) {
+      if (isGradeToken(tokens[i])) { gradeIdx = i; out.grade = normalizeGrade(tokens[i]); break; }
+    }
+
+    // 등급이 없고 뒤에 '학점 평점' 두 숫자가 있으면 마지막 숫자는 평점으로 본다
+    var pointIdx = -1;
+    if (gradeIdx < 0 && tokens.length >= 2) {
+      var lastT = tokens[tokens.length - 1], prevT = tokens[tokens.length - 2];
+      if (/^\d{1,2}(\.\d{1,2})?$/.test(lastT) && parseFloat(lastT) <= 4.5 &&
+          /^\d{1,2}$/.test(prevT) && parseFloat(prevT) >= 1 && parseFloat(prevT) <= 6) {
+        pointIdx = tokens.length - 1;
+      }
+    }
+
+    var creditsIdx = -1;
+    var start = gradeIdx >= 0 ? gradeIdx - 1 : (pointIdx >= 0 ? pointIdx - 1 : tokens.length - 1);
+    for (var j = start; j >= 0; j--) {
+      if (j === 0 && /^\d{1,2}$/.test(tokens[j])) continue; // 맨 앞 순번은 학점이 아님
+      if (!isNumericToken(tokens[j])) continue;
+      var v = parseFloat(tokens[j]);
+      if (v >= 0.5 && v <= 9) { creditsIdx = j; out.credits = v; break; }
+    }
+    out.hasNumbers = (creditsIdx >= 0 || gradeIdx >= 0);
+
+    var skip = {};
+    if (cat) { for (var a = 0; a < cat.span; a++) skip[cat.idx + a] = true; }
+    if (creditsIdx >= 0) skip[creditsIdx] = true;
+    if (gradeIdx >= 0) skip[gradeIdx] = true;
+    if (pointIdx >= 0) skip[pointIdx] = true;
+
+    var nameParts = [];
+    for (var k = 0; k < tokens.length; k++) {
+      if (skip[k]) continue;
+      var tk = tokens[k];
+      if (isNumericToken(tk)) continue;
+      if (isYearToken(tk)) continue;
+      if (/^[,\-–—=]+$/.test(tk)) continue;
+      nameParts.push(tk);
+    }
+    out.name = nameParts.join(' ').replace(/^[,\-–—:]+|[,\-–—:]+$/g, '');
+    return out;
+  }
+
+  function parseTabFields(fields, colMap) {
+    var out = { name: '', cat: null, credits: 0, grade: '', area: -1, hasNumbers: false };
+    var explicit = colMap && (colMap.cat >= 0 || colMap.name >= 0 || colMap.credits >= 0 || colMap.grade >= 0);
+
+    if (explicit) {
+      if (colMap.cat >= 0 && fields[colMap.cat] !== undefined) {
+        out.cat = classifyToken(fields[colMap.cat]) || (findCategoryInTokens(String(fields[colMap.cat]).split(/\s+/)) || { key: null }).key;
+      }
+      if (colMap.name >= 0 && fields[colMap.name] !== undefined) out.name = trimCell(fields[colMap.name]);
+      if (colMap.credits >= 0 && fields[colMap.credits] !== undefined) {
+        var cv = parseFloat(String(fields[colMap.credits]).replace(/[^\d.]/g, ''));
+        if (!isNaN(cv) && cv >= 0 && cv <= 12) out.credits = cv;
+      }
+      if (colMap.grade >= 0 && fields[colMap.grade] !== undefined) out.grade = normalizeGrade(trimCell(fields[colMap.grade]));
+      out.hasNumbers = out.credits > 0 || !!out.grade;
+      if (!out.name) out.name = '';
+      return out;
+    }
+
+    var cat = findCategoryInTokens(fields);
+    if (cat) out.cat = cat.key;
+
+    var gradeIdx = -1;
+    for (var i = fields.length - 1; i >= 0; i--) {
+      if (isGradeToken(trimCell(fields[i]))) { gradeIdx = i; out.grade = normalizeGrade(trimCell(fields[i])); break; }
+    }
+
+    var pointIdx = -1;
+    if (gradeIdx < 0) {
+      var lastIdx = fields.length - 1;
+      while (lastIdx >= 0 && !trimCell(fields[lastIdx])) lastIdx--;
+      var prevIdx = lastIdx - 1;
+      while (prevIdx >= 0 && !trimCell(fields[prevIdx])) prevIdx--;
+      if (lastIdx > 0 && prevIdx >= 0) {
+        var lv2 = trimCell(fields[lastIdx]), pv2 = trimCell(fields[prevIdx]);
+        if (/^\d{1,2}(\.\d{1,2})?$/.test(lv2) && parseFloat(lv2) <= 4.5 &&
+            /^\d{1,2}$/.test(pv2) && parseFloat(pv2) >= 1 && parseFloat(pv2) <= 6) pointIdx = lastIdx;
+      }
+    }
+
+    var creditsIdx = -1;
+    var start = gradeIdx >= 0 ? gradeIdx - 1 : (pointIdx >= 0 ? pointIdx - 1 : fields.length - 1);
+    for (var j = start; j >= 0; j--) {
+      var f = trimCell(fields[j]);
+      if (j === 0 && /^\d{1,2}$/.test(f)) continue; // 맨 앞 순번 열 제외
+      if (!/^\d{1,2}(\.\d{1,2})?$/.test(f)) continue;
+      var v = parseFloat(f);
+      if (v >= 0.5 && v <= 9) { creditsIdx = j; out.credits = v; break; }
+    }
+
+    var skip = {};
+    if (cat) { for (var a = 0; a < cat.span; a++) skip[cat.idx + a] = true; }
+    if (creditsIdx >= 0) skip[creditsIdx] = true;
+    if (gradeIdx >= 0) skip[gradeIdx] = true;
+    if (pointIdx >= 0) skip[pointIdx] = true;
+
+    var best = '', bestLen = 0;
+    for (var k = 0; k < fields.length; k++) {
+      if (skip[k]) continue;
+      var cell = trimCell(fields[k]);
+      if (!cell) continue;
+      if (/^\d{1,2}(\.\d{1,2})?$/.test(cell)) continue;
+      if (isYearToken(cell)) continue;
+      var hangul = (cell.match(/[가-힣]/g) || []).length;
+      var score = hangul * 2 + cell.length;
+      if (score > bestLen) { bestLen = score; best = cell; }
+    }
+    out.name = best;
+    out.hasNumbers = out.credits > 0 || !!out.grade;
+    return out;
+  }
+
+  /* ---------- 성적표 전체 파싱 ---------- */
+  function parseTranscript(text, colMap) {
+    var norm = normalizeText(text);
+    var raw = norm.split('\n');
+    var lines = [];
+    var tabLines = 0;
+    for (var i = 0; i < raw.length; i++) {
+      var L = raw[i].replace(/[ \t]+$/g, '');
+      if (!L.replace(/\s/g, '')) continue;
+      if (L.indexOf('\t') >= 0) tabLines++;
+      lines.push(L);
+    }
+
+    var format = 'space';
+    var forced = !!(colMap && (colMap.cat >= 0 || colMap.name >= 0 || colMap.credits >= 0 || colMap.grade >= 0));
+    if (forced) format = 'tab';
+    else if (lines.length && tabLines / lines.length >= 0.4) format = 'tab';
+
+    var rows = [];
+    var skipped = [];
+    var pending = null;
+    var colCount = 0;
+    var colSamples = [];
+    var headerFields = null;
+    var seen = {};
+
+    function joinName(a, b) {
+      if (!a) return b;
+      if (!b) return a;
+      var last = a.slice(-1), first = b.slice(0, 1);
+      if (/[가-힣A-Za-z0-9]/.test(last) && /[가-힣A-Za-z0-9]/.test(first)) return a + b;
+      return a + ' ' + b;
+    }
+
+    for (var n = 0; n < lines.length; n++) {
+      var line = lines[n];
+      if (isHeaderLine(line)) {
+        if (format === 'tab' && line.indexOf('\t') >= 0 && !headerFields) {
+          headerFields = line.split('\t').map(trimCell);
+          if (headerFields.length > colCount) { colCount = headerFields.length; colSamples = headerFields.slice(); }
+        }
+        continue;
+      }
+
+      var useTab = format === 'tab' && line.indexOf('\t') >= 0;
+      var fields = useTab ? line.split('\t').map(trimCell) : String(line).replace(/\s+/g, ' ').replace(/^[\s]+|[\s]+$/g, '').split(' ');
+      if (fields.length > colCount) { colCount = fields.length; colSamples = fields.slice(); }
+
+      var summary = isSummaryLine(line);
+      var parsed = useTab ? parseTabFields(fields, colMap) : parseSpaceLine(line);
+
+      if (summary) {
+        pending = null;
+        rows.push({
+          name: (parsed.name || line).slice(0, 60),
+          cat: parsed.cat || 'none',
+          credits: parsed.credits || 0,
+          grade: parsed.grade || '',
+          area: parsed.area,
+          include: false,
+          summary: true,
+          note: '소계·합계 의심'
+        });
+        continue;
+      }
+
+      if (isNoiseLine(line)) { continue; }
+
+      if (!parsed.hasNumbers) {
+        // 숫자가 없는 줄: 다음 줄과 이어지는 이름일 수 있음
+        var textOnly = parsed.name || line;
+        if (parsed.cat) {
+          pending = { name: textOnly, cat: parsed.cat };
+        } else if (pending) {
+          pending.name = joinName(pending.name, textOnly);
+        } else if (rows.length) {
+          var prev = rows[rows.length - 1];
+          if (prev && !prev.summary) prev.name = joinName(prev.name, textOnly);
+        } else {
+          skipped.push({ line: line, reason: '해석 불가 (숫자·등급 없음)' });
+        }
+        continue;
+      }
+
+      var name = parsed.name;
+      var catKey = parsed.cat;
+      if (pending) {
+        name = joinName(pending.name, name);
+        if (!catKey) catKey = pending.cat;
+        pending = null;
+      }
+      if (!name) name = '(이름 없음)';
+      if (!catKey) catKey = 'none';
+
+      var include = parsed.credits > 0 || !!parsed.grade;
+      var note = '';
+      if (catKey === 'none') {
+        note = '이수구분 확인 필요';
+        if (!parsed.grade) include = false;
+      }
+
+      var key = [name.replace(/\s+/g, ''), parsed.credits, parsed.grade, catKey].join('|');
+      if (seen[key]) {
+        rows.push({
+          name: name, cat: catKey, credits: parsed.credits, grade: parsed.grade, area: parsed.area,
+          include: false, summary: false, note: '중복 의심'
+        });
+        continue;
+      }
+      seen[key] = true;
+
+      rows.push({
+        name: name, cat: catKey, credits: parsed.credits, grade: parsed.grade, area: parsed.area,
+        include: include, summary: false, note: note
+      });
+    }
+
+    for (var r = 0; r < rows.length; r++) rows[r].id = 'r' + (r + 1);
+
+    return {
+      format: format,
+      rows: rows,
+      skipped: skipped,
+      colCount: colCount,
+      colSamples: colSamples,
+      headerFields: headerFields
+    };
+  }
+
+
+  /* ============================================================
+     졸업요건 데이터 (2022·2023학번 / 2024학번 이후 개편 기준)
+     ============================================================ */
+  var YEARS = ['2022', '2023', '2024', '2025', '2026', '2027'];
+
+  var SCHOOL_LIST = {
+    old: [
+      { key: 'general', label: '글로컬공공서비스대학·일반대학' },
+      { key: 'edu',     label: '사범대학' },
+      { key: 'future',  label: '미래대학' }
+    ],
+    neo: [
+      { key: 'global', label: '글로컬공공서비스대학' },
+      { key: 'bio',    label: '바이오헬스융합대학' },
+      { key: 'edu',    label: '사범대학' },
+      { key: 'art',    label: '문화예술체육대학' },
+      { key: 'future', label: '미래대학' }
+    ]
+  };
+
+  var REQ_2022 = {
+    general: { total: 130, gpa: 1.50, majorMin: 60, majorMax: 70, liberal: 40, core: 9, common: 6, fusion: 0, dept: 6, balance: 19, areas: 4, teaching: 0 },
+    edu:     { total: 140, gpa: 1.50, majorMin: 65, majorMax: 65, liberal: 25, core: 9, common: 6, fusion: 0, dept: 6, balance: 4,  areas: 2, teaching: 22 },
+    future:  { total: 120, gpa: 1.50, majorMin: 60, majorMax: 60, liberal: 30, core: 7, common: 0, fusion: 0, dept: 6, balance: 17, areas: 0, teaching: 0 }
+  };
+
+  var REQ_2023 = {
+    general: { total: 130, gpa: 1.50, majorMin: 60, majorMax: 70, liberal: 40, core: 9, common: 6, fusion: 0, dept: 6, balance: 19, areas: 4, teaching: 0 },
+    edu:     { total: 140, gpa: 1.50, majorMin: 65, majorMax: 65, liberal: 27, core: 9, common: 4, fusion: 0, dept: 6, balance: 8,  areas: 2, teaching: 22 },
+    future:  { total: 120, gpa: 1.50, majorMin: 60, majorMax: 60, liberal: 30, core: 7, common: 0, fusion: 0, dept: 6, balance: 17, areas: 0, teaching: 0 }
+  };
+
+  /* 2024학번 이후 개편 기준 (2026·2027학번은 최신 학사공지 확인 필요) */
+  var REQ_NEO = {
+    global: { total: 130, gpa: 1.50, majorMin: 50, majorMax: 70, liberal: 40, core: 9, common: 4, fusion: 2, dept: 6, balance: 19, areas: 0, teaching: 0 },
+    bio:    { total: 130, gpa: 1.50, majorMin: 60, majorMax: 70, liberal: 40, core: 9, common: 4, fusion: 2, dept: 6, balance: 19, areas: 0, teaching: 0 },
+    edu:    { total: 140, gpa: 1.50, majorMin: 65, majorMax: 65, liberal: 27, core: 7, common: 2, fusion: 0, dept: 6, balance: 12, areas: 0, teaching: 24 },
+    art:    { total: 130, gpa: 1.50, majorMin: 50, majorMax: 70, liberal: 40, core: 9, common: 2, fusion: 4, dept: 6, balance: 19, areas: 0, teaching: 0 },
+    future: { total: 120, gpa: 1.50, majorMin: 60, majorMax: 60, liberal: 30, core: 0, common: 0, fusion: 0, dept: 6, balance: 30, areas: 0, teaching: 0 }
+  };
+
+  var REQUISITES = { '2022': REQ_2022, '2023': REQ_2023, '2024': REQ_NEO, '2025': REQ_NEO, '2026': REQ_NEO, '2027': REQ_NEO };
+
+  function schoolsFor(year) { return (String(year) <= '2023') ? SCHOOL_LIST.old : SCHOOL_LIST.neo; }
+
+  function resolveReq(year, school) {
+    var set = REQUISITES[String(year)] || REQ_2022;
+    return set[school] || set[Object.keys(set)[0]];
+  }
+
+  function profileMeta(year, school) {
+    var list = schoolsFor(year);
+    var lab = '';
+    for (var i = 0; i < list.length; i++) if (list[i].key === school) lab = list[i].label;
+    if (!lab) lab = list.length ? list[0].label : '';
+    var notice = '';
+    if (String(year) === '2026' || String(year) === '2027') notice = '2026·2027학번은 학사공지·교육과정 개편을 학사지원팀에서 최종 확인하세요.';
+    else if (school === 'future') notice = '미래대학은 학과(전공)별 지정 요건이 다를 수 있습니다.';
+    else if (String(year) === '2024' || String(year) === '2025') notice = '2024학번 이후 개편 기준을 적용했습니다.';
+    return { school: lab, notice: notice };
+  }
+
+  /* ---------- 합산 ---------- */
+  function aggregate(rows) {
+    var sum = {
+      core: 0, common: 0, fusion: 0, dept: 0, libUnknown: 0, balance: 0,
+      majorReq: 0, majorElec: 0, teaching: 0, etc: 0,
+      gpa: null, gradedCredits: 0, pointSum: 0,
+      areas: [false, false, false, false, false, false],
+      count: 0, credits: 0, unassigned: 0, unassignedCount: 0
+    };
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r.include) continue;
+      var c = Number(r.credits) || 0;
+      sum.count++;
+      sum.credits += c;
+      switch (r.cat) {
+        case 'core': sum.core += c; break;
+        case 'common': sum.common += c; break;
+        case 'fusion': sum.fusion += c; break;
+        case 'dept': sum.dept += c; break;
+        case 'libUnknown': sum.libUnknown += c; break;
+        case 'balance':
+          sum.balance += c;
+          if (r.area >= 0 && r.area < sum.areas.length) sum.areas[r.area] = true;
+          break;
+        case 'majorReq': sum.majorReq += c; break;
+        case 'majorElec': sum.majorElec += c; break;
+        case 'teaching': sum.teaching += c; break;
+        case 'etc': sum.etc += c; break;
+        default:
+          sum.unassigned += c;
+          sum.unassignedCount++;
+      }
+      var p = gradeToPoint(r.grade);
+      if (p !== null && c > 0) { sum.pointSum += p * c; sum.gradedCredits += c; }
+    }
+    if (sum.gradedCredits > 0) sum.gpa = sum.pointSum / sum.gradedCredits;
+    return sum;
+  }
+
+  /* ---------- 요건 평가 ---------- */
+  function evaluate(f, r) {
+    var fields = f || {};
+    var R = r || resolveReq('2022', 'general');
+    var num = function (k) { return Number(fields[k]) || 0; };
+    var core = num('core'), common = num('common'), fusion = num('fusion'), dept = num('dept');
+    var libUnknown = num('libUnknown'), balance = num('balance');
+    var majorReq = num('majorReq'), majorElec = num('majorElec'), teaching = num('teaching'), etc = num('etc');
+    var gpa = num('gpa'), cuki = num('cuki');
+
+    var liberal = core + common + fusion + dept + libUnknown + balance;
+    var major = majorReq + majorElec;
+    var total = liberal + major + teaching + etc;
+    var areas = fields.areas || [];
+    var areaCount = 0;
+    for (var i = 0; i < AREAS.length; i++) if (areas[i]) areaCount++;
+
+    var items = [];
+    function add(key, label, req, cur, unit, ok, kind) {
+      items.push({
+        key: key, label: label, req: req, cur: cur,
+        unit: unit || '', ok: !!ok, note: '', kind: kind || 'credit',
+        ratio: req > 0 ? Math.max(0, Math.min(1, cur / req)) : (ok ? 1 : 0),
+        gap: Math.max(0, req - cur)
+      });
+    }
+
+    add('total', '총 졸업학점', R.total, total, '학점', total >= R.total);
+    add('gpa', '평점평균', R.gpa, gpa, '', gpa >= R.gpa, 'gpa');
+    if (R.liberal > 0) add('liberal', '교양 최소 이수', R.liberal, liberal, '학점', liberal >= R.liberal);
+    if (R.core > 0) add('core', '중점교양', R.core, core, '학점', core >= R.core);
+    if (R.common > 0) add('common', '기초학업(공통)', R.common, common, '학점', common >= R.common);
+    if (R.fusion > 0) add('fusion', '기초학업(융합)', R.fusion, fusion, '학점', fusion >= R.fusion);
+    if (R.dept > 0) {
+      add('dept', '기초학업(계열)', R.dept, dept, '학점', dept >= R.dept);
+      add('deptSelf', '기초학업 자기계열 1과목', 1, fields.deptSelf ? 1 : 0, '', !!fields.deptSelf, 'check');
+      add('deptOther', '기초학업 타계열 1과목', 1, fields.deptOther ? 1 : 0, '', !!fields.deptOther, 'check');
+    }
+    if (R.balance > 0) add('balance', '균형교양', R.balance, balance, '학점', balance >= R.balance);
+    if (R.areas > 0) add('areas', '균형교양 영역', R.areas, areaCount, '개 영역', areaCount >= R.areas);
+    add('major', '전공', R.majorMin, major, '학점', major >= R.majorMin);
+    add('majorAll', '전공필수 지정과목', 1, fields.majorAll ? 1 : 0, '', !!fields.majorAll, 'check');
+    if (R.teaching > 0) add('teaching', '교직', R.teaching, teaching, '학점', teaching >= R.teaching);
+    add('progDem', '민주시민 프로그램', 1, fields.progDem ? 1 : 0, '', !!fields.progDem, 'check');
+    add('progCre', '창의인재 프로그램', 1, fields.progCre ? 1 : 0, '', !!fields.progCre, 'check');
+    add('progPra', '실용인 프로그램', 1, fields.progPra ? 1 : 0, '', !!fields.progPra, 'check');
+    add('cuki', 'CUKI 마일리지', 150, cuki, '점', cuki >= 150);
+    add('thesis', '졸업논문/졸업시험', 1, fields.thesis ? 1 : 0, '', !!fields.thesis, 'check');
+
+    var passCount = 0, fails = [];
+    for (var k = 0; k < items.length; k++) {
+      if (items[k].ok) passCount++; else fails.push(items[k]);
+    }
+
+    var hasInput = total > 0 || gpa > 0 || cuki > 0 || fields.thesis || fields.progDem || fields.progCre || fields.progPra ||
+      fields.deptSelf || fields.deptOther || fields.majorAll;
+
+    return {
+      items: items, passes: passCount, count: items.length, fails: fails,
+      liberal: liberal, major: major, total: total, teaching: teaching, areaCount: areaCount,
+      ratio: items.length ? passCount / items.length : 0,
+      hasInput: hasInput,
+      complete: fails.length === 0 && hasInput
+    };
+  }
+
+  /* ---------- 부족 과목 유형 · 수강신청 가이드 ---------- */
+  function buildGuide(ev, f, r) {
+    var R = r || resolveReq('2022', 'general');
+    var out = [];
+    function gap(it) { return fmt(it.req - it.cur); }
+    for (var i = 0; i < ev.fails.length; i++) {
+      var it = ev.fails[i];
+      switch (it.key) {
+        case 'total':
+          out.push({ t: '총 이수학점 ' + gap(it) + '학점 부족', b: '졸업까지 ' + R.total + '학점이 필요합니다(현재 ' + fmt(ev.total) + ' / ' + R.total + '). 남은 학기 수강신청 + 계절학기로 채우세요.' });
+          break;
+        case 'gpa':
+          out.push({ t: '평점평균 기준 미달', b: '기준 ' + fmtGpa(R.gpa) + ' 이상 — 현재 ' + fmtGpa(f.gpa) + '. F 과목 재수강으로 끌어올릴 수 있습니다.' });
+          break;
+        case 'liberal':
+          out.push({ t: '교양 합계 ' + gap(it) + '학점 부족', b: '교양 최소 ' + R.liberal + '학점이 필요합니다(현재 ' + fmt(ev.liberal) + '). 아래 교양필수·균형교양 부족 항목을 채우면 함께 해결됩니다.' });
+          break;
+        case 'core':
+          out.push({ t: '중점교양 ' + gap(it) + '학점 부족 (현재 ' + fmt(f.core) + ' / ' + R.core + ')', b: '<code>사회봉사Ⅰ(1)</code> · <code>드림프로젝트(2)</code> · <code>SU진로코칭 1~3(각 1)</code> · <code>SU인성코칭 1~3(각 1)</code> 중 <b>미이수 과목</b>을 확인해 수강신청하세요.' });
+          break;
+        case 'common':
+          out.push({ t: '기초학업(공통) ' + gap(it) + '학점 부족 (현재 ' + fmt(f.common) + ' / ' + R.common + ')', b: '글쓰기·말하기(사고와표현), 영어 등 <b>공통 기초 과목</b> 중 미이수 과목을 확인하세요.' });
+          break;
+        case 'fusion':
+          out.push({ t: '기초학업(융합) ' + gap(it) + '학점 부족 (현재 ' + fmt(f.fusion) + ' / ' + R.fusion + ')', b: '<b>SW·AI·융합 기초</b> 필수 과목 중 미이수 과목을 확인하세요.' });
+          break;
+        case 'dept':
+          out.push({ t: '기초학업(계열) ' + gap(it) + '학점 부족 (현재 ' + fmt(f.dept) + ' / ' + R.dept + ')', b: '<b>자기계열 1과목 + 타계열 1과목</b>을 반드시 채워야 합니다.' });
+          break;
+        case 'deptSelf':
+          out.push({ t: '기초학업 자기계열 1과목 미이수', b: '자기계열(인문·사회과학 / 자연과학 / 예체능) 과목 1개 이상 이수해야 합니다.' });
+          break;
+        case 'deptOther':
+          out.push({ t: '기초학업 타계열 1과목 미이수', b: '자기계열이 아닌 <b>다른 계열 과목 1개</b> 이상 이수해야 합니다.' });
+          break;
+        case 'balance':
+          out.push({
+            t: '균형교양 ' + gap(it) + '학점 부족 (현재 ' + fmt(f.balance) + ' / ' + R.balance + ')',
+            b: R.areas
+              ? '현재 <b>' + ev.areaCount + '개 영역</b> 이수 → <b>' + Math.max(0, R.areas - ev.areaCount) + '개 영역 추가 수강</b> 필요. (역사·철학, 과학·기술, 실용·실천, 문학·예술·문화 등 <b>미이수 영역</b>에서 선택)'
+              : '이 학번·단과대학은 <b>영역별 이수 제한이 없습니다</b> — 교선 과목 아무거나 이수하면 됩니다.'
+          });
+          break;
+        case 'areas':
+          out.push({ t: '균형교양 ' + gap(it) + '개 영역 부족', b: '현재 ' + ev.areaCount + '개 영역 → ' + R.areas + '개 영역 이상 필요. (역사·철학, 과학·기술, 실용·실천, 문학·예술·문화, 사회·공동체, 기타 영역 중 미이수 영역)' });
+          break;
+        case 'major':
+          out.push({ t: '전공 ' + gap(it) + '학점 부족 (현재 ' + fmt(ev.major) + ' / ' + R.majorMin + ')', b: '<b>전공필수·전공선택</b>을 추가 이수해야 합니다. 학과별 <b>전공필수 지정 과목</b>을 먼저 확인하세요' + (R.majorMax > R.majorMin ? ' (권장 ' + R.majorMin + '~' + R.majorMax + '학점).' : '.') });
+          break;
+        case 'majorAll':
+          out.push({ t: '전공필수 지정과목 미확인', b: '학과 사무실에서 <b>전공필수 지정 과목 목록</b>을 받아 모두 이수했는지 확인하고 체크하세요.' });
+          break;
+        case 'teaching':
+          out.push({ t: '교직 ' + gap(it) + '학점 부족 (현재 ' + fmt(f.teaching) + ' / ' + R.teaching + ')', b: '교직이론·교직소양·<b>교육실습</b> 과목 중 미이수 과목을 확인하세요.' });
+          break;
+        case 'progDem':
+          out.push({ t: '민주시민 프로그램 1개 이상 필요', b: 'SEMS+ > CUKI 비교과에서 <b>민주시민</b> 영역 프로그램을 신청·이수하세요.' });
+          break;
+        case 'progCre':
+          out.push({ t: '창의인재 프로그램 1개 이상 필요', b: 'SEMS+ > CUKI 비교과에서 <b>창의인재</b> 영역 프로그램을 신청·이수하세요.' });
+          break;
+        case 'progPra':
+          out.push({ t: '실용인 프로그램 1개 이상 필요', b: 'SEMS+ > CUKI 비교과에서 <b>실용인</b> 영역 프로그램을 신청·이수하세요.' });
+          break;
+        case 'cuki':
+          out.push({ t: 'CUKI 마일리지 ' + gap(it) + '점 부족 (현재 ' + fmt(f.cuki) + ' / 150)', b: 'SEMS+ > <b>CUKI 비교과</b>에서 프로그램 참여·마일리지 적립 내역을 확인하세요. 문의 043-299-8287.' });
+          break;
+        case 'thesis':
+          out.push({ t: '졸업논문/졸업시험 미통과', b: '학과 <b>졸업논문(또는 대체: 졸업시험·작품·실기)</b> 신청 일정과 지도교수를 확인하세요.' });
+          break;
+        default:
+          out.push({ t: it.label + ' 보완 필요', b: '' });
+      }
+    }
+    return out;
+  }
+
+  /* ---------- 마크다운 ---------- */
+  function escPipe(s) {
+    return String(s === null || s === undefined ? '' : s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  }
+  function stripTags(s) { return String(s || '').replace(/<[^>]+>/g, ''); }
+
+  function statusText(item) {
+    if (item.ok) return '✅ 충족';
+    if (item.kind === 'check') return '❌ 미이수';
+    if (item.unit === '개 영역') return '❌ ' + fmt(item.req - item.cur) + '개 영역 부족';
+    if (item.unit === '점') return '❌ ' + fmt(item.req - item.cur) + '점 부족';
+    return '❌ ' + fmt(item.req - item.cur) + '학점 부족';
+  }
+
+  function checkLine(ok, label, detail) {
+    return '- [' + (ok ? 'x' : ' ') + '] ' + label + (detail ? ' — ' + detail : '');
+  }
+
+  function unitTxt(it) {
+    if (it.kind === 'gpa') return '';
+    if (it.kind === 'check') return '';
+    if (it.unit === '개 영역') return '개';
+    if (it.unit === '점') return '점';
+    return '학점';
+  }
+
+  function buildMarkdown(fields, r, courses, memo, dateStr, meta) {
+    var f = fields || {};
+    var R = r || resolveReq('2022', 'general');
+    var ev = evaluate(f, R);
+    var date = dateStr || '';
+    var m = meta || {};
+    var yearTxt = m.year ? String(m.year) : '2022';
+    var schoolTxt = m.schoolLabel || (m.school ? m.school : '');
+    var L = [];
+
+    L.push('---');
+    L.push('title: "서원대 졸업요건 현황 (' + yearTxt + '학번)"');
+    L.push('학번: "' + yearTxt + '"');
+    L.push('단과대학: "' + schoolTxt + '"');
+    L.push('기준: "졸업 ' + R.total + '학점 · 교양 ' + R.liberal + ' · 전공 ' + (R.majorMax > R.majorMin ? R.majorMin + '~' + R.majorMax : R.majorMin) + '"');
+    L.push('갱신: ' + date);
+    L.push('tags:');
+    L.push('  - 서원대');
+    L.push('  - 졸업요건');
+    L.push('---');
+    L.push('');
+    L.push('# 🎓 졸업요건 현황 · ' + date);
+    L.push('');
+    var verdict = ev.hasInput ? (ev.complete ? '✅ 모든 요건 충족' : '⚠️ ' + ev.fails.length + '개 항목 미충족') : '📝 아직 입력 없음';
+    L.push('> [!summary] 판정 — **' + verdict + '**');
+    L.push('> ' + yearTxt + '학번 · ' + escPipe(schoolTxt) + ' 기준 · 총 이수 **' + fmt(ev.total) + ' / ' + R.total + '학점** · 평점평균 **' + fmtGpa(f.gpa) + '** (기준 ' + fmtGpa(R.gpa) + ')');
+    L.push('> 교양 **' + fmt(ev.liberal) + ' / ' + R.liberal + '** · 전공 **' + fmt(ev.major) + ' / ' + R.majorMin + '**' + (R.teaching ? ' · 교직 **' + fmt(f.teaching) + ' / ' + R.teaching + '**' : ''));
+    L.push('> 요건 충족률 **' + Math.round(ev.ratio * 100) + '%** (' + ev.passes + '/' + ev.count + ')');
+    L.push('');
+
+    L.push('## 1. 요건 점검표');
+    L.push('');
+    L.push('| 항목 | 기준 | 현재 | 상태 |');
+    L.push('| :--- | ---: | ---: | :---: |');
+    for (var i = 0; i < ev.items.length; i++) {
+      var it = ev.items[i];
+      var curTxt, reqTxt;
+      if (it.kind === 'gpa') { curTxt = fmtGpa(it.cur); reqTxt = fmtGpa(it.req) + ' 이상'; }
+      else if (it.kind === 'check') { curTxt = it.ok ? '이수' : '미이수'; reqTxt = '필수'; }
+      else {
+        curTxt = fmt(it.cur) + unitTxt(it);
+        reqTxt = fmt(it.req) + (it.unit === '개 영역' ? '개 영역' : it.unit === '점' ? '점' : '학점');
+      }
+      L.push('| ' + it.label + ' | ' + reqTxt + ' | ' + curTxt + ' | ' + statusText(it) + ' |');
+    }
+    L.push('');
+
+    var areaNames = [];
+    for (var a = 0; a < AREAS.length; a++) if (f.areas && f.areas[a]) areaNames.push(AREAS[a]);
+
+    L.push('## 2. 교양 (최소 ' + R.liberal + '학점)');
+    L.push('');
+    L.push(checkLine(ev.liberal >= R.liberal, '교양 합계', fmt(ev.liberal) + ' / ' + R.liberal + '학점'));
+    if (R.core > 0) L.push(checkLine(Number(f.core) >= R.core, '중점교양', fmt(f.core) + ' / ' + R.core + '학점'));
+    if (R.common > 0) L.push(checkLine(Number(f.common) >= R.common, '기초학업(공통)', fmt(f.common) + ' / ' + R.common + '학점'));
+    if (R.fusion > 0) L.push(checkLine(Number(f.fusion) >= R.fusion, '기초학업(융합)', fmt(f.fusion) + ' / ' + R.fusion + '학점'));
+    if (R.dept > 0) L.push(checkLine(Number(f.dept) >= R.dept && f.deptSelf && f.deptOther, '기초학업(계열)',
+      fmt(f.dept) + ' / ' + R.dept + '학점 · 자기계열 ' + (f.deptSelf ? '✓' : '✗') + ' · 타계열 ' + (f.deptOther ? '✓' : '✗')));
+    if (R.balance > 0) L.push(checkLine(Number(f.balance) >= R.balance, '균형교양', fmt(f.balance) + ' / ' + R.balance + '학점'));
+    if (R.areas > 0) L.push(checkLine(ev.areaCount >= R.areas, '균형교양 ' + R.areas + '개 영역', ev.areaCount + ' / ' + R.areas + '영역' + (areaNames.length ? ' (' + areaNames.join(', ') + ')' : '')));
+    else L.push('- ℹ️ 이 학번·단과대학은 균형교양 **영역별 이수 제한 없음**');
+    if (Number(f.libUnknown) > 0) L.push('- ℹ️ 교양필수 미분류 ' + fmt(f.libUnknown) + '학점은 교양 합계에만 포함됨');
+    L.push('');
+
+    L.push('## 3. 전공' + (R.majorMax > R.majorMin ? ' (' + R.majorMin + '~' + R.majorMax + '학점)' : ' (' + R.majorMin + '학점 이상)'));
+    L.push('');
+    L.push(checkLine(ev.major >= R.majorMin, '전공 합계', fmt(ev.major) + ' / ' + R.majorMin + '학점'));
+    L.push('- 전공필수 ' + fmt(f.majorReq) + '학점 · 전공선택 ' + fmt(f.majorElec) + '학점');
+    L.push(checkLine(!!f.majorAll, '전공필수 지정과목 모두 이수', ''));
+    if (ev.major > R.majorMax) L.push('- ⚠️ 권장 범위(' + (R.majorMax > R.majorMin ? R.majorMin + '~' + R.majorMax : R.majorMin) + ')를 ' + fmt(ev.major - R.majorMax) + '학점 초과');
+    if (R.teaching > 0) {
+      L.push('');
+      L.push('### 교직');
+      L.push('');
+      L.push(checkLine(Number(f.teaching) >= R.teaching, '교직 합계', fmt(f.teaching) + ' / ' + R.teaching + '학점'));
+    }
+    L.push('');
+
+    L.push('## 4. 비교과 · 졸업인증');
+    L.push('');
+    L.push(checkLine(!!f.progDem, '민주시민 1개 이상', ''));
+    L.push(checkLine(!!f.progCre, '창의인재 1개 이상', ''));
+    L.push(checkLine(!!f.progPra, '실용인 1개 이상', ''));
+    L.push(checkLine(Number(f.cuki) >= 150, 'CUKI 마일리지', fmt(f.cuki) + ' / 150점'));
+    L.push(checkLine(!!f.thesis, '졸업논문/졸업시험(대체 포함)', ''));
+    L.push('');
+
+    var inc = [];
+    for (var c = 0; c < (courses || []).length; c++) if (courses[c].include) inc.push(courses[c]);
+    if (inc.length) {
+      var sumC = 0;
+      for (var s = 0; s < inc.length; s++) sumC += Number(inc[s].credits) || 0;
+      L.push('## 5. 이수 교과목 (' + inc.length + '과목 · ' + fmt(sumC) + '학점)');
+      L.push('');
+      L.push('| 구분 | 교과목 | 학점 | 성적 |');
+      L.push('| :--- | :--- | ---: | :---: |');
+      for (var k = 0; k < inc.length; k++) {
+        var row = inc[k];
+        var lab = (CATS[row.cat] && CATS[row.cat].label) || '미분류';
+        if (row.cat === 'balance' && row.area >= 0 && AREAS[row.area]) lab += ' · ' + AREAS[row.area];
+        L.push('| ' + lab + ' | ' + escPipe(row.name) + ' | ' + fmt(row.credits) + ' | ' + (row.grade || '-') + ' |');
+      }
+      L.push('');
+    }
+
+    if (ev.hasInput && !ev.fails.length) {
+      L.push('## 🎉 결론');
+      L.push('');
+      L.push('현재 기준으로 **모든 졸업요건을 충족**했습니다. 최종 확인은 학과 사무실·학사지원팀(043-299-8016)에서 받으세요.');
+      L.push('');
+    }
+
+    if (ev.fails.length) {
+      L.push('## ' + (inc.length ? 6 : 5) + '. 부족한 과목 유형 · 수강신청 가이드');
+      L.push('');
+      var guide = buildGuide(ev, f, R);
+      for (var g = 0; g < guide.length; g++) {
+        L.push('- **' + guide[g].t + '** — ' + stripTags(guide[g].b));
+      }
+      L.push('');
+    }
+
+    var memoText = (memo || '').replace(/^\s+|\s+$/g, '');
+    if (memoText) {
+      L.push('## 메모');
+      L.push('');
+      L.push(memoText);
+      L.push('');
+    }
+
+    L.push('---');
+    L.push('*서원대 졸업요건 계산기로 생성 · ' + yearTxt + '학번 ' + (schoolTxt ? escPipe(schoolTxt) : '') + ' 기준 · 최종 확인은 학사지원팀 043-299-8016*');
+    return L.join('\n');
+  }
+
+  return {
+    YEARS: YEARS,
+    AREAS: AREAS,
+    CATS: CATS,
+    CAT_ORDER: CAT_ORDER,
+    GRADES: GRADES,
+    schoolsFor: schoolsFor,
+    resolveReq: resolveReq,
+    profileMeta: profileMeta,
+    gradeToPoint: gradeToPoint,
+    parseTranscript: parseTranscript,
+    aggregate: aggregate,
+    evaluate: evaluate,
+    buildGuide: buildGuide,
+    buildMarkdown: buildMarkdown,
+    fmt: fmt,
+    fmtGpa: fmtGpa
+  };
+})();
+if (typeof module !== 'undefined' && module.exports) { module.exports = GradCore; }
+
+</script>
+
+<script id="app-src">
+(function () {
+  'use strict';
+  var C = GradCore;
+  /* 공용(배포용) 저장 키 — 개인용 파일의 키와 분리해 서로 덮어쓰지 않습니다. */
+  var KEY = 'seowon-grad-calc-public-v1';
+
+  var ZERO_FIELDS = {
+    core: 0, common: 0, fusion: 0, dept: 0, libUnknown: 0, balance: 0,
+    majorReq: 0, majorElec: 0, teaching: 0, etc: 0, gpa: 0, cuki: 0,
+    deptSelf: false, deptOther: false, majorAll: false,
+    areas: [false, false, false, false, false, false],
+    progDem: false, progCre: false, progPra: false, thesis: false
+  };
+
+  /* [가상 예시 데이터] 실존 인물의 성적이 아닙니다.
+     2024학번 · 글로컬공공서비스대학 · 3학년 1학기까지 65학점을 이수한 상황을 가정한 샘플입니다.
+     화면이 어떻게 동작하는지 처음 열어 본 학우가 눌러 보는 용도입니다. */
+  var EXAMPLE = {
+    year: '2024',
+    school: 'global',
+    fields: {
+      core: 9, common: 4, fusion: 2, dept: 6, libUnknown: 0, balance: 14,
+      majorReq: 9, majorElec: 21, teaching: 0, etc: 0, gpa: 3.42, cuki: 60,
+      deptSelf: true, deptOther: true, majorAll: false,
+      areas: [false, false, false, false, false, false],
+      progDem: false, progCre: false, progPra: false, thesis: false
+    }
+  };
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  var state = {
+    v: 2,
+    theme: 'auto',
+    tab: 'input',
+    year: '2022',
+    school: 'general',
+    fields: clone(ZERO_FIELDS),
+    courses: [],
+    memo: '',
+    pasteText: '',
+    skipped: [],
+    prevParsedAreas: [false, false, false, false, false, false]
+  };
+
+  var el = function (id) { return document.getElementById(id); };
+  var saveTimer = null;
+
+  function esc(s) {
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function setText(id, txt) { var n = el(id); if (n) n.textContent = txt; }
+  function show(id, on) { var n = el(id); if (n) n.classList.toggle('hidden', !on); }
+
+  function toast(msg) {
+    var t = el('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  /* ---------- 안전 실행 · 안내 ---------- */
+  function safe(fn) {
+    try { fn(); } catch (e) { try { if (window.console && console.warn) console.warn('[calc]', e); } catch (x) {} }
+  }
+  function hideJsWarn() {
+    var b = el('jsWarn');
+    if (b) b.style.display = 'none';
+  }
+  function scrollTop() { try { window.scrollTo(0, 0); } catch (e) {} }
+
+  /* 예시 불러오기 '되돌리기' 보관함 */
+  var undoState = null, undoTimer = null;
+  function snapshotState() {
+    return {
+      year: state.year, school: state.school, tab: state.tab,
+      fields: clone(state.fields),
+      courses: clone(state.courses),
+      skipped: (state.skipped || []).slice(),
+      prevParsedAreas: (state.prevParsedAreas || []).slice()
+    };
+  }
+  function restoreState(s) {
+    if (!s) return;
+    state.year = s.year; state.school = s.school;
+    state.fields = clone(s.fields);
+    state.courses = clone(s.courses);
+    state.skipped = (s.skipped || []).slice();
+    state.prevParsedAreas = (s.prevParsedAreas || []).slice();
+    renderAll();
+    saveNow();
+    toast('이전 입력으로 되돌렸어요');
+  }
+  /* 되돌릴 내용이 있는지(과목 행 또는 0이 아닌 입력값) */
+  function hasData(s) {
+    if (!s) return false;
+    if ((s.courses || []).length) return true;
+    var f = s.fields || {};
+    for (var k in f) {
+      if (!f.hasOwnProperty(k)) continue;
+      var v = f[k];
+      if (typeof v === 'number' && v > 0) return true;
+      if (v === true) return true;
+      if (Object.prototype.toString.call(v) === '[object Array]') {
+        for (var i = 0; i < v.length; i++) if (v[i]) return true;
+      }
+    }
+    return false;
+  }
+  function showUndo(prev, msg) {
+    undoState = prev;
+    var bar = el('undoBar');
+    if (!bar) return;
+    setText('undoMsg', msg || '이전 입력으로 되돌릴 수 있어요');
+    bar.classList.add('show');
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(hideUndo, 15000);
+  }
+  function hideUndo() {
+    undoState = null;
+    var bar = el('undoBar');
+    if (bar) bar.classList.remove('show');
+    clearTimeout(undoTimer);
+  }
+
+  /* ---------- 현재 요건 ---------- */
+  function req() { return C.resolveReq(state.year, state.school); }
+
+  /* ---------- 저장 ---------- */
+  function saveNow() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      var d = new Date();
+      var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+      setText('saveState', '자동 저장됨 ' + hh + ':' + mm);
+    } catch (e) {
+      setText('saveState', '저장 제한됨(브라우저)');
+    }
+  }
+  function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 350); }
+
+  function loadState() {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) { raw = null; }
+    if (!raw) return;
+    try {
+      var s = JSON.parse(raw);
+      if (!s || typeof s !== 'object') return;
+      if (s.year && C.YEARS.indexOf(String(s.year)) >= 0) state.year = String(s.year);
+      if (s.school) state.school = String(s.school);
+      var list = C.schoolsFor(state.year);
+      var okSchool = false;
+      for (var q = 0; q < list.length; q++) if (list[q].key === state.school) okSchool = true;
+      if (!okSchool && list.length) state.school = list[0].key;
+
+      if (s.fields) {
+        for (var k in ZERO_FIELDS) {
+          if (!ZERO_FIELDS.hasOwnProperty(k)) continue;
+          if (k === 'areas') {
+            if (Object.prototype.toString.call(s.fields.areas) === '[object Array]') {
+              for (var i = 0; i < state.fields.areas.length; i++) state.fields.areas[i] = !!s.fields.areas[i];
+            }
+          } else if (typeof s.fields[k] !== 'undefined') {
+            state.fields[k] = s.fields[k];
+          }
+        }
+      }
+      if (s.courses && s.courses.length) {
+        state.courses = s.courses.map(function (r) {
+          return {
+            id: r.id || ('r' + Math.random().toString(36).slice(2, 8)),
+            name: r.name || '', cat: r.cat || 'none',
+            credits: Number(r.credits) || 0, grade: r.grade || '',
+            area: typeof r.area === 'number' ? r.area : -1,
+            include: !!r.include, summary: !!r.summary, note: r.note || ''
+          };
+        });
+      }
+      if (typeof s.memo === 'string') state.memo = s.memo;
+      if (typeof s.pasteText === 'string') state.pasteText = s.pasteText;
+      if (s.theme === 'light' || s.theme === 'dark' || s.theme === 'auto') state.theme = s.theme;
+      if (s.tab === 'paste' || s.tab === 'input' || s.tab === 'export') state.tab = s.tab;
+      if (s.skipped && s.skipped.length) state.skipped = s.skipped;
+    } catch (e) { /* 손상된 저장값은 무시 */ }
+  }
+
+  /* ---------- 테마 ---------- */
+  function resolvedTheme() {
+    if (state.theme === 'light' || state.theme === 'dark') return state.theme;
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    } catch (e) {}
+    return 'light';
+  }
+  function applyTheme() {
+    var t = resolvedTheme();
+    document.documentElement.setAttribute('data-theme', t);
+    var b = el('themeBtn');
+    if (b) b.textContent = t === 'dark' ? '☀️ 라이트' : '🌙 다크';
+  }
+
+  /* ---------- 탭 ---------- */
+  function showTab(name) {
+    var panels = { paste: 'panel-paste', input: 'panel-input', export: 'panel-export' };
+    if (!panels[name]) name = 'input';
+    state.tab = name;
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute('data-tab') === name;
+      tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+    for (var k in panels) {
+      if (!panels.hasOwnProperty(k)) continue;
+      var p = el(panels[k]);
+      if (p) p.classList.toggle('hidden', k !== name);
+    }
+    if (name === 'export') renderMarkdown();
+    saveSoon();
+  }
+
+  /* ---------- 학번·단과대학 ---------- */
+  function fillYearSelect() {
+    var sel = el('yearSel');
+    var h = '';
+    for (var i = 0; i < C.YEARS.length; i++) {
+      h += '<option value="' + C.YEARS[i] + '"' + (C.YEARS[i] === state.year ? ' selected' : '') + '>' + C.YEARS[i] + '학번</option>';
+    }
+    sel.innerHTML = h;
+  }
+
+  function fillSchoolSelect() {
+    var sel = el('schoolSel');
+    var list = C.schoolsFor(state.year);
+    var h = '';
+    var found = false;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].key === state.school) found = true;
+      h += '<option value="' + list[i].key + '"' + (list[i].key === state.school ? ' selected' : '') + '>' + esc(list[i].label) + '</option>';
+    }
+    if (!found && list.length) state.school = list[0].key;
+    sel.innerHTML = h;
+    sel.value = state.school;
+  }
+
+  function renderProfile() {
+    var r = req();
+    var meta = C.profileMeta(state.year, state.school);
+
+    setText('brandSub', state.year + '학번 · ' + meta.school + ' · 졸업 ' + r.total + '학점 기준');
+    var info = '<b>' + state.year + '학번 · ' + esc(meta.school) + '</b> 기준<br>졸업 <b>' + r.total + '학점</b> · 교양 <b>' + r.liberal + '</b> · 전공 <b>' + majorRange(r) + '</b>'
+      + (r.teaching ? ' · 교직 <b>' + r.teaching + '</b>' : '');
+    if (meta.notice) info += '<span class="notice-mini">⚠️ ' + esc(meta.notice) + '</span>';
+    el('profileInfo').innerHTML = info;
+
+    /* 기준표 */
+    var rows = [
+      ['총 졸업학점', r.total + '학점 이상'],
+      ['평점평균', C.fmtGpa(r.gpa) + ' 이상'],
+      ['교양 합계', r.liberal + '학점 이상'],
+      ['중점교양', r.core + '학점' + (r.core ? '' : ' (해당 없음)')],
+      ['기초학업(공통)', (r.common || 0) + '학점'],
+      ['기초학업(융합)', (r.fusion || 0) + '학점'],
+      ['기초학업(계열)', r.dept + '학점 (자기계열 1 + 타계열 1)'],
+      ['균형교양', r.balance + '학점 이상' + (r.areas ? ' · ' + r.areas + '개 영역 이상' : ' · 영역 제한 없음')],
+      ['전공', majorRange(r) + '학점'],
+      ['교직', r.teaching ? r.teaching + '학점' : '해당 없음'],
+      ['비교과', '민주시민·창의인재·실용인 각 1개 + CUKI 150점'],
+      ['졸업논문', '논문 또는 대체(졸업시험·작품·실기) 통과']
+    ];
+    var body = '';
+    for (var i = 0; i < rows.length; i++) {
+      body += '<tr' + (i >= 3 && i <= 7 ? ' class="sub"' : '') + '><td>' + esc(rows[i][0]) + '</td><td class="num">' + esc(rows[i][1]) + '</td></tr>';
+    }
+    el('reqBody').innerHTML = body;
+    setText('reqMeta', state.year + '학번 · ' + meta.school + ' — 이 기준으로 아래 대시보드가 계산됩니다.');
+    var partsSum = r.core + (r.common || 0) + (r.fusion || 0) + r.dept + r.balance;
+    var noteTxt = '교양필수 = 중점교양 ' + r.core + ' + 기초공통 ' + (r.common || 0) + (r.fusion ? ' + 기초융합 ' + r.fusion : '') + ' + 기초계열 ' + r.dept + ' = ' + C.fmt(r.core + (r.common || 0) + (r.fusion || 0) + r.dept) + '학점';
+    if (partsSum > r.liberal) noteTxt += ' · ⚠️ 공식 기준표에 균형교양 ' + r.balance + '학점으로 적혀 있어 세부 합(' + partsSum + ')이 교양 합계(' + r.liberal + ')보다 큽니다 — 이 단과대학은 학과 기준을 한 번 더 확인하세요.';
+    setText('reqNote', noteTxt);
+
+    /* 교양 카드 */
+    var libReq = r.core + (r.common || 0) + (r.fusion || 0) + r.dept;
+    setText('metaLibReq', '중점교양 ' + r.core + ' + 기초학업(공통) ' + (r.common || 0)
+      + (r.fusion ? ' + 기초학업(융합) ' + r.fusion : '') + ' + 기초학업(계열) ' + r.dept + ' = ' + libReq + '학점');
+    setText('hintCore', '기준 ' + r.core + '학점 · 사회봉사Ⅰ(1), 드림프로젝트(2), SU진로코칭 1~3(각 1), SU인성코칭 1~3(각 1)');
+    show('rowFusion', !!r.fusion);
+    setText('gcredCore', r.core + '학점');
+    setText('gcredCommon', (r.common || 0) + '학점');
+    setText('gcredFusion', (r.fusion || 0) + '학점');
+    setText('gcredDept', r.dept + '학점');
+    setText('gcredBal', r.balance + '학점 이상');
+    setText('gfLib', String(r.liberal));
+    setText('gfReq', String(libReq));
+    setText('gfParts', '(중점 ' + r.core + ' + 기초공통 ' + (r.common || 0) + (r.fusion ? ' + 기초융합 ' + r.fusion : '') + ' + 기초계열 ' + r.dept + ')');
+    setText('gfBal', String(r.balance));
+    show('gitemFusion', !!r.fusion);
+
+    /* 균형교양 카드 */
+    setText('metaBalance', r.balance + '학점 이상' + (r.areas ? ' + ' + r.areas + '개 영역 이상 각 1과목' : ' (영역별 이수 제한 없음)'));
+    setText('areaNeed', String(r.areas || 0));
+    show('rowAreas', !!r.areas);
+    show('areaNone', !r.areas);
+
+    /* 전공 카드 */
+    setText('metaMajor', majorRange(r) + '학점' + (r.majorMax > r.majorMin ? ' (권장 ' + r.majorMin + '~' + r.majorMax + ')' : ' 이상'));
+
+    /* 교직 카드 */
+    show('cardTeaching', !!r.teaching);
+    if (r.teaching) {
+      setText('metaTeaching', '사범대학 교직 과목 ' + r.teaching + '학점 이상 (교직이론·교직소양·교육실습)');
+      setText('pillTeaching', C.fmt(state.fields.teaching) + ' / ' + r.teaching);
+    }
+
+    /* 총계 카드 */
+    setText('metaTotal', '졸업 ' + r.total + '학점 이상 · 평점평균 ' + C.fmtGpa(r.gpa) + ' 이상');
+
+    renderAreas();
+    updateAll();
+  }
+
+  function majorRange(r) {
+    return r.majorMax > r.majorMin ? (r.majorMin + '~' + r.majorMax) : String(r.majorMin);
+  }
+
+  /* ---------- 필드 바인딩 ---------- */
+  var FIELD_MAP = [
+    ['f-core', 'core', 'num'], ['f-common', 'common', 'num'], ['f-fusion', 'fusion', 'num'],
+    ['f-dept', 'dept', 'num'], ['f-balance', 'balance', 'num'], ['f-libUnknown', 'libUnknown', 'num'],
+    ['f-majorReq', 'majorReq', 'num'], ['f-majorElec', 'majorElec', 'num'], ['f-teaching', 'teaching', 'num'],
+    ['f-etc', 'etc', 'num'], ['f-gpa', 'gpa', 'num'], ['f-cuki', 'cuki', 'num'],
+    ['c-deptSelf', 'deptSelf', 'bool'], ['c-deptOther', 'deptOther', 'bool'],
+    ['c-majorAll', 'majorAll', 'bool'], ['c-progDem', 'progDem', 'bool'],
+    ['c-progCre', 'progCre', 'bool'], ['c-progPra', 'progPra', 'bool'], ['c-thesis', 'thesis', 'bool']
+  ];
+
+  function bindFields() {
+    FIELD_MAP.forEach(function (m) {
+      var node = el(m[0]);
+      if (!node) return;
+      node.addEventListener('input', function () {
+        if (m[2] === 'num') {
+          var v = parseFloat(node.value);
+          state.fields[m[1]] = isNaN(v) ? 0 : v;
+        }
+        updateAll();
+        saveSoon();
+      });
+      node.addEventListener('change', function () {
+        if (m[2] === 'bool') state.fields[m[1]] = !!node.checked;
+        updateAll();
+        saveSoon();
+      });
+    });
+  }
+
+  function syncFieldsToUI() {
+    FIELD_MAP.forEach(function (m) {
+      var node = el(m[0]);
+      if (!node) return;
+      if (m[2] === 'num') {
+        var v = Number(state.fields[m[1]]) || 0;
+        node.value = v === 0 ? '' : String(v);
+      } else {
+        node.checked = !!state.fields[m[1]];
+      }
+    });
+    el('memoBox').value = state.memo || '';
+    el('pasteBox').value = state.pasteText || '';
+  }
+
+  /* ---------- 영역 칩 ---------- */
+  function renderAreas() {
+    var box = el('areaChips');
+    if (!box) return;
+    var html = '';
+    for (var i = 0; i < C.AREAS.length; i++) {
+      html += '<button type="button" class="chip" data-area="' + i + '" aria-pressed="' + (state.fields.areas[i] ? 'true' : 'false') + '">' + esc(C.AREAS[i]) + '</button>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* ---------- 결과 갱신 ---------- */
+  function setBar(barId, ratio, ok) {
+    var b = el(barId);
+    if (!b) return;
+    var fill = b.querySelector('i');
+    if (fill) fill.style.width = Math.round(Math.max(0, Math.min(1, ratio)) * 100) + '%';
+    b.className = 'bar' + (ok ? ' ok' : '');
+  }
+
+  function updateAll() {
+    var r = req();
+    var f = state.fields;
+    var ev = C.evaluate(f, r);
+
+    setText('sumTotal', C.fmt(ev.total) + ' / ' + r.total);
+    setText('sumGpa', (Number(f.gpa) > 0 ? C.fmtGpa(f.gpa) : '—') + ' / ' + C.fmtGpa(r.gpa));
+    setText('sumLiberal', C.fmt(ev.liberal) + ' / ' + r.liberal);
+    setText('sumMajor', C.fmt(ev.major) + ' / ' + r.majorMin);
+    setText('sumCuki', C.fmt(f.cuki) + ' / 150');
+
+    var pct = Math.round(ev.ratio * 100);
+    setText('ringPct', pct + '%');
+    var circle = el('ringFg');
+    if (circle) {
+      var circ = 2 * Math.PI * 52;
+      circle.setAttribute('stroke-dasharray', circ.toFixed(1));
+      circle.setAttribute('stroke-dashoffset', (circ * (1 - ev.ratio)).toFixed(1));
+    }
+
+    var verdict = el('verdict');
+    if (!ev.hasInput) {
+      verdict.className = 'verdict idle';
+      el('verdictText').textContent = '학점을 입력하면 판정이 나옵니다';
+    } else if (ev.complete) {
+      verdict.className = 'verdict pass';
+      el('verdictText').textContent = '모든 졸업요건 충족 🎉';
+    } else {
+      verdict.className = 'verdict fail';
+      el('verdictText').textContent = ev.fails.length + '개 항목 미충족 · 충족 ' + ev.passes + '/' + ev.count;
+    }
+
+    var dl = el('deficits');
+    var dh = '';
+    var creditFails = ev.fails.filter(function (x) { return x.kind !== 'check'; }).slice(0, 4);
+    for (var i = 0; i < creditFails.length; i++) {
+      dh += '<li>' + esc(creditFails[i].label) + ' ' + C.fmt(creditFails[i].req - creditFails[i].cur) + esc(creditFails[i].unit === '개 영역' ? '개 영역' : creditFails[i].unit === '점' ? '점' : '학점') + ' 부족</li>';
+    }
+    var checkFails = ev.fails.filter(function (x) { return x.kind === 'check'; });
+    if (checkFails.length) dh += '<li>확인 필요 ' + checkFails.length + '건</li>';
+    dl.innerHTML = ev.hasInput ? dh : '';
+
+    /* 교양필수 */
+    var libReq = r.core + (r.common || 0) + (r.fusion || 0) + r.dept;
+    var libCur = Number(f.core) + Number(f.common) + Number(f.fusion) + Number(f.dept);
+    setText('pillLibReq', C.fmt(libCur) + ' / ' + libReq);
+    el('pillLibReq').className = 'pill' + (libCur >= libReq ? ' ok' : '');
+    setBar('barLibReq', libCur / libReq, libCur >= libReq);
+
+    /* 균형교양 */
+    setText('pillBalance', C.fmt(f.balance) + ' / ' + r.balance);
+    var balOk = Number(f.balance) >= r.balance && (!r.areas || ev.areaCount >= r.areas);
+    el('pillBalance').className = 'pill' + (balOk ? ' ok' : '');
+    setBar('barBalance', Number(f.balance) / r.balance, balOk);
+    setText('areaCount', String(ev.areaCount));
+
+    /* 전공 */
+    setText('pillMajor', C.fmt(ev.major) + ' / ' + r.majorMin);
+    el('pillMajor').className = 'pill' + (ev.major >= r.majorMin ? ' ok' : '');
+    setBar('barMajor', ev.major / r.majorMin, ev.major >= r.majorMin);
+    var mh = el('majorHint');
+    if (ev.major > r.majorMax) mh.textContent = '전공 ' + C.fmt(ev.major) + '학점 — 권장 범위(' + majorRange(r) + ')보다 ' + C.fmt(ev.major - r.majorMax) + '학점 많아요. 졸업학점에는 들어갑니다.';
+    else mh.textContent = '전공은 최소 ' + r.majorMin + '학점' + (r.majorMax > r.majorMin ? ' (권장 ' + majorRange(r) + ')' : '') + '입니다. 학과별 전공필수 지정 과목을 먼저 확인하세요.';
+
+    /* 교직 */
+    if (r.teaching) {
+      setText('pillTeaching', C.fmt(f.teaching) + ' / ' + r.teaching);
+      el('pillTeaching').className = 'pill' + (Number(f.teaching) >= r.teaching ? ' ok' : '');
+      setBar('barTeaching', Number(f.teaching) / r.teaching, Number(f.teaching) >= r.teaching);
+    }
+
+    /* 총계 */
+    setText('pillTotal', C.fmt(ev.total) + ' / ' + r.total);
+    el('pillTotal').className = 'pill' + (ev.total >= r.total ? ' ok' : '');
+    setBar('barTotal', ev.total / r.total, ev.total >= r.total);
+    setText('totalFormula', C.fmt(ev.liberal) + ' 교양 + ' + C.fmt(ev.major) + ' 전공'
+      + (Number(f.teaching) ? ' + ' + C.fmt(f.teaching) + ' 교직' : '') + ' + ' + C.fmt(f.etc) + ' 기타 = ' + C.fmt(ev.total) + '학점');
+
+    /* 비교과 */
+    var noncur = (f.progDem ? 1 : 0) + (f.progCre ? 1 : 0) + (f.progPra ? 1 : 0) + (Number(f.cuki) >= 150 ? 1 : 0);
+    setText('pillNoncur', noncur + ' / 4');
+    el('pillNoncur').className = 'pill' + (noncur === 4 ? ' ok' : '');
+    setBar('barNoncur', noncur / 4, noncur === 4);
+
+    setText('pillThesis', f.thesis ? '통과' : '미통과');
+    el('pillThesis').className = 'pill' + (f.thesis ? ' ok' : 'bad');
+
+    renderGuide(ev, f, r);
+    updateCourseStats();
+    if (state.tab === 'export') renderMarkdown();
+    saveSoon();
+  }
+
+  /* ---------- 수강신청 가이드 ---------- */
+  function renderGuide(ev, f, r) {
+    var list = el('guideList');
+    if (!list) return;
+    var pill = el('pillGuide');
+
+    if (!ev.hasInput) {
+      list.innerHTML = '<div class="gidle">학점을 입력하면 <b>부족한 과목 유형</b>과 <b>수강신청 가이드</b>가 여기에 나옵니다.</div>';
+      pill.className = 'pill';
+      pill.textContent = '—';
+      return;
+    }
+
+    if (!ev.fails.length) {
+      list.innerHTML = '<div class="gdone">🎉 현재 기준(' + state.year + '학번 · ' + esc(C.profileMeta(state.year, state.school).school)
+        + ')으로 모든 졸업요건을 충족했습니다!<br><span style="font-weight:600;font-size:12.5px">최종 확인은 학과 사무실·학사지원팀(043-299-8016)에서 한 번 더 받아 두세요.</span></div>';
+      pill.className = 'pill ok';
+      pill.textContent = '충족 🎉';
+      return;
+    }
+
+    var rows = C.buildGuide(ev, f, r);
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      html += '<div class="gcard"><div class="gt">' + esc(rows[i].t) + '</div><div class="gb">' + rows[i].b + '</div></div>';
+    }
+    list.innerHTML = html;
+    pill.className = 'pill bad';
+    pill.textContent = rows.length + '건 보완 필요';
+  }
+
+  /* ---------- 과목 테이블 ---------- */
+  function needsCheck(row) {
+    if (!row || row.summary) return false;
+    if (row.cat === 'none' || row.cat === 'libUnknown') return true;
+    if (row.cat === 'balance' && (typeof row.area !== 'number' || row.area < 0)) return true;
+    return false;
+  }
+
+  function categoryValue(row) {
+    if (row.cat === 'balance') return 'balance:' + (typeof row.area === 'number' ? row.area : -1);
+    return row.cat || 'none';
+  }
+
+  function categorySelect(row, i) {
+    var v = categoryValue(row);
+    var groups = [
+      { label: '교양필수 (교필)', items: [['core', '중점교양'], ['common', '기초학업 공통'], ['fusion', '기초학업 융합'], ['dept', '기초학업 계열'], ['libUnknown', '교필 — 세부 미지정']] },
+      { label: '균형교양 (교선)', items: [['balance:0', '균형 1영역'], ['balance:1', '균형 2영역'], ['balance:2', '균형 3영역'], ['balance:3', '균형 4영역'], ['balance:4', '균형 5영역'], ['balance:5', '균형 6영역'], ['balance:-1', '균형 — 영역 미지정']] },
+      { label: '전공 · 기타', items: [['majorReq', '전공필수'], ['majorElec', '전공선택'], ['teaching', '교직'], ['etc', '일반선택']] },
+      { label: '제외', items: [['none', '미분류 / 합산 제외']] }
+    ];
+    var h = '';
+    for (var g = 0; g < groups.length; g++) {
+      h += '<optgroup label="' + groups[g].label + '">';
+      for (var k = 0; k < groups[g].items.length; k++) {
+        var val = groups[g].items[k][0];
+        h += '<option value="' + val + '"' + (val === v ? ' selected' : '') + '>' + esc(groups[g].items[k][1]) + '</option>';
+      }
+      h += '</optgroup>';
+    }
+    return '<select data-idx="' + i + '" data-k="cat">' + h + '</select>';
+  }
+
+  function gradeOptions(sel) {
+    var h = '<option value=""' + (!sel ? ' selected' : '') + '>—</option>';
+    for (var i = 0; i < C.GRADES.length; i++) {
+      var g = C.GRADES[i];
+      h += '<option value="' + g + '"' + (g === sel ? ' selected' : '') + '>' + g + '</option>';
+    }
+    return h;
+  }
+
+  function renderCourses() {
+    var tb = el('courseBody');
+    if (!tb) return;
+    if (!state.courses.length) {
+      tb.innerHTML = '<tr class="empty"><td colspan="6">아직 분석한 과목이 없어요. 위에 성적표를 붙여넣고 [분석]을 눌러 주세요.</td></tr>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < state.courses.length; i++) {
+      var row = state.courses[i];
+      var cls = (row.summary ? 'suspect ' : '') + (row.include ? '' : 'excluded');
+      html += '<tr class="' + cls.trim() + '">';
+      html += '<td class="c-check"><input type="checkbox" data-idx="' + i + '" data-k="include"' + (row.include ? ' checked' : '') + '></td>';
+      html += '<td>' + categorySelect(row, i) +
+        (row.summary ? '<span class="tag">소계</span>' : (needsCheck(row) ? '<span class="tag">확인</span>' : '')) + '</td>';
+      html += '<td class="c-name"><input type="text" data-idx="' + i + '" data-k="name" value="' + esc(row.name) + '" placeholder="교과목명"></td>';
+      html += '<td class="c-credit"><input type="number" min="0" max="12" step="0.5" inputmode="decimal" data-idx="' + i + '" data-k="credits" value="' + (Number(row.credits) || 0) + '"></td>';
+      html += '<td><select data-idx="' + i + '" data-k="grade">' + gradeOptions(row.grade) + '</select></td>';
+      html += '<td class="c-del"><button type="button" class="mini" data-idx="' + i + '" data-k="del" title="행 삭제">✕</button></td>';
+      html += '</tr>';
+    }
+    tb.innerHTML = html;
+  }
+
+  function updateCourseStats() {
+    var inc = state.courses.filter(function (row) { return row.include; });
+    var sum = C.aggregate(state.courses);
+    var need = state.courses.filter(needsCheck).length;
+    setText('previewCount', state.courses.length + '과목');
+    var ro = el('readout');
+    var html = '';
+    html += '<span>포함 <b>' + inc.length + '</b>과목</span>';
+    html += '<span>학점 합 <b>' + C.fmt(sum.credits) + '</b></span>';
+    if (sum.gpa !== null) html += '<span>평균 평점 <b>' + C.fmtGpa(sum.gpa) + '</b></span>';
+    html += '<span>전필 <b>' + C.fmt(sum.majorReq) + '</b> · 전선 <b>' + C.fmt(sum.majorElec) + '</b></span>';
+    html += '<span>교양 <b>' + C.fmt(sum.core + sum.common + sum.fusion + sum.dept + sum.libUnknown + sum.balance) + '</b></span>';
+    var areaOn = 0;
+    for (var z = 0; z < sum.areas.length; z++) if (sum.areas[z]) areaOn++;
+    if (sum.balance > 0) html += '<span>균형 영역 <b>' + areaOn + '</b>개</span>';
+    if (sum.unassignedCount) html += '<span class="warnchip">미분류 <b>' + sum.unassignedCount + '</b>과목 · ' + C.fmt(sum.unassigned) + '학점</span>';
+    if (need) html += '<span class="warnchip">세부 지정 필요 <b>' + need + '</b>과목</span>';
+    ro.innerHTML = html;
+
+    var sb = el('skippedBox');
+    if (state.skipped && state.skipped.length) {
+      sb.classList.remove('hidden');
+      var listTxt = state.skipped.slice(0, 6).map(function (s) { return esc(s.line.slice(0, 60)); }).join(' · ');
+      sb.innerHTML = '⚠️ 해석하지 못한 줄 ' + state.skipped.length + '개: <span class="muted">' + listTxt + (state.skipped.length > 6 ? ' …' : '') + '</span>';
+    } else {
+      sb.classList.add('hidden');
+      sb.innerHTML = '';
+    }
+
+    var ab = el('applyBtn');
+    if (ab) ab.disabled = !state.courses.length;
+  }
+
+  /* ---------- 파싱 실행 ---------- */
+  function currentColMap() {
+    function v(id) { var n = el(id); return n ? parseInt(n.value, 10) : -1; }
+    var m = { cat: v('mapCat'), name: v('mapName'), credits: v('mapCredits'), grade: v('mapGrade') };
+    var any = m.cat >= 0 || m.name >= 0 || m.credits >= 0 || m.grade >= 0;
+    return any ? m : null;
+  }
+
+  function fillMapSelects(info) {
+    var ids = ['mapCat', 'mapName', 'mapCredits', 'mapGrade'];
+    ids.forEach(function (id) {
+      var sel = el(id);
+      if (!sel) return;
+      var prev = sel.value;
+      var h = '<option value="-1">자동</option>';
+      for (var c = 0; c < info.colCount; c++) {
+        var sample = info.colSamples[c] ? String(info.colSamples[c]).slice(0, 14) : '';
+        h += '<option value="' + c + '">' + (c + 1) + '열' + (sample ? ' (' + esc(sample) + ')' : '') + '</option>';
+      }
+      sel.innerHTML = h;
+      var exists = false;
+      for (var q = 0; q < sel.options.length; q++) if (sel.options[q].value === prev) exists = true;
+      sel.value = exists ? prev : '-1';
+    });
+    setText('mapTip', '표에서 ' + info.colCount + '개 열을 찾았어요.');
+  }
+
+  function runParse(colMap) {
+    var text = el('pasteBox').value;
+    state.pasteText = text;
+    var info = C.parseTranscript(text, colMap || null);
+    state.courses = info.rows;
+    state.skipped = info.skipped;
+    if (info.colCount >= 3) fillMapSelects(info);
+    renderCourses();
+    autoApply();
+    updateAll();
+
+    var inc = info.rows.filter(function (row) { return row.include; }).length;
+    if (!info.rows.length) {
+      toast('읽어낸 과목이 없어요. PDF에서 전체 복사했는지 확인해 주세요.');
+    } else {
+      toast(inc + '과목을 읽어 대시보드에 반영했어요 · 미리보기에서 확인하세요');
+    }
+  }
+
+  /* ---------- 적용 ---------- */
+  function mergeAreas(parsed) {
+    var f = state.fields;
+    var prev = state.prevParsedAreas || [];
+    for (var i = 0; i < f.areas.length; i++) {
+      var manual = !!f.areas[i] && !prev[i];
+      f.areas[i] = manual || !!parsed[i];
+    }
+    state.prevParsedAreas = parsed.slice();
+  }
+
+  function autoApply() {
+    if (!state.courses.length) return;
+    var sum = C.aggregate(state.courses);
+    var f = state.fields;
+    f.core = sum.core;
+    f.common = sum.common;
+    f.fusion = sum.fusion;
+    f.dept = sum.dept;
+    f.libUnknown = sum.libUnknown;
+    f.balance = sum.balance;
+    f.majorReq = sum.majorReq;
+    f.majorElec = sum.majorElec;
+    f.teaching = sum.teaching;
+    f.etc = sum.etc;
+    if (sum.gpa !== null) f.gpa = Math.round(sum.gpa * 100) / 100;
+    mergeAreas(sum.areas);
+    syncFieldsToUI();
+  }
+
+  function applyToDashboard() {
+    autoApply();
+    renderAreas();
+    updateAll();
+    toast('과목 합계를 대시보드에 반영했어요');
+    showTab('input');
+  }
+
+  /* ---------- 예시 / 초기화 ---------- */
+  /* 예시 화면은 실존 인물의 성적이 아닌 가상 데이터입니다.
+     예시는 묻지 않고 바로 불러옵니다(모바일·인앱 뷰어에서 confirm()이 막혀 '버튼이 안 먹는' 문제 방지).
+     실수로 눌러도 잃지 않도록, 불러오기 직전 상태를 되돌리기 바에 담아 둡니다. */
+  function loadExample() {
+    var prev = snapshotState();
+    state.year = EXAMPLE.year;
+    state.school = EXAMPLE.school;
+    state.fields = clone(EXAMPLE.fields);
+    state.courses = [];
+    state.skipped = [];
+    state.prevParsedAreas = [false, false, false, false, false, false];
+    var body = el('courseBody');
+    if (body) body.innerHTML = '';
+    /* 대시보드 탭(② 직접 입력 · 대시보드)으로 전환한 뒤 전체를 다시 그립니다. */
+    state.tab = 'input';
+    renderAll();
+    showTab('input');
+    saveNow();
+    toast('예시 화면(가상 데이터 · 2024학번 65학점)을 불러왔어요');
+    if (hasData(prev)) showUndo(prev, '예시를 불러왔어요 · 이전 입력으로 되돌릴 수 있어요');
+    scrollTop();
+  }
+
+  var resetArmed = false, resetArmTimer = null;
+  function disarmReset() { resetArmed = false; clearTimeout(resetArmTimer); }
+
+  /* 초기화는 블로킹 confirm 대신 '두 번 누르기'로 확인합니다(모든 브라우저·뷰어에서 동작). */
+  function resetAll() {
+    if (!resetArmed) {
+      resetArmed = true;
+      clearTimeout(resetArmTimer);
+      resetArmTimer = setTimeout(disarmReset, 5000);
+      toast('한 번 더 누르면 모두 0으로 초기화됩니다 (5초 안에)');
+      return;
+    }
+    disarmReset();
+    state.fields = clone(ZERO_FIELDS);
+    state.courses = [];
+    state.skipped = [];
+    state.memo = '';
+    state.pasteText = '';
+    state.prevParsedAreas = [false, false, false, false, false, false];
+    var pb = el('pasteBox'); if (pb) pb.value = '';
+    var mb = el('memoBox'); if (mb) mb.value = '';
+    var cb = el('courseBody'); if (cb) cb.innerHTML = '';
+    renderAll();
+    showTab('input');
+    saveNow();
+    hideUndo();
+    toast('모두 0으로 초기화했어요');
+  }
+
+  /* ---------- 마크다운 ---------- */
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+
+  function renderMarkdown() {
+    var md = C.buildMarkdown(state.fields, req(), state.courses, state.memo, todayStr(), {
+      year: state.year, school: state.school, schoolLabel: C.profileMeta(state.year, state.school).school
+    });
+    var pv = el('mdPreview');
+    if (pv) pv.value = md;
+    return md;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () {
+        return fallbackCopy(text);
+      });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+
+  function mdFileName() {
+    return '서원대_졸업요건_현황_' + state.year + '학번_' + todayStr() + '.md';
+  }
+
+  function copyFallback(md) {
+    copyText(md).then(function (ok) {
+      toast(ok ? '파일 저장이 막혀 마크다운을 복사했어요 — 원하는 곳에 붙여넣으세요'
+               : '저장·복사가 모두 막혔어요. 미리보기를 길게 눌러 직접 복사해 주세요.');
+    });
+  }
+
+  /* 1) Blob URL + a.click() — 윈도우·맥·안드로이드 Chrome·iOS Safari
+     2) iOS 공유 시트(파일로 저장) — 오래된 iOS·인앱 브라우저
+     3) 클립보드 복사 폴백 */
+  function downloadMd() {
+    var md = '';
+    try { md = renderMarkdown(); } catch (e) { md = ''; }
+    var fname = mdFileName();
+    var canDownload = false;
+    try { canDownload = 'download' in document.createElement('a'); } catch (e) { canDownload = false; }
+
+    if (canDownload && md) {
+      try {
+        var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fname;
+        a.rel = 'noopener';
+        a.style.position = 'fixed';
+        a.style.left = '-9999px';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+          try { document.body.removeChild(a); } catch (e) {}
+          try { URL.revokeObjectURL(url); } catch (e) {}
+        }, 1500);
+        toast('.md 파일로 저장했어요 — 다운로드/파일 앱을 확인하세요');
+        return;
+      } catch (e) { /* 아래 대체 경로로 */ }
+    }
+
+    try {
+      if (navigator.share && typeof File !== 'undefined' && md) {
+        var file = new File([md], fname, { type: 'text/markdown' });
+        if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: fname }).then(function () {
+            toast('공유 시트에서 저장했어요');
+          }).catch(function () { copyFallback(md); });
+          return;
+        }
+      }
+    } catch (e) { /* 아래 대체 경로로 */ }
+
+    copyFallback(md);
+  }
+
+  /* ---------- 이벤트 ---------- */
+  function bindEvents() {
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) {
+      (function (btn) {
+        btn.addEventListener('click', function () { showTab(btn.getAttribute('data-tab')); });
+      })(tabs[i]);
+    }
+
+    el('themeBtn').addEventListener('click', function () {
+      state.theme = resolvedTheme() === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      saveSoon();
+    });
+
+    el('yearSel').addEventListener('change', function () {
+      state.year = el('yearSel').value;
+      state.school = C.schoolsFor(state.year)[0].key;
+      fillSchoolSelect();
+      renderProfile();
+      saveNow();
+    });
+
+    el('schoolSel').addEventListener('change', function () {
+      state.school = el('schoolSel').value;
+      renderProfile();
+      saveNow();
+    });
+
+    el('parseBtn').addEventListener('click', function () { runParse(currentColMap()); });
+    el('reparseBtn').addEventListener('click', function () { runParse(currentColMap()); });
+    el('applyBtn').addEventListener('click', applyToDashboard);
+
+    el('samplePdfBtn').addEventListener('click', function () {
+      el('pasteBox').value = SAMPLE_PDF;
+      runParse(null);
+    });
+    el('sampleTabBtn').addEventListener('click', function () {
+      el('pasteBox').value = SAMPLE_TAB;
+      runParse(null);
+    });
+    el('clearPasteBtn').addEventListener('click', function () {
+      el('pasteBox').value = '';
+      state.pasteText = '';
+      saveSoon();
+    });
+
+    el('pasteBox').addEventListener('input', function () {
+      state.pasteText = el('pasteBox').value;
+      saveSoon();
+    });
+
+    el('courseBody').addEventListener('input', onCourseEvent);
+    el('courseBody').addEventListener('change', onCourseEvent);
+    el('courseBody').addEventListener('click', onCourseClick);
+
+    el('addRowBtn').addEventListener('click', function () {
+      state.courses.push({
+        id: 'r' + Math.random().toString(36).slice(2, 8),
+        name: '', cat: 'majorElec', credits: 3, grade: '', area: -1,
+        include: true, summary: false, note: ''
+      });
+      renderCourses();
+      updateAll();
+    });
+
+    el('toggleAllBtn').addEventListener('click', function () {
+      var allOn = state.courses.every(function (row) { return row.include || row.summary; });
+      state.courses.forEach(function (row) { if (!row.summary) row.include = !allOn; });
+      autoApply();
+      renderCourses();
+      updateAll();
+    });
+
+    el('clearRowsBtn').addEventListener('click', function () {
+      state.courses = [];
+      state.skipped = [];
+      renderCourses();
+      updateAll();
+      toast('분석 결과를 비웠어요');
+    });
+
+    el('areaChips').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button[data-area]') : null;
+      if (!b) return;
+      var i = parseInt(b.getAttribute('data-area'), 10);
+      state.fields.areas[i] = !state.fields.areas[i];
+      updateAll();
+      saveSoon();
+    });
+
+    el('memoBox').addEventListener('input', function () {
+      state.memo = el('memoBox').value;
+      renderMarkdown();
+      saveSoon();
+    });
+
+    el('copyBtn').addEventListener('click', function () {
+      var md = renderMarkdown();
+      copyText(md).then(function (ok) {
+        toast(ok ? '마크다운을 복사했어요' : '복사가 막혔어요 — 미리보기를 길게 눌러 복사하세요');
+      });
+    });
+
+    el('downloadBtn').addEventListener('click', downloadMd);
+    el('refreshMdBtn').addEventListener('click', function () { renderMarkdown(); toast('새로고침했어요'); });
+
+    el('resetBtn').addEventListener('click', resetAll);
+    el('resetTopBtn').addEventListener('click', resetAll);
+    el('loadExampleBtn').addEventListener('click', loadExample);
+    el('loadExampleBtn2').addEventListener('click', loadExample);
+
+    el('undoBtn').addEventListener('click', function () {
+      var s = undoState;
+      hideUndo();
+      if (s) restoreState(s);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && state.tab === 'paste') {
+        e.preventDefault();
+        runParse(currentColMap());
+      }
+    });
+  }
+
+  function onCourseClick(e) {
+    var t = e.target;
+    var btn = t && t.closest ? t.closest('button[data-k="del"]') : null;
+    if (!btn) return;
+    var idx = parseInt(btn.getAttribute('data-idx'), 10);
+    if (isNaN(idx)) return;
+    state.courses.splice(idx, 1);
+    autoApply();
+    renderCourses();
+    updateAll();
+  }
+
+  function onCourseEvent(e) {
+    var t = e.target;
+    if (!t || !t.getAttribute) return;
+    if (t.tagName === 'BUTTON') return;
+    var idx = parseInt(t.getAttribute('data-idx'), 10);
+    var k = t.getAttribute('data-k');
+    if (isNaN(idx) || !k) return;
+    var row = state.courses[idx];
+    if (!row) return;
+
+    if (k === 'include') {
+      row.include = !!t.checked;
+      if (t.closest && t.closest('tr')) t.closest('tr').classList.toggle('excluded', !row.include);
+    } else if (k === 'name') {
+      row.name = t.value;
+    } else if (k === 'credits') {
+      var v = parseFloat(t.value);
+      row.credits = isNaN(v) ? 0 : v;
+    } else if (k === 'grade') {
+      row.grade = t.value;
+    } else if (k === 'cat') {
+      var val = t.value;
+      if (val.indexOf('balance:') === 0) {
+        row.cat = 'balance';
+        row.area = parseInt(val.slice(8), 10);
+        if (isNaN(row.area)) row.area = -1;
+      } else {
+        row.cat = val;
+        row.area = -1;
+      }
+      renderCourses();
+    }
+
+    if (k !== 'name') autoApply();
+    updateAll();
+  }
+
+  /* ---------- 예시 데이터 ---------- */
+  var SAMPLE_TAB = [
+    '학년도\t학기\t이수구분\t교과목명\t학점\t등급\t평점',
+    '2025\t1\t전필\t경영학원론\t3\tA+\t4.5',
+    '2025\t1\t교필\t사고와표현Ⅰ-글쓰기\t2\tA0\t4.0',
+    '2025\t1\t중점교양\tSU인성코칭1\t1\tP\t',
+    '2025\t1\t기초학업(계열)\t인간과자연\t3\tB+\t3.5',
+    '2025\t2\t교선\t영화로보는세상\t2\tA+\t4.5',
+    '2025\t2\t전선\t마케팅원론\t3\tA0\t4.0',
+    '소계\t\t\t\t14\t\t3.87'
+  ].join('\n');
+
+  var SAMPLE_PDF = [
+    '2025학년도 1학기 성적 취득현황',
+    '순번 이수구분 교과목명 학점 등급 평점',
+    '1 전필 경영학원론 3 A+ 4.5',
+    '2 교필 사고와표현Ⅰ-글쓰기 2 A0 4.0',
+    '3 중점교양 SU인성코칭 1 1 P',
+    '4 기초학업 (계열) 인간과자연 3 B+ 3.5',
+    '5 교선 영화로보는세상 2 A+ 4.5',
+    '6 전선 마케팅',
+    '원론 3 A0 4.0',
+    '합계 14 3.9',
+    '2025학년도 2학기 성적 취득현황',
+    '순번 이수구분 교과목명 학점 등급 평점',
+    '1 전공필수 조직행동론 3 B+ 3.5',
+    '2 균형교양 정치와현대사회 2 A+ 4.5',
+    '3 교양필수 영어회화Ⅰ 2 P',
+    '4 일반선택 취업과진로 1 NP'
+  ].join('\n');
+
+  /* ---------- 전체 다시 그리기 ---------- */
+  function renderAll() {
+    safe(fillYearSelect);
+    safe(fillSchoolSelect);
+    safe(syncFieldsToUI);
+    safe(renderCourses);
+    safe(renderAreas);
+    safe(renderProfile);
+    safe(updateAll);
+    safe(renderMarkdown);
+  }
+
+  /* ---------- 시작 ---------- */
+  function init() {
+    try { loadState(); } catch (e) {}
+    safe(applyTheme);
+    /* 이벤트를 먼저 묶어 두어, 렌더 중 오류가 나도 버튼은 살아 있게 합니다. */
+    safe(bindFields);
+    safe(bindEvents);
+    renderAll();
+    safe(function () { showTab(state.tab || 'input'); });
+    if (state.pasteText) { setText('saveState', '이전 기록을 불러왔어요'); }
+    hideJsWarn();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
