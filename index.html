@@ -267,7 +267,6 @@ html[data-theme="dark"] .gcard .gt{color:var(--warn)}
 .pf .k{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pf .v{margin-top:1px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
 .pf.hit{border-color:var(--ok);background:var(--ok-soft)}
-.pf.miss{border-style:dashed}
 
 /* export */
 #mdPreview{min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.65;white-space:pre;overflow:auto;font-weight:400}
@@ -2243,20 +2242,11 @@ var PdfReader = (function () {
     });
   }
 
-  function release() {
-    if (workerBlobUrl) {
-      try { URL.revokeObjectURL(workerBlobUrl); } catch (e) { /* 무시 */ }
-      workerBlobUrl = null;
-    }
-  }
-
   return {
     MAX_BYTES: CONFIG.maxBytes,
     MIN_TEXT_CHARS: CONFIG.minTextChars,
     read: read,
-    describe: describe,
-    buildLines: buildLines,
-    release: release
+    describe: describe
   };
 })();
 </script>
@@ -2311,7 +2301,7 @@ var Store = (function () {
     }
   }
 
-  return { key: KEY, available: available, save: save, load: load };
+  return { available: available, save: save, load: load };
 })();
 
 /* ============================================================================
