@@ -328,10 +328,15 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
   try { var w = document.getElementById('jsWarn'); if (w) w.style.display = 'none'; } catch (e) {}
   window.addEventListener('error', function (e) {
     try {
+      var msg = (e && (e.message || (e.error && e.error.message))) || '알 수 없는 오류';
+      var src = (e && e.filename) || '';
+      /* 워커 스크립트(blob:)에서 난 오류는 이 화면의 스크립트 오류가 아니다.
+         file:// 로 열었을 때 pdf.js 워커가 막히며 나는 알림이 여기로 새어 들어온다. */
+      if (/WorkerGlobalScope|importScripts/i.test(msg)) return;
+      if (/^blob:/i.test(src)) return;
       var b = document.getElementById('jsErr');
       if (!b) return;
       b.classList.remove('hidden');
-      var msg = (e && (e.message || (e.error && e.error.message))) || '알 수 없는 오류';
       var m = document.getElementById('jsErrMsg');
       if (m) m.textContent = '오류: ' + msg + ' — Chrome·Edge·Safari에서 다시 열어 주세요.';
     } catch (x) {}
@@ -1989,6 +1994,25 @@ var PdfReader = (function () {
 
   var libPromise = null;
 
+  /* ------------------------------------------------------- 실행 환경 */
+
+  /**
+   * 파일을 더블클릭해 연 화면(file://)은 출처(origin)가 'null'이라
+   * blob: 워커를 만들 수 없습니다. 앱 미리보기·샌드박스 뷰어도 출처가 null로 옵니다.
+   * 이 환경에서는 워커를 아예 띄우지 않고 메인 스레드에서 읽습니다.
+   */
+  var MAIN_THREAD_ONLY = (function () {
+    try {
+      var loc = window.location;
+      if (!loc) return false;
+      if (loc.protocol === 'file:') return true;
+      var origin = loc.origin;
+      return origin === 'null' || origin === null || origin === undefined;
+    } catch (e) {
+      return false;
+    }
+  })();
+
   /* ------------------------------------------------------------- 오류 */
 
   function failure(code, cause) {
@@ -2069,6 +2093,26 @@ var PdfReader = (function () {
       .catch(function () { fallback(); });
   }
 
+  /**
+   * 워커 없이 메인 스레드(fake worker)에서 돌리도록 설정한다.
+   *  · pdf.js 3.x에는 getDocument의 disableWorker 옵션이 없어, 공개된
+   *    PDFWorkerUtil.isWorkerDisabled를 세워 워커 생성을 건너뛰게 한다.
+   *  · 이 경로에서 pdf.js는 workerSrc를 <script>로 읽으므로 blob:이 아니라
+   *    실제 주소(CDN)를 넣어야 한다. file:// 화면에서도 https 스크립트는 열린다.
+   */
+  function useMainThread(lib) {
+    try {
+      if (lib.PDFWorkerUtil) lib.PDFWorkerUtil.isWorkerDisabled = true;
+    } catch (e) { /* 공개 API가 없는 판이면 아래 옵션만 남는다 */ }
+    if (lib.GlobalWorkerOptions) lib.GlobalWorkerOptions.workerSrc = CONFIG.workerUrl;
+  }
+
+  /** 워커·블롭 때문에 생긴 실패인지 — 이때만 워커 없이 다시 시도한다 */
+  function isWorkerFailure(err) {
+    var text = String((err && (err.message || err.name)) || err || '');
+    return /worker|importScripts|WorkerGlobalScope|blob:/i.test(text);
+  }
+
   function ensureLibrary() {
     if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
     if (libPromise) return libPromise;
@@ -2077,6 +2121,11 @@ var PdfReader = (function () {
       .then(function () {
         var lib = window.pdfjsLib;
         if (!lib) throw failure('network');
+        /* file://(출처 null) — 워커를 만들지 않고 메인 스레드에서 읽는다 */
+        if (MAIN_THREAD_ONLY) {
+          useMainThread(lib);
+          return lib;
+        }
         return applyWorker(lib).then(function () { return lib; });
       })
       .catch(function (err) {
@@ -2198,6 +2247,18 @@ var PdfReader = (function () {
     });
   }
 
+  /** getDocument에 넘길 옵션 — 워커를 쓰지 않을 때는 그 사실을 함께 알린다 */
+  function documentParams(bytes, workerless) {
+    var params = {
+      data: bytes,
+      isEvalSupported: false,
+      disableFontFace: true
+    };
+    /* 3.x는 useMainThread가 세우는 isWorkerDisabled가 일하고, 4.x부터는 이 옵션을 직접 받는다 */
+    if (workerless) params.disableWorker = true;
+    return params;
+  }
+
   /**
    * File 객체를 읽어 텍스트를 돌려준다.
    * @returns {Promise<{numPages:number, text:string, chars:number, pages:Array}>}
@@ -2211,29 +2272,44 @@ var PdfReader = (function () {
         var reader = new FileReader();
         reader.onerror = function () { reject(failure('read')); };
         reader.onload = function () {
-          var task;
-          try {
-            task = lib.getDocument({
-              data: new Uint8Array(reader.result),
-              isEvalSupported: false,
-              disableFontFace: true
-            });
-          } catch (e) {
-            reject(failure('parse', e));
-            return;
-          }
+          var bytes = new Uint8Array(reader.result);
 
-          task.promise.then(function (doc) {
+          function handleDoc(doc) {
             collect(doc).then(function (result) {
               resolve(result);
               try { doc.destroy(); } catch (e) { /* 이미 닫힌 문서 */ }
             }).catch(function (err) {
               reject(failure('parse', err));
             });
-          }).catch(function (err) {
+          }
+
+          function giveUp(err) {
             var name = (err && err.name) || '';
             reject(failure(/password/i.test(name) ? 'password' : 'parse', err));
-          });
+          }
+
+          function open(workerless) {
+            var task;
+            try {
+              task = lib.getDocument(documentParams(bytes, workerless));
+            } catch (e) {
+              giveUp(e);
+              return;
+            }
+
+            task.promise.then(handleDoc).catch(function (err) {
+              /* https에서도 워커가 막힌 경우(광고 차단·확장 프로그램·CSP) — 워커 없이 한 번 더 */
+              if (!workerless && !MAIN_THREAD_ONLY && isWorkerFailure(err)) {
+                try { task.destroy(); } catch (e) { /* 정리 실패는 무시 */ }
+                useMainThread(lib);
+                open(true);
+                return;
+              }
+              giveUp(err);
+            });
+          }
+
+          open(MAIN_THREAD_ONLY);
         };
         reader.readAsArrayBuffer(file);
       });
