@@ -2,7 +2,8 @@
 <html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
 <title>서원대 졸업요건 계산기 · 22~27학번</title>
 <!--
@@ -365,13 +366,23 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
   .jswarn,.undobar,.tabs,.top-actions,.actions,.toast,.profilebar{display:none !important}
   .card,.summary{box-shadow:none;break-inside:avoid}
 }
+/* Mobile safe areas, long filenames and keyboard focus */
+.wrap{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+.toast{bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+.undobar{bottom:calc(72px + env(safe-area-inset-bottom,0px));width:max-content}
+.pdfmeta,.ocrnote,.privacy,.foot{overflow-wrap:anywhere}
+.card,.ggrid>*,.split>*,.profilebar>*{min-width:0}
+button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(hover:none){button,.chip{min-height:44px}}
+@media(max-width:380px){.field{grid-template-columns:minmax(0,1fr) 96px}.ocrstats{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <!-- 스크립트가 실행되지 않는 뷰어(아이폰 파일 미리보기 QuickLook · 앱 내 HTML 뷰어 · 메일 첨부 미리보기)에서만 이 배너가 보입니다. -->
 <div class="jswarn" id="jsWarn" role="alert">
   <span class="t">⚠️ 지금은 미리보기 화면이라 버튼이 작동하지 않습니다 — 브라우저에서 열어 주세요</span>
-  <span class="os">아이폰 · 아이패드</span> 공유 버튼 <b>□↑</b> → <b>‘Safari에서 열기’</b> (또는 파일 앱에서 이 파일을 길게 눌러 <b>Safari</b>·<b>Chrome</b>으로 열기)<br>
+  <span class="os">아이폰 · 아이패드</span> 파일 미리보기에서는 실행이 제한될 수 있어요. 배포된 <b>HTTPS 링크를 Safari·Chrome에서 열어 주세요.</b><br>
   <span class="os">안드로이드</span> 파일을 다운로드한 뒤 <b>Chrome</b> 또는 <b>삼성 인터넷</b>으로 열기 — 기본 HTML 뷰어에서는 버튼이 작동하지 않습니다<br>
   <span class="os">윈도우 · 맥</span> 내려받은 파일을 <b>Chrome</b>·<b>Edge</b>·<b>Safari</b>에서 더블클릭해 열기 (메일·메신저 미리보기 창에서는 안 됩니다)
 </div>
@@ -707,6 +718,10 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
         <span><b>내 폰 안에서만 읽고, 서버로는 절대 전송하지 않습니다.</b> PDF는 이 브라우저 메모리에서만 열립니다. 인식 엔진(pdf.js)만 인터넷에서 한 번 내려받고, 파일 내용은 어디에도 보내지 않습니다. 글자가 없는 그림 PDF는 같은 방식으로 <b>글자 인식(OCR)</b> 엔진·언어 데이터만 내려받아 이 기기 안에서 숫자를 읽습니다.</span>
       </p>
 
+      <p class="tip">기본은 앞 3쪽을 읽습니다. 3·8이 포함된 숫자는 확대 원본과 흑백 보정본으로 추가 대조합니다. 작은 숫자는 정밀 모드로 확대 재인식할 수 있어요. 흐릿한 원본은 확대해도 복원되지 않을 수 있습니다.</p>
+      <label class="check"><input type="checkbox" id="ocrFine"> 작은 숫자 정밀 인식 (3/8 확대 대조 · 느릴 수 있음)</label>
+      <p class="tip">CDN에서 엔진·언어 파일을 받으므로 인터넷이 필요하며, 해당 서비스에 IP 등 접속 정보가 전달될 수 있습니다. 성적·PDF 내용은 업로드하지 않습니다.</p>
+      <button type="button" class="btn sm hidden" id="cancelPdfBtn">PDF/OCR 중단</button>
       <div class="drop" id="pdfDrop" role="button" tabindex="0" aria-label="성적 PDF 선택 또는 끌어다 놓기">
         <input type="file" id="pdfFile" class="visually-hidden" accept=".pdf,application/pdf">
         <div class="ico" aria-hidden="true">📎</div>
@@ -1007,6 +1022,7 @@ var Rules = (function () {
     } else if (String(year) === '2024' || String(year) === '2025') {
       notice = '2024학번 이후 개편 기준을 적용했습니다.';
     }
+    notice += ' 전공 학점은 범위의 최소값으로 계산하며, 학과·복수전공·편입·재수강 기준은 별도 확인이 필요합니다.';
     return { school: label, notice: notice };
   }
 
@@ -1593,7 +1609,7 @@ var Transcript = (function (Rules) {
       break;
     }
     if (totalLine) {
-      var tnum = totalLine.match(/(\d{2,3})\s*(?:학점)?/);
+      var tnum = totalLine.match(/(?:총\s*취득\s*학점|총\s*이수\s*학점|취득\s*학점\s*계|이수\s*학점\s*계|학점\s*합계|총\s*학점)\s*[:：]?\s*(\d{1,3}(?:\.\d{1,2})?)(?![\d.])/);
       if (tnum) {
         out.total = parseFloat(tnum[1]);
         out.totalSource = totalLine.slice(0, 90);
@@ -1610,7 +1626,7 @@ var Transcript = (function (Rules) {
       if (looksLikeCourseRow(lines[p])) continue;
       var gm = lines[p].match(/(평점\s*평균|전체\s*평점|총\s*평점|누적\s*평점|평균\s*평점)\s*[:\t ]*([0-4](?:\.\d{1,2})?)/);
       if (!gm) continue;
-      out.gpa = parseFloat(gm[2]);
+      out.gpa = Math.min(4.5, parseFloat(gm[2]));
       out.gpaSource = lines[p].slice(0, 90);
       break;
     }
@@ -1662,8 +1678,11 @@ var Grader = (function (Rules) {
 
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
-      if (!row.include) continue;
-      var credits = Number(row.credits) || 0;
+      if (!row.include || row.summary) continue;
+      var attempted = Number(row.credits);
+      if (!isFinite(attempted) || attempted < 0) attempted = 0;
+      var grade = String(row.grade || '').toUpperCase().trim();
+      var credits = /^(F|NP|U)$/.test(grade) ? 0 : attempted;
       sum.count++;
       sum.credits += credits;
 
@@ -1675,7 +1694,7 @@ var Grader = (function (Rules) {
         case 'libUnknown': sum.libUnknown += credits; break;
         case 'balance':
           sum.balance += credits;
-          if (row.area >= 0 && row.area < sum.areas.length) sum.areas[row.area] = true;
+          if (credits > 0 && row.area >= 0 && row.area < sum.areas.length) sum.areas[row.area] = true;
           break;
         case 'majorReq': sum.majorReq += credits; break;
         case 'majorElec': sum.majorElec += credits; break;
@@ -1687,7 +1706,7 @@ var Grader = (function (Rules) {
       }
 
       var point = Rules.gradeToPoint(row.grade);
-      if (point !== null && credits > 0) { sum.pointSum += point * credits; sum.gradedCredits += credits; }
+      if (point !== null && attempted > 0) { sum.pointSum += point * attempted; sum.gradedCredits += attempted; }
     }
 
     if (sum.gradedCredits > 0) sum.gpa = sum.pointSum / sum.gradedCredits;
@@ -1698,7 +1717,7 @@ var Grader = (function (Rules) {
   function evaluate(f, r) {
     var fields = f || {};
     var R = r || Rules.resolveReq('2022', 'general');
-    var num = function (k) { return Number(fields[k]) || 0; };
+    var num = function (k) { var n = Number(fields[k]); return isFinite(n) && n >= 0 ? n : 0; };
 
     var core = num('core'), common = num('common'), fusion = num('fusion'), dept = num('dept');
     var libUnknown = num('libUnknown'), balance = num('balance');
@@ -2053,8 +2072,8 @@ var PdfReader = (function () {
   /* ------------------------------------------------------- 실행 환경 */
 
   /**
-   * 파일을 더블클릭해 연 화면(file://)은 출처(origin)가 'null'이라
-   * blob: 워커를 만들 수 없습니다. 앱 미리보기·샌드박스 뷰어도 출처가 null로 옵니다.
+   * file:// 및 opaque origin에서는 브라우저별 워커 정책이 다르므로
+   * PDF 워커 스크립트를 명시적으로 읽어 fake worker 경로를 사용합니다.
    * 이 환경에서는 워커를 아예 띄우지 않고 메인 스레드에서 읽습니다.
    */
   var MAIN_THREAD_ONLY = (function () {
@@ -2131,36 +2150,22 @@ var PdfReader = (function () {
 
   /** 워커 본문을 blob URL로 바꿔 넘긴다(교차 출처 워커는 브라우저가 막는다). */
   function applyWorker(lib) {
-    var fallback = function () { lib.GlobalWorkerOptions.workerSrc = CONFIG.workerUrl; };
-
-    if (typeof fetch !== 'function' || typeof Blob !== 'function' || typeof URL === 'undefined' || !URL.createObjectURL) {
-      fallback();
-      return Promise.resolve();
-    }
-
-    return fetch(CONFIG.workerUrl, { mode: 'cors', credentials: 'omit' })
-      .then(function (res) {
-        if (!res.ok) throw failure('network');
-        return res.text();
-      })
-      .then(function (code) {
-        lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
-      })
-      .catch(function () { fallback(); });
+    lib.GlobalWorkerOptions.workerSrc = CONFIG.workerUrl;
+    return Promise.resolve();
   }
 
   /**
    * 워커 없이 메인 스레드(fake worker)에서 돌리도록 설정한다.
-   *  · pdf.js 3.x에는 getDocument의 disableWorker 옵션이 없어, 공개된
-   *    PDFWorkerUtil.isWorkerDisabled를 세워 워커 생성을 건너뛰게 한다.
+   *  · pdf.js 3.x는 pdfjsWorker.WorkerMessageHandler가 있으면 fake worker를 사용한다.
    *  · 이 경로에서 pdf.js는 workerSrc를 <script>로 읽으므로 blob:이 아니라
    *    실제 주소(CDN)를 넣어야 한다. file:// 화면에서도 https 스크립트는 열린다.
    */
   function useMainThread(lib) {
-    try {
-      if (lib.PDFWorkerUtil) lib.PDFWorkerUtil.isWorkerDisabled = true;
-    } catch (e) { /* 공개 API가 없는 판이면 아래 옵션만 남는다 */ }
-    if (lib.GlobalWorkerOptions) lib.GlobalWorkerOptions.workerSrc = CONFIG.workerUrl;
+    lib.GlobalWorkerOptions.workerSrc = CONFIG.workerUrl;
+    if (window.pdfjsWorker && window.pdfjsWorker.WorkerMessageHandler) return Promise.resolve();
+    return loadScript(CONFIG.workerUrl).then(function () {
+      if (!window.pdfjsWorker || !window.pdfjsWorker.WorkerMessageHandler) throw failure('network');
+    });
   }
 
   /** 워커·블롭 때문에 생긴 실패인지 — 이때만 워커 없이 다시 시도한다 */
@@ -2170,7 +2175,6 @@ var PdfReader = (function () {
   }
 
   function ensureLibrary() {
-    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
     if (libPromise) return libPromise;
 
     libPromise = loadScript(CONFIG.libUrl)
@@ -2179,8 +2183,7 @@ var PdfReader = (function () {
         if (!lib) throw failure('network');
         /* file://(출처 null) — 워커를 만들지 않고 메인 스레드에서 읽는다 */
         if (MAIN_THREAD_ONLY) {
-          useMainThread(lib);
-          return lib;
+          return useMainThread(lib).then(function () { return lib; });
         }
         return applyWorker(lib).then(function () { return lib; });
       })
@@ -2304,73 +2307,60 @@ var PdfReader = (function () {
   }
 
   /** getDocument에 넘길 옵션 — 워커를 쓰지 않을 때는 그 사실을 함께 알린다 */
-  function documentParams(bytes, workerless) {
-    var params = {
-      data: bytes,
-      isEvalSupported: false,
-      disableFontFace: true
-    };
-    /* 3.x는 useMainThread가 세우는 isWorkerDisabled가 일하고, 4.x부터는 이 옵션을 직접 받는다 */
-    if (workerless) params.disableWorker = true;
-    return params;
+  function documentParams(bytes) {
+    return { data: bytes.slice(), isEvalSupported: false, disableFontFace: true };
+  }
+
+  var jobs = [];
+  function dispose(task) { if (task) { try { Promise.resolve(task.destroy()).catch(function () {}); } catch (e) {} } }
+  function cancel() { jobs.slice().forEach(function (job) { job(); }); }
+  function withDocument(file, action) {
+    if (!file || !file.size) return Promise.reject(failure('read'));
+    if (file.size > CONFIG.maxBytes) return Promise.reject(failure('size'));
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader(), task = null, done = false;
+      var timer = setTimeout(function () { finish(failure('timeout')); }, 90000);
+      function stop() { finish(failure('cancelled')); }
+      jobs.push(stop);
+      function finish(err, value) {
+        if (done) return; done = true; clearTimeout(timer);
+        jobs = jobs.filter(function (job) { return job !== stop; });
+        if (reader.readyState === 1) reader.abort();
+        dispose(task);
+        if (err) reject(err); else resolve(value);
+      }
+      reader.onerror = function () { finish(failure('read')); };
+      reader.onabort = function () { finish(failure('cancelled')); };
+      reader.onload = function () {
+        var bytes = new Uint8Array(reader.result);
+        ensureLibrary().then(function (lib) {
+          function open(retried) {
+            if (done) return;
+            try { task = lib.getDocument(documentParams(bytes)); }
+            catch (e) { finish(failure('parse', e)); return; }
+            task.promise.then(function (doc) {
+              if (done) { dispose(doc); return; }
+              return action(doc).then(function (value) { finish(null, value); });
+            }).catch(function (err) {
+              if (done) return;
+              if (!retried && !MAIN_THREAD_ONLY && isWorkerFailure(err)) {
+                dispose(task); task = null;
+                useMainThread(lib).then(function () { open(true); }, function (e) { finish(e); });
+              } else finish(failure(/password/i.test(err.name || '') ? 'password' : 'parse', err));
+            });
+          }
+          open(false);
+        }).catch(function (e) { finish(e); });
+      };
+      try { reader.readAsArrayBuffer(file); } catch (e) { finish(failure('read', e)); }
+    });
   }
 
   /**
    * File 객체를 읽어 텍스트를 돌려준다.
    * @returns {Promise<{numPages:number, text:string, chars:number, pages:Array}>}
    */
-  function read(file) {
-    if (!file) return Promise.reject(failure('read'));
-    if (file.size > CONFIG.maxBytes) return Promise.reject(failure('size'));
-
-    return ensureLibrary().then(function (lib) {
-      return new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onerror = function () { reject(failure('read')); };
-        reader.onload = function () {
-          var bytes = new Uint8Array(reader.result);
-
-          function handleDoc(doc) {
-            collect(doc).then(function (result) {
-              resolve(result);
-              try { doc.destroy(); } catch (e) { /* 이미 닫힌 문서 */ }
-            }).catch(function (err) {
-              reject(failure('parse', err));
-            });
-          }
-
-          function giveUp(err) {
-            var name = (err && err.name) || '';
-            reject(failure(/password/i.test(name) ? 'password' : 'parse', err));
-          }
-
-          function open(workerless) {
-            var task;
-            try {
-              task = lib.getDocument(documentParams(bytes, workerless));
-            } catch (e) {
-              giveUp(e);
-              return;
-            }
-
-            task.promise.then(handleDoc).catch(function (err) {
-              /* https에서도 워커가 막힌 경우(광고 차단·확장 프로그램·CSP) — 워커 없이 한 번 더 */
-              if (!workerless && !MAIN_THREAD_ONLY && isWorkerFailure(err)) {
-                try { task.destroy(); } catch (e) { /* 정리 실패는 무시 */ }
-                useMainThread(lib);
-                open(true);
-                return;
-              }
-              giveUp(err);
-            });
-          }
-
-          open(MAIN_THREAD_ONLY);
-        };
-        reader.readAsArrayBuffer(file);
-      });
-    });
-  }
+  function read(file) { return withDocument(file, collect); }
 
   /* ------------------------------------------- 그림 → 캔버스 (OCR 준비) */
 
@@ -2381,92 +2371,32 @@ var PdfReader = (function () {
    * @returns {Promise<Array<{page:number, canvas:HTMLCanvasElement}>>}
    */
   function render(file, options) {
-    var opts = options || {};
-    var scale = Math.min(Math.max(opts.scale || 2.4, 1), 4);
-    var maxPages = Math.max(1, Math.min(opts.maxPages || 4, CONFIG.maxPages));
-    var only = null;
-    if (opts.only && opts.only.length) {
-      only = [];
-      for (var o = 0; o < opts.only.length; o++) only.push(opts.only[o]);
-    }
-
-    if (!file) return Promise.reject(failure('read'));
-    if (file.size > CONFIG.maxBytes) return Promise.reject(failure('size'));
-
-    return ensureLibrary().then(function (lib) {
-      return new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onerror = function () { reject(failure('read')); };
-        reader.onload = function () {
-          var bytes = new Uint8Array(reader.result);
-          var canvases = [];
-
-          function drawPages(doc) {
-            var limit = Math.min(doc.numPages, maxPages);
-            var chain = Promise.resolve();
-            for (var p = 1; p <= limit; p++) {
-              if (only && only.indexOf(p) < 0) continue;
-              (function (pageNo) {
-                chain = chain.then(function () {
-                  return doc.getPage(pageNo).then(function (page) {
-                    var viewport = page.getViewport({ scale: scale });
-                    var canvas = document.createElement('canvas');
-                    canvas.width = Math.round(viewport.width);
-                    canvas.height = Math.round(viewport.height);
-                    var ctx = canvas.getContext('2d');
-                    if (!ctx) throw failure('parse');
-                    return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
-                      canvases.push({ page: pageNo, canvas: canvas });
-                    });
-                  });
-                });
-              })(p);
-            }
-            return chain.then(function () {
-              try { doc.destroy(); } catch (e) { /* 이미 닫힌 문서 */ }
-              return canvases;
-            });
-          }
-
-          function handleDoc(doc) {
-            drawPages(doc)
-              .then(resolve)
-              .catch(function (err) { reject(failure('parse', err)); });
-          }
-
-          function giveUp(err) {
-            var name = (err && err.name) || '';
-            reject(failure(/password/i.test(name) ? 'password' : 'parse', err));
-          }
-
-          function open(workerless) {
-            var task;
-            try {
-              task = lib.getDocument(documentParams(bytes, workerless));
-            } catch (e) {
-              giveUp(e);
-              return;
-            }
-
-            task.promise.then(handleDoc).catch(function (err) {
-              if (!workerless && !MAIN_THREAD_ONLY && isWorkerFailure(err)) {
-                try { task.destroy(); } catch (e) { /* 정리 실패는 무시 */ }
-                useMainThread(lib);
-                open(true);
-                return;
-              }
-              giveUp(err);
-            });
-          }
-
-          open(MAIN_THREAD_ONLY);
-        };
-        reader.readAsArrayBuffer(file);
-      });
-    });
+    var opts = options || {}, canvases = [];
+    return withDocument(file, function (doc) {
+      var limit = Math.min(doc.numPages, opts.maxPages || 3, CONFIG.maxPages);
+      var chain = Promise.resolve();
+      for (var p = 1; p <= limit; p++) (function (pageNo) {
+        if (opts.only && opts.only.indexOf(pageNo) < 0) return;
+        chain = chain.then(function () { return doc.getPage(pageNo); }).then(function (page) {
+          var base = page.getViewport({ scale: 1 });
+          var region = opts.region || { y: 0, height: 1 };
+          var scale = Math.min(opts.scale || 3, 6, Math.sqrt(6000000 / (base.width * base.height * region.height)), 4096 / Math.max(base.width, base.height * region.height));
+          var viewport = page.getViewport({ scale: scale });
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.floor(viewport.width));
+          canvas.height = Math.max(1, Math.floor(viewport.height * region.height));
+          canvases.push({ page: pageNo, canvas: canvas, scale: scale, offsetY: viewport.height * region.y, fullWidth: viewport.width, fullHeight: viewport.height });
+          var ctx = canvas.getContext('2d');
+          if (!ctx) throw failure('parse');
+          return page.render({ canvasContext: ctx, viewport: viewport, transform: [1, 0, 0, 1, 0, -viewport.height * region.y], background: 'rgb(255,255,255)' }).promise.then(function () { page.cleanup(); });
+        });
+      })(p);
+      return chain.then(function () { return canvases; });
+    }).catch(function (err) { canvases.forEach(function (e) { e.canvas.width = e.canvas.height = 0; }); throw err; });
   }
 
   return {
+    cancel: cancel,
     MAX_BYTES: CONFIG.maxBytes,
     MIN_TEXT_CHARS: CONFIG.minTextChars,
     read: read,
@@ -3428,6 +3358,7 @@ var PdfOcr = (function () {
   return {
     CONFIG: CONFIG,
     analyze: analyze,
+    cancel: function () { },
     toSummaryText: toSummaryText,
     /* 시험·점검용 내부 함수(화면에서는 쓰지 않는다) */
     _internals: {
@@ -3581,6 +3512,13 @@ var Store = (function () {
   /* ------------------------------------------------------------ 유틸 */
 
   function el(id) { return document.getElementById(id); }
+  function validNumber(value, max) {
+    var n = Number(value); return isFinite(n) ? Math.max(0, Math.min(max, n)) : 0;
+  }
+  function fieldNumber(key, value) {
+    var node = el('f-' + key);
+    return validNumber(value, node && node.max ? Number(node.max) : 9999);
+  }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function setText(id, text) { var node = el(id); if (node) node.textContent = text; }
   function show(id, on) { var node = el(id); if (node) node.classList.toggle('hidden', !on); }
@@ -3602,7 +3540,7 @@ var Store = (function () {
 
   /** 한 버튼의 오류가 화면 전체를 멈추지 않게 한다 */
   function safe(fn) {
-    try { fn(); } catch (e) { /* 화면은 계속 살아 있게 둔다 */ }
+    try { fn(); } catch (e) { show('jsErr', true); setText('jsErrMsg', '일부 화면을 처리하지 못했어요. 새로고침하거나 초기화 후 다시 확인해 주세요.'); }
   }
 
   function scrollTop() { try { window.scrollTo(0, 0); } catch (e) { /* 무시 */ } }
@@ -3641,18 +3579,18 @@ var Store = (function () {
             for (var a = 0; a < state.fields.areas.length; a++) state.fields.areas[a] = !!saved.fields.areas[a];
           }
         } else if (typeof saved.fields[key] !== 'undefined') {
-          state.fields[key] = saved.fields[key];
+          state.fields[key] = typeof ZERO_FIELDS[key] === 'boolean' ? saved.fields[key] === true : fieldNumber(key, saved.fields[key]);
         }
       }
     }
 
-    if (saved.courses && saved.courses.length) {
-      state.courses = saved.courses.map(function (row) {
+    if (Array.isArray(saved.courses)) {
+      state.courses = saved.courses.filter(function (row) { return row && typeof row === "object"; }).slice(0, 2000).map(function (row) {
         return {
           id: row.id || ('r' + Math.random().toString(36).slice(2, 8)),
-          name: row.name || '',
-          cat: row.cat || 'none',
-          credits: Number(row.credits) || 0,
+          name: String(row.name || ''),
+          cat: Object.prototype.hasOwnProperty.call(Rules.CATS, row.cat) ? row.cat : 'none',
+          credits: validNumber(row.credits, 12),
           grade: row.grade || '',
           area: typeof row.area === 'number' ? row.area : -1,
           include: !!row.include,
@@ -3666,7 +3604,8 @@ var Store = (function () {
     if (typeof saved.pasteText === 'string') state.pasteText = saved.pasteText;
     if (saved.theme === 'light' || saved.theme === 'dark' || saved.theme === 'auto') state.theme = saved.theme;
     if (saved.tab === 'paste' || saved.tab === 'input' || saved.tab === 'export') state.tab = saved.tab;
-    if (saved.skipped && saved.skipped.length) state.skipped = saved.skipped;
+    if (Array.isArray(saved.skipped)) state.skipped = saved.skipped.filter(function (r) { return r && typeof r.line === 'string'; });
+    if (Array.isArray(saved.prevParsedAreas)) state.prevParsedAreas = ZERO_FIELDS.areas.map(function (_, i) { return saved.prevParsedAreas[i] === true; });
   }
 
   /* ------------------------------------------------- 되돌리기 */
@@ -3676,6 +3615,7 @@ var Store = (function () {
       year: state.year,
       school: state.school,
       tab: state.tab,
+      memo: state.memo, pasteText: state.pasteText,
       fields: clone(state.fields),
       courses: clone(state.courses),
       skipped: (state.skipped || []).slice(),
@@ -3685,6 +3625,8 @@ var Store = (function () {
 
   function restoreState(snapshot) {
     if (!snapshot) return;
+    cancelImport();
+    state.memo = snapshot.memo || ''; state.pasteText = snapshot.pasteText || '';
     state.year = snapshot.year;
     state.school = snapshot.school;
     state.fields = clone(snapshot.fields);
@@ -3692,13 +3634,14 @@ var Store = (function () {
     state.skipped = (snapshot.skipped || []).slice();
     state.prevParsedAreas = (snapshot.prevParsedAreas || []).slice();
     renderAll();
+    showTab(snapshot.tab || 'input');
     saveNow();
     toast('이전 입력으로 되돌렸어요');
   }
 
   function hasData(snapshot) {
     if (!snapshot) return false;
-    if ((snapshot.courses || []).length) return true;
+    if (snapshot.memo || snapshot.pasteText || (snapshot.courses || []).length) return true;
     var fields = snapshot.fields || {};
     for (var key in fields) {
       if (!fields.hasOwnProperty(key)) continue;
@@ -3896,7 +3839,7 @@ var Store = (function () {
       node.addEventListener('input', function () {
         if (map[2] === 'num') {
           var value = parseFloat(node.value);
-          state.fields[map[1]] = isNaN(value) ? 0 : value;
+          state.fields[map[1]] = fieldNumber(map[1], value);
         }
         updateAll();
         saveSoon();
@@ -3904,6 +3847,7 @@ var Store = (function () {
 
       node.addEventListener('change', function () {
         if (map[2] === 'bool') state.fields[map[1]] = !!node.checked;
+        else node.value = state.fields[map[1]] || ''; 
         updateAll();
         saveSoon();
       });
@@ -3971,7 +3915,7 @@ var Store = (function () {
       el('verdictText').textContent = '학점을 입력하면 판정이 나옵니다';
     } else if (ev.complete) {
       verdict.className = 'verdict pass';
-      el('verdictText').textContent = '모든 졸업요건 충족 🎉';
+      el('verdictText').textContent = '입력한 공통 기준 충족 · 학과 최종 확인 필요';
     } else {
       verdict.className = 'verdict fail';
       el('verdictText').textContent = ev.fails.length + '개 항목 미충족 · 충족 ' + ev.passes + '/' + ev.count;
@@ -4244,7 +4188,6 @@ var Store = (function () {
   }
 
   function autoApply() {
-    if (!state.courses.length) return;
     var sum = Grader.aggregate(state.courses);
     var f = state.fields;
 
@@ -4258,7 +4201,7 @@ var Store = (function () {
     f.majorElec = sum.majorElec;
     f.teaching = sum.teaching;
     f.etc = sum.etc;
-    if (sum.gpa !== null) f.gpa = Math.round(sum.gpa * 100) / 100;
+    f.gpa = sum.gpa === null ? 0 : Math.round(sum.gpa * 100) / 100;
 
     mergeAreas(sum.areas);
     syncFieldsToUI();
@@ -4292,8 +4235,20 @@ var Store = (function () {
     return '<div class="pf ' + (kind || 'hit') + '"><div class="k">' + esc(label) + '</div><div class="v">' + esc(value) + '</div></div>';
   }
 
+  var importToken = 0, pendingOcr = null;
+  function cancelImport() {
+    importToken++; ocrToken++; pdfBusy = false; ocrBusy = false;
+    ocrLast = null; pendingOcr = null;
+    PdfReader.cancel(); if (window.PdfOcr) PdfOcr.cancel();
+    pdfBarBusy(false); show('cancelPdfBtn', false);
+  }
+  function clearImportedCredits() {
+    PDF_VALUE_FIELDS.forEach(function (pair) { state.fields[pair[0]] = 0; });
+    state.fields.gpa = 0; state.fields.areas = ZERO_FIELDS.areas.slice();
+    state.courses = []; state.skipped = []; state.prevParsedAreas = ZERO_FIELDS.areas.slice();
+  }
   function handlePdfFile(file) {
-    if (pdfBusy || !file) return;
+    if (!file) return;
 
     var isPdf = /\.pdf$/i.test(file.name || '') || file.type === 'application/pdf';
     if (!isPdf) {
@@ -4301,16 +4256,24 @@ var Store = (function () {
       return;
     }
 
+    cancelImport();
+    var token = importToken;
+    show('cancelPdfBtn', true);
     pdfBusy = true;
     pdfOutput('');
     pdfBarBusy(true, 'PDF를 읽는 중… (처음 한 번은 인식 엔진을 내려받아 조금 걸립니다)');
 
     PdfReader.read(file).then(function (result) {
+      if (token !== importToken) return;
+      ocrLast = { file: file, result: result };
+      show('cancelPdfBtn', false);
       pdfBusy = false;
       pdfBarBusy(false);
       if (result.chars < PdfReader.MIN_TEXT_CHARS) renderPdfWithoutText(result, file);
       else renderPdfText(result);
     }).catch(function (err) {
+      if (token !== importToken) return;
+      show('cancelPdfBtn', false);
       pdfBusy = false;
       pdfBarBusy(false);
       pdfOutput('<div class="pdfmsg bad"><b>PDF를 읽지 못했어요.</b> ' + esc(PdfReader.describe(err))
@@ -4323,7 +4286,7 @@ var Store = (function () {
   var OCR_STAGE_TEXT = {
     engine: '글자를 읽는 인식(OCR) 엔진을 준비하고 있어요',
     page: '도표 안의 숫자를 읽는 중이에요',
-    retry: '값이 조금 어긋나 원그래프를 한 번 더 읽고 있어요',
+    retry: '작은 숫자·불확실한 값을 확대해 다시 읽고 있어요',
     pick: '읽은 값을 정리하고 있어요'
   };
 
@@ -4382,7 +4345,7 @@ var Store = (function () {
       '<li><span class="dot" aria-hidden="true"></span>도표에서 숫자 읽기</li>',
       '<li><span class="dot" aria-hidden="true"></span>값 정리</li>',
       '</ol>',
-      '<p class="ocrnote">' + esc(pdfMetaLine(result, file, '이 화면 안에서만 읽습니다 · 10~20초 걸릴 수 있어요')) + '</p>',
+      '<p class="ocrnote">' + esc(pdfMetaLine(result, file, '이 기기에서 처리 · 정밀 인식은 수 분 걸릴 수 있어요')) + '</p>',
       '</div>'
     ].join(''));
 
@@ -4398,18 +4361,22 @@ var Store = (function () {
     }
 
     ocrBusy = true;
+    show('cancelPdfBtn', true);
     var token = ++ocrToken;
 
     PdfOcr.analyze(file, {
+      fine: el('ocrFine').checked,
       onStage: function (name, at) { if (token === ocrToken) setOcrStage(name, at); },
       onProgress: function (at) { if (token === ocrToken) setOcrStage('page', at); }
     }).then(function (out) {
       if (token !== ocrToken) return;
       ocrBusy = false;
+      show('cancelPdfBtn', false);
       renderOcrResult(out, result, file);
     }).catch(function (err) {
       if (token !== ocrToken) return;
       ocrBusy = false;
+      show('cancelPdfBtn', false);
       renderOcrFallback(err, result, file);
     });
   }
@@ -4423,13 +4390,7 @@ var Store = (function () {
   }
 
   function renderOcrResult(out, result, file) {
-    var previous = snapshotState();
-    var summaryText = PdfOcr.toSummaryText(out);
-    var summary = Transcript.parseSummary(summaryText);
-    applySummary(summary);
-    updateAll();
-    saveNow();
-    if (hasData(previous)) showUndo(previous, 'OCR로 읽은 값을 반영했어요 · 이전 입력으로 되돌릴 수 있어요');
+    pendingOcr = out;
 
     var totals = ocrTotals(out.fields);
     var applied = Object.keys(out.fields).length;
@@ -4455,7 +4416,7 @@ var Store = (function () {
         '<div class="ocrval' + (needCheck ? ' check' : '') + '">' +
         '<div class="k">' + esc(OCR_AREA_LABEL[key]) + '</div>' +
         '<div class="v">' + esc(String(out.fields[key])) + '<small>학점</small></div>' +
-        (needCheck ? '<span class="flag">확인 필요</span>' : '') +
+        ((out.digit38Items || []).indexOf(key) >= 0 ? '<span class="flag">3/8 확인 필요</span>' : (needCheck ? '<span class="flag">확인 필요</span>' : '')) +
         '</div>'
       );
     }
@@ -4494,7 +4455,7 @@ var Store = (function () {
 
       '<div class="ocralert">',
       '<b class="lead">⚠️ 그림에서 읽은 값이라 3 ↔ 8 처럼 숫자가 바뀌어 읽힐 수 있어요.</b>',
-      '<span>아래 숫자를 원본 성적표와 꼭 한 번 대조해 주세요.</span>',
+      '<span>아직 반영하지 않았어요. 아래 숫자를 원본과 대조한 뒤 적용하세요. 적용하면 기존 학점·평점·과목 목록·교양 영역을 교체합니다. 비교과 체크는 유지됩니다.</span>',
       '<span class="fix">틀린 항목은 <b>② 직접 입력 · 대시보드</b> 탭에서 고칠 수 있어요.</span>',
       '</div>',
 
@@ -4503,7 +4464,7 @@ var Store = (function () {
       notes,
 
       '<div class="actions">',
-      '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>',
+      '<button class="btn sm primary" type="button" data-ocr-apply>숫자 확인 완료 · 학점 교체 적용</button>',
       '<button class="btn sm ghost" type="button" data-pdf-paste>표 붙여넣기로 확인</button>',
       '<button class="btn sm ghost" type="button" data-pdf-clear>안내 닫기</button>',
       '</div>',
@@ -4511,7 +4472,7 @@ var Store = (function () {
     ].join('');
 
     pdfOutput(html);
-    toast('그림 PDF에서 ' + applied + '개 값을 읽어 대시보드에 넣었어요 · 숫자를 꼭 대조해 주세요');
+    toast('그림 PDF에서 ' + applied + '개 값을 읽었어요 · 확인 후 적용하세요');
   }
 
   /** OCR이 안 됐을 때 — 서원대 포털에 맞춘 두 가지 대안을 눈에 띄게 보여 준다 */
@@ -4559,19 +4520,23 @@ var Store = (function () {
 
   /** 글자 층이 있는 PDF — 과목 표와 요약 표를 함께 읽는다 */
   function renderPdfText(result) {
+    var previous = snapshotState();
     var text = result.text;
+    if (result.readPages < result.numPages) toast('앞 ' + result.readPages + '쪽만 읽었어요. 나머지 쪽은 별도 확인하세요.');
 
     state.pasteText = text;
     el('pasteBox').value = text;
 
     var info = Transcript.parseTranscript(text);
+    var preliminary = Transcript.parseSummary(text);
+    if (info.rows.some(function (r) { return r.include; }) || Object.keys(preliminary.fields).length || preliminary.gpa !== null) clearImportedCredits();
     state.courses = info.rows;
     state.skipped = info.skipped;
     if (info.colCount >= 3) fillMapSelects(info);
     renderCourses();
 
     /* 1) 과목 행을 먼저 합산하고, 2) PDF 요약 표의 값으로 덮어쓴다(표가 더 정확하다) */
-    autoApply();
+    if (info.rows.some(function (r) { return r.include; })) autoApply();
     var summary = Transcript.parseSummary(text);
     var applied = applySummary(summary);
     renderAreas();
@@ -4579,9 +4544,10 @@ var Store = (function () {
 
     var included = info.rows.filter(function (row) { return row.include; }).length;
 
+    showUndo(previous, 'PDF 읽기 전 입력으로 되돌릴 수 있어요');
     if (!applied && !included) {
       pdfOutput('<div class="pdfmsg warn"><b>학점 표를 찾지 못했어요.</b> 이 PDF는 글자는 있지만 표 구조가 자동 인식과 달라요. '
-        + '아래 <b>붙여넣기</b> 상자에서 <b>[분석]</b>을 누르거나, <b>열 지정</b>을 펼쳐 열을 직접 골라 주세요.</div>');
+        + '아래 <b>붙여넣기</b> 또는 이미지 OCR을 이용해 주세요.<button class="btn sm" type="button" data-ocr-retry>그림·작은 숫자 OCR로 읽기</button></div>');
       return;
     }
 
@@ -4629,6 +4595,7 @@ var Store = (function () {
 
     html.push('<div class="actions">',
       '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>',
+      '<button class="btn sm ghost" type="button" data-ocr-retry>그림·작은 숫자 OCR로 다시 읽기</button>',
       '<button class="btn sm ghost" type="button" data-pdf-clear>인식 결과 지우기</button>',
       '</div></div>');
 
@@ -4656,8 +4623,10 @@ var Store = (function () {
   /* ------------------------------------------------- 예시 / 초기화 */
 
   function loadExample() {
+    cancelImport();
     var previous = snapshotState();
 
+    state.pasteText = ''; state.memo = '';
     state.year = EXAMPLE.year;
     state.school = EXAMPLE.school;
     state.fields = clone(EXAMPLE.fields);
@@ -4690,6 +4659,7 @@ var Store = (function () {
     }
 
     disarmReset();
+    cancelImport();
     state.fields = clone(ZERO_FIELDS);
     state.courses = [];
     state.skipped = [];
@@ -4857,16 +4827,24 @@ var Store = (function () {
     var out = el('pdfOut');
     if (out) {
       out.addEventListener('click', function (event) {
-        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry]') : null;
+        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry], [data-ocr-apply]') : null;
         if (!target) return;
-        if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
+        if (target.hasAttribute('data-ocr-apply')) {
+          if (!pendingOcr) return;
+          var previous = snapshotState();
+          clearImportedCredits(); state.pasteText = '';
+          applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(pendingOcr)));
+          pendingOcr = null; renderAll(); saveNow(); showTab('input');
+          showUndo(previous, 'OCR 학점을 적용했어요 · 이전 입력으로 되돌리기');
+          target.disabled = true; target.textContent = '적용 완료';
+        } else if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
         else if (target.hasAttribute('data-pdf-paste')) {
           var box = el('pasteBox');
           if (box) { box.focus(); box.scrollIntoView({ block: 'center' }); }
         } else if (target.hasAttribute('data-ocr-retry')) {
           if (ocrLast && ocrLast.file) renderPdfWithoutText(ocrLast.result, ocrLast.file);
         } else if (target.hasAttribute('data-pdf-clear')) {
-          pdfOutput('');
+          cancelImport(); pdfOutput('');
         }
       });
     }
@@ -4933,6 +4911,7 @@ var Store = (function () {
         name: '', cat: 'majorElec', credits: 3, grade: '', area: -1,
         include: true, summary: false, note: ''
       });
+      autoApply();
       renderCourses();
       updateAll();
     });
@@ -4950,7 +4929,7 @@ var Store = (function () {
       state.skipped = [];
       renderCourses();
       updateAll();
-      toast('분석 결과를 비웠어요');
+      toast('과목 목록만 비웠어요 · 대시보드 학점은 유지됩니다');
     });
 
     el('areaChips').addEventListener('click', function (event) {
@@ -4996,6 +4975,9 @@ var Store = (function () {
       }
     });
 
+    window.addEventListener('pagehide', function () { clearTimeout(saveTimer); saveNow(); });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') { clearTimeout(saveTimer); saveNow(); } });
+    el('cancelPdfBtn').addEventListener('click', function () { cancelImport(); pdfOutput(''); toast('인식을 중단했어요'); });
     bindPdfDropzone();
   }
 
@@ -5030,7 +5012,8 @@ var Store = (function () {
       row.name = target.value;
     } else if (key === 'credits') {
       var credits = parseFloat(target.value);
-      row.credits = isNaN(credits) ? 0 : credits;
+      row.credits = validNumber(credits, 12);
+      if (event.type === "change") target.value = row.credits;
     } else if (key === 'grade') {
       row.grade = target.value;
     } else if (key === 'cat') {
@@ -5104,11 +5087,12 @@ var Store = (function () {
     safe(loadState);
     safe(applyTheme);
     /* 이벤트를 먼저 묶어 두어, 그리는 중 오류가 나도 버튼은 살아 있게 한다 */
+    if (!Store.available) setText('saveState', '저장 불가 · 내보내기로 보관하세요');
     safe(bindFields);
     safe(bindEvents);
     renderAll();
     safe(function () { showTab(state.tab || 'input'); });
-    if (state.pasteText) safe(function () { setText('saveState', '이전 기록을 불러왔어요'); });
+    if (state.pasteText && Store.available) safe(function () { setText('saveState', '이전 기록을 불러왔어요'); });
     hideJsWarn();
   }
 
