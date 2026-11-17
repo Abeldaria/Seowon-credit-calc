@@ -88,13 +88,20 @@ html[data-theme="dark"] .jserr{background:#2b1516;color:#ffc9c4}
 .verdict.pass{background:var(--ok-soft);color:var(--ok)}
 .verdict.fail{background:var(--bad-soft);color:var(--bad)}
 .verdict.idle{background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .stat{background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:8px 10px;min-width:0}
 .stat .k{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat .v{font-size:14px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat .v small{font-weight:500;color:var(--muted);font-size:11px}
-.deficits{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
-.deficits li{font-size:12px;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:4px 9px;font-weight:600}
+.stat .v.bad{color:var(--bad)}
+.stat .s{margin-top:2px;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .s b{font-weight:700;color:var(--text)}
+.stat .s b.ok{color:var(--ok)}
+.stat .s b.bad{color:var(--bad)}
+.stat .s b.chk{color:var(--warn)}
+.stat .s .bad{color:var(--bad);font-weight:700}
+.deficits{margin:9px 0 0;font-size:12.5px;line-height:1.5;font-weight:650;color:var(--bad)}
+.deficits:empty{display:none}
 
 /* tabs */
 .tabs{display:flex;gap:5px;padding:5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -205,7 +212,17 @@ tr.empty td{text-align:center;color:var(--muted);padding:26px 10px;font-size:13p
 .guide summary::-webkit-details-marker{display:none}
 .guide summary .arw{margin-left:auto;transition:transform .2s;color:var(--muted);font-size:11px}
 .guide[open] summary .arw{transform:rotate(180deg)}
-.guide-body{padding-bottom:16px}
+.guide-body{padding-bottom:14px}
+.refreq{background:var(--panel);border:1px dashed var(--line);border-radius:12px;margin-bottom:12px;padding:0 14px}
+.refreq summary{cursor:pointer;padding:12px 0;font-size:12px;font-weight:650;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.refreq summary::-webkit-details-marker{display:none}
+.refreq summary em{font-style:normal;font-weight:600;font-size:11px;color:var(--muted);opacity:.85}
+.refreq summary .arw{margin-left:auto;transition:transform .2s;color:var(--muted);font-size:10px}
+.refreq[open] summary .arw{transform:rotate(180deg)}
+.refreq-body{border-top:1px solid var(--line2);padding:10px 0 8px}
+.refreq-body .reftip{margin:0 0 8px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.refreq .card{box-shadow:none;border:1px solid var(--line2);margin-bottom:8px;padding:12px 12px 14px}
+.refreq .card:last-child{margin-bottom:0}
 .gformula{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:12px;line-height:1.5}
 .gformula b{font-weight:800}
 .gformula .sum{background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:3px 8px;font-weight:800;font-size:11.5px}
@@ -342,11 +359,23 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
 .undobar .btn{white-space:nowrap;flex:0 0 auto}
 
 @media (max-width:760px){
-  .summary{grid-template-columns:1fr;gap:12px;padding:16px}
-  .ring-wrap{width:112px;height:112px}
-  .ring{width:112px;height:112px}
+  .summary{grid-template-columns:1fr;gap:6px;padding:13px 14px 14px}
+  .ring-wrap{width:84px;height:84px}
+  .ring{width:84px;height:84px}
+  .profilebar{padding:10px 12px;gap:6px}
+  .pinfo{font-size:11.5px;line-height:1.5;padding-bottom:0}
+  .pinfo .notice-mini{display:none}
+  .ring-center b{font-size:22px}
+  .save{display:none}
+  .mark{width:38px;height:38px;border-radius:12px;font-size:19px}
+  .brand h1{font-size:16px}
+  .brand p{font-size:11.5px}
+  .top-actions{gap:6px}
+  .top-actions .btn{padding:6px 9px;font-size:12px}
+  .summary .verdict{font-size:13px;padding:5px 10px;margin-bottom:8px}
+  .stats{gap:6px}
+  .stat{padding:7px 8px}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-  .stats .stat:nth-child(5){grid-column:1/-1}
   .field{grid-template-columns:1fr 106px}
   .split{grid-template-columns:1fr}
   .ggrid{grid-template-columns:1fr}
@@ -428,11 +457,6 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
     </div>
   </header>
 
-  <section class="pubnotice" aria-label="배포용 안내">
-    <p class="pt"><b>📢 서원대 재학생 공유용 · 비공식 도우미</b></p>
-    <p>본 계산기는 서원대학교 공식 졸업인증제·교육과정 이수 안내를 바탕으로 제작된 <b>비공식 도우미</b>입니다. 입력한 성적 데이터는 서버로 전송되지 않고 <b>내 브라우저에만 저장</b>됩니다. 성적 PDF도 기기 안에서만 읽습니다.</p>
-  </section>
-
   <section class="profilebar" aria-label="학번·단과대학 선택">
     <label for="yearSel">학번 (입학년도)
       <select id="yearSel"></select>
@@ -443,7 +467,7 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
     <div class="pinfo" id="profileInfo"></div>
   </section>
 
-  <section class="summary" aria-label="전체 요약">
+  <section class="summary" aria-label="학점 요약">
     <div class="ring-wrap">
       <svg class="ring" viewBox="0 0 132 132" aria-hidden="true">
         <defs>
@@ -455,18 +479,17 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
         <circle class="bg" cx="66" cy="66" r="52"></circle>
         <circle class="fg" id="ringFg" cx="66" cy="66" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
       </svg>
-      <div class="ring-center"><b id="ringPct">0%</b><span>요건 충족률</span></div>
+      <div class="ring-center"><b id="ringPct">0%</b><span>학점 충족</span></div>
     </div>
     <div class="sum-body">
-      <div class="verdict idle" id="verdict"><span>📝</span><span id="verdictText">학점을 입력하면 판정이 나옵니다</span></div>
+      <div class="verdict idle" id="verdict"><span id="verdictText">성적을 넣으면 학점 요건을 채점합니다</span></div>
       <div class="stats">
-        <div class="stat"><div class="k">총 이수학점</div><div class="v" id="sumTotal">0 <small>/ 130</small></div></div>
-        <div class="stat"><div class="k">평점평균</div><div class="v" id="sumGpa">— <small>/ 1.50</small></div></div>
-        <div class="stat"><div class="k">교양</div><div class="v" id="sumLiberal">0 <small>/ 40</small></div></div>
-        <div class="stat"><div class="k">전공</div><div class="v" id="sumMajor">0 <small>/ 60</small></div></div>
-        <div class="stat"><div class="k">CUKI 마일리지</div><div class="v" id="sumCuki">0 <small>/ 150</small></div></div>
+        <div class="stat"><div class="k">총 이수학점</div><div class="v" id="sumTotal">0 <small>/ 130</small></div><div class="s" id="sumTotalNote">130학점 기준</div></div>
+        <div class="stat"><div class="k">평점평균</div><div class="v" id="sumGpa">— <small>/ 1.50</small></div><div class="s" id="sumGpaNote">4.5 만점</div></div>
+        <div class="stat"><div class="k">전공 (전필·전선)</div><div class="v" id="sumMajor">0 <small>/ 60</small></div><div class="s" id="sumMajorParts">전필 0 · 전선 0</div></div>
+        <div class="stat"><div class="k">교양 (교필·교선)</div><div class="v" id="sumLiberal">0 <small>/ 40</small></div><div class="s" id="sumLiberalParts">교필 0 · 교선 0</div></div>
       </div>
-      <ul class="deficits" id="deficits"></ul>
+      <p class="deficits" id="deficits"></p>
     </div>
   </section>
 
@@ -485,52 +508,27 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
       <div class="guide-body">
         <div class="gformula" id="gFormula">
           <span>교양 <b id="gfLib">40</b>학점 =</span>
-          <span>교양필수 <b id="gfReq">21</b>학점 <span class="muted" id="gfParts">(중점 9 + 기초공통 6 + 기초계열 6)</span></span>
+          <span>교필 <b id="gfReq">21</b> <span class="muted" id="gfParts">(중점 9 + 기초공통 6 + 기초계열 6)</span></span>
           <span>+</span>
           <span>균형교양 <b id="gfBal">19</b>학점 이상</span>
-          <span class="sum">교필 = 중점·기초 / 교선 = 균형</span>
         </div>
-        <div class="ggrid">
-          <div class="gitem">
-            <div class="gtop"><span class="gbadge">교필</span><b>중점교양</b><span class="gcred" id="gcredCore">9학점</span></div>
-            <p>학교가 <b>모든 학생에게 지정한</b> 인성·진로·봉사 프로그램입니다. <b>사회봉사Ⅰ(1)</b>, <b>드림프로젝트(2)</b>, <b>SU진로코칭 1~3(각 1)</b>, <b>SU인성코칭 1~3(각 1)</b> 중 학기별로 배정된 과목을 이수하면 채워집니다. 성적표에는 <b>중점교양</b> 또는 <b>교필</b>로 찍힙니다.</p>
-          </div>
-          <div class="gitem">
-            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(공통)</b><span class="gcred" id="gcredCommon">6학점</span></div>
-            <p>사고와표현(글쓰기·말하기), 영어회화처럼 <b>모든 학과가 공통으로</b> 듣는 기초 과목입니다. 1학년 때 대부분 채우고, F를 받으면 졸업이 막힙니다.</p>
-          </div>
-          <div class="gitem" id="gitemFusion">
-            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(융합)</b><span class="gcred" id="gcredFusion">0학점</span></div>
-            <p>2024학번 이후 교육과정에서 생긴 <b>SW·AI·융합 기초</b> 영역입니다. 성적표에 <b>기초학업(융합)</b>·<b>기초융합</b>으로 표기됩니다.</p>
-          </div>
-          <div class="gitem">
-            <div class="gtop"><span class="gbadge">교필</span><b>기초학업(계열)</b><span class="gcred" id="gcredDept">6학점</span></div>
-            <p>인문·사회과학 / 자연과학 / 예체능 <b>3개 계열 중 자기계열 1과목 + 타계열 1과목</b>입니다. 보통 1학년 정규학기에만 열리니 이미 들었는지 성적표에서 확인하세요.</p>
-          </div>
-          <div class="gitem">
-            <div class="gtop"><span class="gbadge sel">교선</span><b>균형교양</b><span class="gcred" id="gcredBal">19학점 이상</span></div>
-            <p>내가 골라 듣는 교양(교선)입니다. <span id="gcredArea">2022~2023학번은 6개 영역 중 4개 영역 이상에서 각 1과목</span>이 필요하고, <b>2024학번 이후는 영역별 이수 제한이 폐지</b>되어 학점만 채우면 됩니다.</p>
-          </div>
-        </div>
-        <p class="gtip">성적표에 <b>교필</b>로만 적혀 있으면 → ① 탭 미리보기에서 그 행의 <b>분류</b>를 눌러 중점교양 / 기초공통 / 기초융합 / 기초계열 중 하나로 골라 주세요. <b>교선</b>은 <b>균형교양</b>으로 고르면 합산에 바로 반영됩니다.</p>
+        <p class="gtip">성적표에 <b>교필</b>로만 적혀 있으면 ① 탭에서 그 행의 <b>분류</b>를 중점교양 / 기초공통 / 기초계열 중 하나로 골라 주세요. <b>교선</b>은 균형교양으로 고르면 됩니다.</p>
       </div>
     </details>
 
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>📋 내 기준 요건표</h2>
-          <p class="meta" id="reqMeta">선택한 학번·단과대학 기준입니다.</p>
+    <details class="guide" id="reqBox">
+      <summary>📋 내 기준 요건표 <span class="arw">▼</span></summary>
+      <div class="guide-body">
+        <p class="meta" id="reqMeta" style="margin-bottom:6px">선택한 학번·단과대학 기준입니다.</p>
+        <div class="tbl-wrap" style="border:0;margin-top:4px">
+          <table class="reqtable" id="reqTable">
+            <thead><tr><th>항목</th><th style="text-align:right">기준</th></tr></thead>
+            <tbody id="reqBody"></tbody>
+          </table>
         </div>
+        <p class="tip" id="reqNote"></p>
       </div>
-      <div class="tbl-wrap" style="border:0;margin-top:4px">
-        <table class="reqtable" id="reqTable">
-          <thead><tr><th>항목</th><th style="text-align:right">기준</th></tr></thead>
-          <tbody id="reqBody"></tbody>
-        </table>
-      </div>
-      <p class="tip" id="reqNote"></p>
-    </div>
+    </details>
 
     <div class="card">
       <div class="card-head">
@@ -655,6 +653,21 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
       <div class="barlabel"><span>합계</span><span id="totalFormula">0학점</span></div>
     </div>
 
+    <div class="card" id="guideCard">
+      <div class="card-head">
+        <div>
+          <h2>🧭 부족한 과목 유형 &amp; 수강신청 가이드</h2>
+          <p class="meta">지금 학점 기준으로 <b>무엇을 더 들어야 하는지</b> 과목 유형까지 알려드립니다.</p>
+        </div>
+        <span class="pill" id="pillGuide">—</span>
+      </div>
+      <div class="grow" id="guideList"></div>
+    </div>
+
+    <details class="refreq" id="refReqBox">
+      <summary>📌 [참고] 졸업인증 별도 요건 <em>CUKI · 비교과 · 졸업논문 — 학교 포털에서 개별 확인</em><span class="arw">▼</span></summary>
+      <div class="refreq-body">
+        <p class="reftip">학점·평점 충족률에는 들어가지 않습니다. SEMS+ &gt; CUKI 비교과에서 확인한 뒤 해당되면 체크하세요.</p>
     <div class="card">
       <div class="card-head">
         <div>
@@ -687,17 +700,8 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
         <label class="check"><input type="checkbox" id="c-thesis"> 졸업논문/졸업시험(대체 포함) 통과</label>
       </div>
     </div>
-
-    <div class="card" id="guideCard">
-      <div class="card-head">
-        <div>
-          <h2>🧭 부족한 과목 유형 &amp; 수강신청 가이드</h2>
-          <p class="meta">지금 학점 기준으로 <b>무엇을 더 들어야 하는지</b> 과목 유형까지 알려드립니다.</p>
-        </div>
-        <span class="pill" id="pillGuide">—</span>
       </div>
-      <div class="grow" id="guideList"></div>
-    </div>
+    </details>
 
   </section>
 
@@ -715,12 +719,11 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
 
       <p class="privacy">
         <span class="lock" aria-hidden="true">🔒</span>
-        <span><b>내 폰 안에서만 읽고, 서버로는 절대 전송하지 않습니다.</b> PDF는 이 브라우저 메모리에서만 열립니다. 인식 엔진(pdf.js)만 인터넷에서 한 번 내려받고, 파일 내용은 어디에도 보내지 않습니다. 글자가 없는 그림 PDF는 같은 방식으로 <b>글자 인식(OCR)</b> 엔진·언어 데이터만 내려받아 이 기기 안에서 숫자를 읽습니다.</span>
+        <span><b>파일은 이 기기 안에서만 읽고 서버로 보내지 않습니다.</b> 인식 엔진(pdf.js·OCR)만 인터넷에서 한 번 내려받습니다(IP 등 접속 정보는 전달될 수 있음).</span>
       </p>
 
-      <p class="tip">기본은 앞 3쪽을 읽습니다. 숫자가 유난히 작거나 흐리게 읽히면 <b>고해상도 정밀 인식</b>을 켜고 한 번 더 넣어 보세요.</p>
-      <label class="check"><input type="checkbox" id="ocrFine"> 고해상도 정밀 인식 (더 느리지만 작은 숫자에 강함)</label>
-      <p class="tip">CDN에서 엔진·언어 파일(약 3MB)을 받으므로 인터넷이 필요하며, 해당 서비스에 IP 등 접속 정보가 전달될 수 있습니다. 성적·PDF 내용은 업로드하지 않습니다.</p>
+      <p class="tip">앞 3쪽을 읽습니다. 작은 숫자가 빠지면 <b>정밀 인식</b>을 켜 보세요.</p>
+      <label class="check"><input type="checkbox" id="ocrFine"> 고해상도 정밀 인식 (느리지만 작은 숫자에 강함)</label>
       <p class="tip" id="fileProtoTip" hidden>지금은 <b>내 PC 파일(file://)</b>로 열려 있어요. 글자 인식(OCR)은 웹 주소에서 가장 빠르고 안정적입니다 — <a href="https://abeldaria.github.io/Seowon-credit-calc/" target="_blank" rel="noopener">같은 계산기를 웹에서 열기</a> (성적이 서버로 가지 않는 점은 같습니다)</p>
       <button type="button" class="btn sm hidden" id="cancelPdfBtn">PDF/OCR 중단</button>
       <div class="drop" id="pdfDrop" role="button" tabindex="0" aria-label="성적 PDF 선택 또는 끌어다 놓기">
@@ -747,15 +750,9 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
       </div>
 
       <div class="notice">
-        <b>📄 PDF에서 복사하는 방법</b> — <b>“성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요.”</b>
-        <ol>
-          <li>종합정보시스템에서 <b>성적 취득현황</b>을 PDF로 열거나 저장합니다. (맥은 <b>⌘+A → ⌘+C</b>)</li>
-          <li>PDF 화면 아무 곳이나 한 번 클릭한 뒤 <b>Ctrl+A</b>로 전체 선택, <b>Ctrl+C</b>로 복사합니다.</li>
-          <li>아래 상자에 붙여넣고 <b>[분석]</b>을 누르세요. 공백·줄바꿈만 있어도 이수구분·학점·등급을 찾아냅니다.</li>
-        </ol>
+        <b>📄 PDF에서 복사</b> — <b>성적 취득현황 PDF를 열고 Ctrl(⌘)+A → Ctrl(⌘)+C</b>로 전체 복사해 아래에 붙여넣고 <b>[분석]</b>을 누르세요.
       </div>
 
-      <label for="pasteBox" class="muted" style="font-size:12px;font-weight:650">성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요</label>
       <textarea id="pasteBox" spellcheck="false" placeholder="성적 취득현황 PDF를 열고 Ctrl+A → Ctrl+C로 전체 복사해서 여기에 붙여넣으세요.
 
 예)
@@ -868,9 +865,9 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
   </main>
 
   <footer class="foot">
-    <p><b>안내</b> · 본 계산기는 서원대학교 공식 졸업인증제·교육과정 이수 안내를 바탕으로 제작된 비공식 도우미입니다. 입력한 성적 데이터는 서버로 전송되지 않고 내 브라우저에만 저장됩니다.</p>
+    <p><b>안내</b> · 서원대학교 공식 안내를 바탕으로 만든 <b>비공식 도우미</b>입니다. 입력한 성적은 서버로 전송되지 않고 내 브라우저에만 저장됩니다.</p>
     <p><b>개인정보</b> · 성적표를 붙여넣거나 PDF를 넣어도 외부로 전송되지 않고, 자동 저장도 이 브라우저의 로컬 저장소(<code>seowon-grad-calc-public-v1</code>)에만 됩니다. <b>성적 PDF를 넣을 때만</b> 읽기 엔진(pdf.js)을 CDN에서 한 번 내려받고, 글자가 없는 그림 PDF는 글자 인식(OCR) 엔진과 언어 데이터를 한 번 더 내려받습니다. 그 요청에도 파일 내용은 포함되지 않습니다. 브라우저 저장 데이터를 지우면 입력도 함께 사라집니다.</p>
-    <p><b>기준</b> · 서원대학교 졸업인증제 기준표(2022·2023학번 / 2024학번 이후 개편). 학번·단과대학을 고르면 총 졸업학점·교양·전공·교직 기준이 자동으로 바뀝니다. 비교과(민주시민·창의인재·실용인 각 1개 + CUKI 150점)와 졸업논문(대체 포함)은 공통입니다.</p>
+    <p><b>기준</b> · 서원대학교 졸업인증제 기준표(2022·2023학번 / 2024학번 이후 개편). 학번·단과대학을 고르면 총 졸업학점·교양·전공·교직 기준이 자동으로 바뀝니다. 비교과(민주시민·창의인재·실용인 각 1개 + CUKI 150점)와 졸업논문(대체 포함)은 별도 요건으로, 학점 충족률 계산에는 넣지 않습니다.</p>
     <p>학과·입학년도·교육과정 개편에 따라 세부 기준이 다를 수 있습니다. 최종 확인은 학사지원팀 043-299-8016 · 비교과는 교육혁신원 043-299-8287.</p>
   </footer>
 </div>
@@ -1016,14 +1013,9 @@ var Rules = (function () {
     if (!label) label = list.length ? list[0].label : '';
 
     var notice = '';
-    if (String(year) === '2026' || String(year) === '2027') {
-      notice = '2026·2027학번은 학사공지·교육과정 개편을 학사지원팀에서 최종 확인하세요.';
-    } else if (school === 'future') {
-      notice = '미래대학은 학과(전공)별 지정 요건이 다를 수 있습니다.';
-    } else if (String(year) === '2024' || String(year) === '2025') {
-      notice = '2024학번 이후 개편 기준을 적용했습니다.';
-    }
-    notice += ' 전공 학점은 범위의 최소값으로 계산하며, 학과·복수전공·편입·재수강 기준은 별도 확인이 필요합니다.';
+    if (String(year) === '2026' || String(year) === '2027') notice = '26·27학번은 학사공지로 최종 확인. ';
+    else if (school === 'future') notice = '미래대학은 학과별 지정 요건 확인. ';
+    notice += '전공은 범위 최소값 기준 · 학과·복수전공·재수강은 학과 확인.';
     return { school: label, notice: notice };
   }
 
@@ -1573,12 +1565,19 @@ var Transcript = (function (Rules) {
       out.sources[sk] = '영역별 취득학점 합';
     }
 
-    /* '교양필수 20'처럼 합계만 적힌 행은, 세부(중점·기초)가 모두 있으면 중복이므로 버린다 */
+    /* '교양필수 20'처럼 합계만 적힌 행과 세부(중점·기초)가 함께 있으면
+       세부를 그대로 두고 차액만 '교필 미분류'로 남긴다 — 두 번 세지 않게. */
     if (out.fields.libUnknown !== undefined) {
       var parts = (out.fields.core || 0) + (out.fields.common || 0) + (out.fields.fusion || 0) + (out.fields.dept || 0);
-      if (parts > 0 && Math.abs(parts - out.fields.libUnknown) < 0.01) {
-        delete out.fields.libUnknown;
-        delete out.sources.libUnknown;
+      if (parts > 0) {
+        var remain = out.fields.libUnknown - parts;
+        if (remain > 0.01) {
+          out.fields.libUnknown = Math.round(remain * 100) / 100;
+        } else {
+          if (remain < -0.01) out.warnings.push('교필 합계(' + Rules.fmt(out.fields.libUnknown) + ')보다 세부 합(' + Rules.fmt(parts) + ')이 커요 — 세부 값을 우선했습니다.');
+          delete out.fields.libUnknown;
+          delete out.sources.libUnknown;
+        }
       }
     }
 
@@ -1725,73 +1724,108 @@ var Grader = (function (Rules) {
     var majorReq = num('majorReq'), majorElec = num('majorElec'), teaching = num('teaching'), etc = num('etc');
     var gpa = num('gpa'), cuki = num('cuki');
 
-    var liberal = core + common + fusion + dept + libUnknown + balance;
+    var libDetail = core + common + fusion + dept;
+    var liberal = libDetail + libUnknown + balance;
     var major = majorReq + majorElec;
     var total = liberal + major + teaching + etc;
     var areas = fields.areas || [];
     var areaCount = 0;
     for (var i = 0; i < Rules.AREAS.length; i++) if (areas[i]) areaCount++;
 
+    /* 교필 합계만 있고 세부(중점·기초)가 하나도 없으면 세부는 판정하지 않는다 */
+    var libDetailUnknown = libUnknown > 0 && libDetail === 0;
+
     var items = [];
 
-    function add(key, label, req, cur, unit, ok, kind) {
+    function add(key, label, req, cur, unit, ok, kind, unknown) {
       items.push({
         key: key, label: label, req: req, cur: cur,
-        unit: unit || '', ok: !!ok, note: '', kind: kind || 'credit',
+        unit: unit || '', ok: !!ok, unknown: !!unknown, note: '', kind: kind || 'credit',
         ratio: req > 0 ? Math.max(0, Math.min(1, cur / req)) : (ok ? 1 : 0),
         gap: Math.max(0, req - cur)
       });
     }
 
     add('total', '총 졸업학점', R.total, total, '학점', total >= R.total);
-    add('gpa', '평점평균', R.gpa, gpa, '', gpa >= R.gpa, 'gpa');
-    if (R.liberal > 0) add('liberal', '교양 최소 이수', R.liberal, liberal, '학점', liberal >= R.liberal);
-    if (R.core > 0) add('core', '중점교양', R.core, core, '학점', core >= R.core);
-    if (R.common > 0) add('common', '기초학업(공통)', R.common, common, '학점', common >= R.common);
-    if (R.fusion > 0) add('fusion', '기초학업(융합)', R.fusion, fusion, '학점', fusion >= R.fusion);
+    add('gpa', '평점평균', R.gpa, gpa, '', gpa >= R.gpa, 'gpa', gpa <= 0);
+    if (R.liberal > 0) add('liberal', '교양 합계', R.liberal, liberal, '학점', liberal >= R.liberal);
+    if (R.core > 0) add('core', '중점교양', R.core, core, '학점', core >= R.core, 'credit', libDetailUnknown);
+    if (R.common > 0) add('common', '기초학업(공통)', R.common, common, '학점', common >= R.common, 'credit', libDetailUnknown);
+    if (R.fusion > 0) add('fusion', '기초학업(융합)', R.fusion, fusion, '학점', fusion >= R.fusion, 'credit', libDetailUnknown);
     if (R.dept > 0) {
-      add('dept', '기초학업(계열)', R.dept, dept, '학점', dept >= R.dept);
+      add('dept', '기초학업(계열)', R.dept, dept, '학점', dept >= R.dept, 'credit', libDetailUnknown);
       add('deptSelf', '기초학업 자기계열 1과목', 1, fields.deptSelf ? 1 : 0, '', !!fields.deptSelf, 'check');
       add('deptOther', '기초학업 타계열 1과목', 1, fields.deptOther ? 1 : 0, '', !!fields.deptOther, 'check');
     }
     if (R.balance > 0) add('balance', '균형교양', R.balance, balance, '학점', balance >= R.balance);
-    if (R.areas > 0) add('areas', '균형교양 영역', R.areas, areaCount, '개 영역', areaCount >= R.areas);
-    add('major', '전공', R.majorMin, major, '학점', major >= R.majorMin);
+    if (R.areas > 0) add('areas', '균형교양 영역', R.areas, areaCount, '개 영역', areaCount >= R.areas, 'credit', balance > 0 && areaCount === 0);
+    add('major', '전공 합계', R.majorMin, major, '학점', major >= R.majorMin);
     add('majorAll', '전공필수 지정과목', 1, fields.majorAll ? 1 : 0, '', !!fields.majorAll, 'check');
     if (R.teaching > 0) add('teaching', '교직', R.teaching, teaching, '학점', teaching >= R.teaching);
     add('progDem', '민주시민 프로그램', 1, fields.progDem ? 1 : 0, '', !!fields.progDem, 'check');
     add('progCre', '창의인재 프로그램', 1, fields.progCre ? 1 : 0, '', !!fields.progCre, 'check');
     add('progPra', '실용인 프로그램', 1, fields.progPra ? 1 : 0, '', !!fields.progPra, 'check');
-    add('cuki', 'CUKI 마일리지', 150, cuki, '점', cuki >= 150);
+    add('cuki', 'CUKI 마일리지', 150, cuki, '점', cuki >= 150, 'cuki');
     add('thesis', '졸업논문/졸업시험', 1, fields.thesis ? 1 : 0, '', !!fields.thesis, 'check');
 
-    var passCount = 0, fails = [];
-    for (var k = 0; k < items.length; k++) {
-      if (items[k].ok) passCount++; else fails.push(items[k]);
+    /* 충족률·미충족 배지 = 학점·평점 "수치" 요건만 (총학점·평점·교양 합계·세부·균형·전공 합계) */
+    var scaleItems = [], scaleFails = [], scalePasses = 0;
+    for (var s = 0; s < items.length; s++) {
+      var scaleIt = items[s];
+      if (scaleIt.unknown) continue;
+      if (scaleIt.kind !== 'credit' && scaleIt.kind !== 'gpa') continue;
+      scaleItems.push(scaleIt);
+      if (scaleIt.ok) scalePasses++; else scaleFails.push(scaleIt);
     }
 
-    var hasInput = total > 0 || gpa > 0 || cuki > 0 ||
-      !!(fields.thesis || fields.progDem || fields.progCre || fields.progPra ||
-         fields.deptSelf || fields.deptOther || fields.majorAll);
+    /* 학점 확인 항목(계열 1과목·전공필수 지정과목)과 별도 요건(비교과·CUKI·졸업논문)을 가른다 */
+    var ACAD_CHECK = { deptSelf: 1, deptOther: 1, majorAll: 1 };
+    var acadItems = [], acadFails = [], otherFails = [];
+    for (var q = 0; q < items.length; q++) {
+      var item = items[q];
+      var academic = item.kind === 'credit' || item.kind === 'gpa' || !!ACAD_CHECK[item.key];
+      if (academic) acadItems.push(item);
+      if (item.ok) continue;
+      if (academic) acadFails.push(item); else otherFails.push(item);
+    }
+
+    /* 전필 · 전선 · 교필 · 교선 — 지금 학번·단과대학 기준에서 각각 얼마나 남았는지 */
+    var libCur = liberal - balance;
+    var needLib = R.core + (R.common || 0) + (R.fusion || 0) + R.dept;
+    var needElec = Math.max(0, R.majorMin - majorReq);
+    var parts4 = {
+      majorReq: { cur: majorReq, need: null, gap: 0, state: fields.majorAll ? 'ok' : 'chk' },
+      majorElec: { cur: majorElec, need: needElec, gap: Math.max(0, needElec - majorElec), state: major >= R.majorMin ? 'ok' : 'bad' },
+      lib: { cur: libCur, need: needLib, gap: Math.max(0, needLib - libCur), state: libCur >= needLib ? 'ok' : 'bad', detail: libDetail, detailUnknown: libDetailUnknown },
+      balance: { cur: balance, need: R.balance, gap: Math.max(0, R.balance - balance), state: (balance >= R.balance && (!R.areas || areaCount >= R.areas)) ? 'ok' : 'bad' }
+    };
+
+    var hasInput = total > 0 || gpa > 0;
 
     return {
-      items: items, passes: passCount, count: items.length, fails: fails,
+      items: items, acadItems: acadItems, acadFails: acadFails, otherFails: otherFails,
+      scaleItems: scaleItems, scaleFails: scaleFails, scalePasses: scalePasses, scaleCount: scaleItems.length,
+      ratio: scaleItems.length ? scalePasses / scaleItems.length : 0,
+      parts4: parts4, libDetailUnknown: libDetailUnknown,
+      fails: acadFails.concat(otherFails),
       liberal: liberal, major: major, total: total, teaching: teaching, areaCount: areaCount,
-      ratio: items.length ? passCount / items.length : 0,
+      majorReq: majorReq, majorElec: majorElec, core: core, common: common, fusion: fusion,
+      dept: dept, libUnknown: libUnknown, balance: balance,
       hasInput: hasInput,
-      complete: fails.length === 0 && hasInput
+      complete: hasInput && acadFails.length === 0
     };
   }
 
   /** 부족한 항목마다 "무엇을 더 들어야 하는지" 문장을 만든다. */
-  function buildGuide(ev, f, r) {
+  function buildGuide(ev, f, r, list) {
     var R = r || Rules.resolveReq('2022', 'general');
     var out = [];
+    var fails = list || ev.fails;
 
     function gap(item) { return Rules.fmt(item.req - item.cur); }
 
-    for (var i = 0; i < ev.fails.length; i++) {
-      var item = ev.fails[i];
+    for (var i = 0; i < fails.length; i++) {
+      var item = fails[i];
       switch (item.key) {
         case 'total':
           out.push({ t: '총 이수학점 ' + gap(item) + '학점 부족', b: '졸업까지 ' + R.total + '학점이 필요합니다(현재 ' + Rules.fmt(ev.total) + ' / ' + R.total + '). 남은 학기 수강신청 + 계절학기로 채우세요.' });
@@ -1914,19 +1948,20 @@ var Grader = (function (Rules) {
     L.push('# 🎓 졸업요건 현황 · ' + date);
     L.push('');
 
-    var verdict = ev.hasInput ? (ev.complete ? '✅ 모든 요건 충족' : '⚠️ ' + ev.fails.length + '개 항목 미충족') : '📝 아직 입력 없음';
+    var verdict = ev.hasInput ? (ev.complete ? '✅ 학점 요건 충족' : '⚠️ ' + ev.scaleFails.length + '개 항목 미충족') : '📝 아직 입력 없음';
     L.push('> [!summary] 판정 — **' + verdict + '**');
     L.push('> ' + yearTxt + '학번 · ' + escPipe(schoolTxt) + ' 기준 · 총 이수 **' + Rules.fmt(ev.total) + ' / ' + R.total + '학점** · 평점평균 **' + Rules.fmtGpa(f.gpa) + '** (기준 ' + Rules.fmtGpa(R.gpa) + ')');
     L.push('> 교양 **' + Rules.fmt(ev.liberal) + ' / ' + R.liberal + '** · 전공 **' + Rules.fmt(ev.major) + ' / ' + R.majorMin + '**' + (R.teaching ? ' · 교직 **' + Rules.fmt(f.teaching) + ' / ' + R.teaching + '**' : ''));
-    L.push('> 요건 충족률 **' + Math.round(ev.ratio * 100) + '%** (' + ev.passes + '/' + ev.count + ')');
+    L.push('> 학점 요건 충족률 **' + Math.round(ev.ratio * 100) + '%** (' + ev.scalePasses + '/' + ev.scaleCount + ') · 전공필수·선택·교양필수·선택 학점만 계산');
+    L.push('');
     L.push('');
 
-    L.push('## 1. 요건 점검표');
+    L.push('## 1. 학점·성적 요건 점검표');
     L.push('');
     L.push('| 항목 | 기준 | 현재 | 상태 |');
     L.push('| :--- | ---: | ---: | :---: |');
-    for (var i = 0; i < ev.items.length; i++) {
-      var item = ev.items[i];
+    for (var i = 0; i < ev.acadItems.length; i++) {
+      var item = ev.acadItems[i];
       var curTxt, reqTxt;
       if (item.kind === 'gpa') { curTxt = Rules.fmtGpa(item.cur); reqTxt = Rules.fmtGpa(item.req) + ' 이상'; }
       else if (item.kind === 'check') { curTxt = item.ok ? '이수' : '미이수'; reqTxt = '필수'; }
@@ -1974,7 +2009,9 @@ var Grader = (function (Rules) {
     }
     L.push('');
 
-    L.push('## 4. 비교과 · 졸업인증');
+    L.push('## 4. [참고] 졸업인증 별도 요건 (CUKI · 비교과 · 졸업논문)');
+    L.push('');
+    L.push('> 학점·평점 충족률에는 들어가지 않습니다. 학교 포털(SEMS+)에서 개별 확인하세요.');
     L.push('');
     L.push(checkLine(!!f.progDem, '민주시민 1개 이상', ''));
     L.push(checkLine(!!f.progCre, '창의인재 1개 이상', ''));
@@ -2001,17 +2038,17 @@ var Grader = (function (Rules) {
       L.push('');
     }
 
-    if (ev.hasInput && !ev.fails.length) {
+    if (ev.hasInput && !ev.acadFails.length) {
       L.push('## 🎉 결론');
       L.push('');
-      L.push('현재 기준으로 **모든 졸업요건을 충족**했습니다. 최종 확인은 학과 사무실·학사지원팀(043-299-8016)에서 받으세요.');
+      L.push('현재 기준으로 **학점 요건을 모두 충족**했습니다. 최종 확인은 학과 사무실·학사지원팀(043-299-8016)에서 받으세요.');
       L.push('');
     }
 
-    if (ev.fails.length) {
+    if (ev.acadFails.length) {
       L.push('## ' + (included.length ? 6 : 5) + '. 부족한 과목 유형 · 수강신청 가이드');
       L.push('');
-      var guide = buildGuide(ev, f, R);
+      var guide = buildGuide(ev, f, R, ev.acadFails);
       for (var g = 0; g < guide.length; g++) {
         L.push('- **' + guide[g].t + '** — ' + stripTags(guide[g].b));
       }
@@ -3169,9 +3206,11 @@ var PdfOcr = (function () {
 
     /* 이수구분: 라벨(전공필수·교양선택…)이 가장 많이 보이는 쪽을 고른다.
        제목 글자가 흔들려도 도표 쪽을 찾도록 제목·라벨 두 단서를 함께 쓴다. */
-    var areaPage = areaPageByLabels(wordsByPage, order) || pickPage(titles, order, function (t) {
+    /* 전필·전선·교필·교선 4개 합계는 '이수구분별 취득학점' 원그래프 쪽에서 읽는다.
+       학기별 막대(범례에 같은 이름이 있음)를 고르면 숫자가 엉뚱하게 짝지어진다. */
+    var areaPage = pickPage(titles, order, function (t) {
       return t.indexOf('이수구분') >= 0 && t.indexOf('학기') < 0;
-    });
+    }) || areaPageByLabels(wordsByPage, order);
     /* 학기: '학기별 취득학점' 도표 쪽이 있으면 그 쪽만 */
     var termPage = pickPage(titles, order, function (t) {
       return t.indexOf('학기별') >= 0 && t.indexOf('이수구분') < 0;
@@ -3960,8 +3999,8 @@ var Store = (function () {
       ['균형교양', r.balance + '학점 이상' + (r.areas ? ' · ' + r.areas + '개 영역 이상' : ' · 영역 제한 없음')],
       ['전공', majorRange(r) + '학점'],
       ['교직', r.teaching ? r.teaching + '학점' : '해당 없음'],
-      ['비교과', '민주시민·창의인재·실용인 각 1개 + CUKI 150점'],
-      ['졸업논문', '논문 또는 대체(졸업시험·작품·실기) 통과']
+      ['참고 · 비교과', '민주시민·창의인재·실용인 각 1개 + CUKI 150점'],
+      ['참고 · 졸업논문', '논문 또는 대체(졸업시험·작품·실기) 통과']
     ];
 
     var body = '';
@@ -4086,11 +4125,27 @@ var Store = (function () {
     var f = state.fields;
     var ev = Grader.evaluate(f, r);
 
-    setText('sumTotal', Rules.fmt(ev.total) + ' / ' + r.total);
+    var fmt = Rules.fmt;
+
+    setText('sumTotal', fmt(ev.total) + ' / ' + r.total);
+    el('sumTotal').className = 'v' + (ev.total >= r.total ? '' : ' bad');
+    setText('sumTotalNote', ev.total >= r.total ? '충족' : (fmt(r.total - ev.total) + '학점 남음'));
+
     setText('sumGpa', (Number(f.gpa) > 0 ? Rules.fmtGpa(f.gpa) : '—') + ' / ' + Rules.fmtGpa(r.gpa));
-    setText('sumLiberal', Rules.fmt(ev.liberal) + ' / ' + r.liberal);
-    setText('sumMajor', Rules.fmt(ev.major) + ' / ' + r.majorMin);
-    setText('sumCuki', Rules.fmt(f.cuki) + ' / 150');
+    el('sumGpa').className = 'v' + (Number(f.gpa) > 0 && Number(f.gpa) < r.gpa ? ' bad' : '');
+
+    setText('sumMajor', fmt(ev.major) + ' / ' + r.majorMin);
+    el('sumMajor').className = 'v' + (ev.major >= r.majorMin ? '' : ' bad');
+    el('sumMajorParts').innerHTML = '전필 <b class="' + ev.parts4.majorReq.state + '">' + fmt(ev.majorReq) + '</b>'
+      + ' · 전선 <b class="' + ev.parts4.majorElec.state + '">' + fmt(ev.majorElec) + '</b>'
+      + (ev.hasInput && ev.parts4.majorElec.gap > 0 ? '<span class="bad">(-' + fmt(ev.parts4.majorElec.gap) + ')</span>' : '');
+
+    setText('sumLiberal', fmt(ev.liberal) + ' / ' + r.liberal);
+    el('sumLiberal').className = 'v' + (ev.liberal >= r.liberal ? '' : ' bad');
+    el('sumLiberalParts').innerHTML = '교필 <b class="' + ev.parts4.lib.state + '">' + fmt(ev.parts4.lib.cur) + '</b>'
+      + (ev.hasInput && ev.parts4.lib.gap > 0 ? '<span class="bad">(-' + fmt(ev.parts4.lib.gap) + ')</span>' : '')
+      + ' · 교선 <b class="' + ev.parts4.balance.state + '">' + fmt(ev.balance) + '</b>'
+      + (ev.hasInput && ev.parts4.balance.gap > 0 ? '<span class="bad">(-' + fmt(ev.parts4.balance.gap) + ')</span>' : '');
 
     setText('ringPct', Math.round(ev.ratio * 100) + '%');
     var circle = el('ringFg');
@@ -4103,26 +4158,33 @@ var Store = (function () {
     var verdict = el('verdict');
     if (!ev.hasInput) {
       verdict.className = 'verdict idle';
-      el('verdictText').textContent = '학점을 입력하면 판정이 나옵니다';
-    } else if (ev.complete) {
+      el('verdictText').textContent = '성적을 넣으면 학점 요건을 채점합니다';
+    } else if (!ev.scaleFails.length) {
       verdict.className = 'verdict pass';
-      el('verdictText').textContent = '입력한 공통 기준 충족 · 학과 최종 확인 필요';
+      el('verdictText').textContent = '학점 요건 충족';
     } else {
       verdict.className = 'verdict fail';
-      el('verdictText').textContent = ev.fails.length + '개 항목 미충족 · 충족 ' + ev.passes + '/' + ev.count;
+      el('verdictText').textContent = '학점 요건 ' + ev.scalePasses + '/' + ev.scaleCount + ' 충족';
     }
 
     var deficits = el('deficits');
-    var deficitHtml = '';
-    var creditFails = ev.fails.filter(function (item) { return item.kind !== 'check'; }).slice(0, 4);
-    for (var i = 0; i < creditFails.length; i++) {
-      var item = creditFails[i];
-      var unit = item.unit === '개 영역' ? '개 영역' : (item.unit === '점' ? '점' : '학점');
-      deficitHtml += '<li>' + esc(item.label) + ' ' + Rules.fmt(item.req - item.cur) + unit + ' 부족</li>';
+    var SHORT = { total: '총학점', gpa: '평점', liberal: '교양', core: '중점교양', common: '기초공통', fusion: '기초융합', dept: '기초계열', balance: '균형교양', areas: '균형 영역', major: '전공', teaching: '교직' };
+    var failKeys = {};
+    for (var fk = 0; fk < ev.scaleFails.length; fk++) failKeys[ev.scaleFails[fk].key] = true;
+    var subLibFail = failKeys.core || failKeys.common || failKeys.fusion || failKeys.dept || failKeys.balance || failKeys.areas;
+    var shortList = [];
+    for (var si = 0; si < ev.scaleFails.length; si++) {
+      var sf = ev.scaleFails[si];
+      if (sf.key === 'liberal' && subLibFail) continue;   /* 교양 합계 부족은 아래 세부가 이미 말해 준다 */
+      var nm = SHORT[sf.key] || sf.label;
+      if (sf.key === 'gpa') shortList.push('평점 ' + Rules.fmtGpa(sf.req) + ' 미달');
+      else if (sf.unit === '개 영역') shortList.push(nm + ' ' + fmt(sf.req - sf.cur) + '개 부족');
+      else if (sf.unit === '점') shortList.push(nm + ' ' + fmt(sf.req - sf.cur) + '점 부족');
+      else shortList.push(nm + ' ' + fmt(sf.req - sf.cur) + '학점 부족');
     }
-    var checkFails = ev.fails.filter(function (item) { return item.kind === 'check'; });
-    if (checkFails.length) deficitHtml += '<li>확인 필요 ' + checkFails.length + '건</li>';
-    deficits.innerHTML = ev.hasInput ? deficitHtml : '';
+    deficits.textContent = (ev.hasInput && shortList.length)
+      ? (shortList.slice(0, 3).join(' · ') + (shortList.length > 3 ? ' 외 ' + (shortList.length - 3) + '건' : ''))
+      : '';
 
     /* 교양필수 */
     var libReq = r.core + (r.common || 0) + (r.fusion || 0) + r.dept;
@@ -4193,15 +4255,15 @@ var Store = (function () {
       return;
     }
 
-    if (!ev.fails.length) {
-      list.innerHTML = '<div class="gdone">🎉 현재 기준(' + state.year + '학번 · ' + esc(Rules.profileMeta(state.year, state.school).school)
-        + ')으로 모든 졸업요건을 충족했습니다!<br><span style="font-weight:600;font-size:12.5px">최종 확인은 학과 사무실·학사지원팀(043-299-8016)에서 한 번 더 받아 두세요.</span></div>';
+    if (!ev.acadFails.length) {
+      list.innerHTML = '<div class="gdone">🎉 ' + state.year + '학번 · ' + esc(Rules.profileMeta(state.year, state.school).school)
+        + ' 기준 <b>학점 요건을 모두 채웠습니다.</b><br><span style="font-weight:600;font-size:12.5px">최종 확인은 학과 사무실·학사지원팀(043-299-8016).</span></div>';
       pill.className = 'pill ok';
       pill.textContent = '충족 🎉';
       return;
     }
 
-    var rows = Grader.buildGuide(ev, f, r);
+    var rows = Grader.buildGuide(ev, f, r, ev.acadFails);
     var html = '';
     for (var i = 0; i < rows.length; i++) {
       html += '<div class="gcard"><div class="gt">' + esc(rows[i].t) + '</div><div class="gb">' + rows[i].b + '</div></div>';
@@ -4846,7 +4908,7 @@ var Store = (function () {
       html.push('<p class="pdfmeta">PDF에 없던 항목: ' + esc(missing.join(', ')) + ' — ② 탭에서 직접 입력해 주세요.</p>');
     }
 
-    html.push('<p class="pdfmeta">도표에 없는 <b>균형교양 영역(4개) 이수 여부</b>, <b>비교과 3개 · CUKI 150점</b>, <b>졸업논문</b>은 ② 탭에서 직접 체크해 주세요.</p>');
+    html.push('<p class="pdfmeta">도표에 없는 <b>균형교양 영역(4개) 이수 여부</b>는 ② 탭에서, <b>비교과·CUKI·졸업논문</b>은 ② 탭 맨 아래 <b>[참고]</b>에서 체크하세요.</p>');
 
     if (summary.warnings && summary.warnings.length) {
       html.push('<p class="pdfmeta warnline">⚠️ ' + esc(summary.warnings.join(' ')) + '</p>');
@@ -4866,11 +4928,21 @@ var Store = (function () {
   function applySummary(summary) {
     var f = state.fields;
     var count = 0;
+    var src = summary.fields || {};
+    var sf = {};
+    for (var k0 in src) if (src.hasOwnProperty(k0)) sf[k0] = src[k0];
+
+    /* 교필 합계(교양필수 20)와 세부(중점·기초)가 같이 읽히면 세부를 넣고 차액만 미분류로 남긴다
+       — 합계를 세부에 또 더해 두 번 세는 일을 막는다. */
+    if (sf.libUnknown !== undefined) {
+      var detail = (sf.core || 0) + (sf.common || 0) + (sf.fusion || 0) + (sf.dept || 0);
+      if (detail > 0) sf.libUnknown = Math.max(0, sf.libUnknown - detail);
+    }
 
     for (var i = 0; i < PDF_VALUE_FIELDS.length; i++) {
       var key = PDF_VALUE_FIELDS[i][0];
-      if (summary.fields[key] === undefined) continue;
-      f[key] = summary.fields[key];
+      if (sf[key] === undefined) continue;
+      f[key] = sf[key];
       count++;
     }
     if (summary.gpa !== null) { f.gpa = summary.gpa; count++; }
