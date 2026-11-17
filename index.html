@@ -268,6 +268,62 @@ html[data-theme="dark"] .gcard .gt{color:var(--warn)}
 .pf .v{margin-top:1px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
 .pf.hit{border-color:var(--ok);background:var(--ok-soft)}
 
+/* ── 그림 PDF · OCR ───────────────────────────────────────── */
+.ocrpanel{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
+.ocrhead{display:flex;align-items:center;gap:10px}
+.ocrico{flex:0 0 auto;width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:var(--accent-soft);font-size:18px;line-height:1}
+.ocrhead .t{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ocrhead .t b{font-size:13.5px;line-height:1.4}
+.ocrhead .t span{font-size:12px;color:var(--muted);line-height:1.45}
+.ocrpct{flex:0 0 auto;font-size:13px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.ocrbar{position:relative;height:6px;margin-top:11px;border-radius:999px;background:var(--line);overflow:hidden}
+.ocrbar>i{display:block;height:100%;width:0;border-radius:999px;background:var(--accent);transition:width .3s ease}
+.ocrsteps{margin:11px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:5px 16px;font-size:11.5px;color:var(--muted)}
+.ocrsteps li{display:flex;align-items:center;gap:6px}
+.ocrsteps .dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--line)}
+.ocrsteps li.is-active{color:var(--text);font-weight:800}
+.ocrsteps li.is-active .dot{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ocrsteps li.is-done{color:var(--ok);font-weight:700}
+.ocrsteps li.is-done .dot{background:var(--ok)}
+.nw{white-space:nowrap}
+.ocrnote{margin:9px 0 0;font-size:11.5px;color:var(--muted);word-break:keep-all}
+
+.ocrres{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
+.ocrres-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ocrbadge{flex:0 0 auto;padding:4px 9px;border-radius:9px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em}
+.ocrres-head .t{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ocrres-head .t b{font-size:14px;line-height:1.35}
+.ocrres-head .t span{font-size:11.5px;color:var(--muted)}
+.ocrstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ocrstat{padding:10px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);min-width:0}
+.ocrstat span{display:block;font-size:11px;color:var(--muted);font-weight:750}
+.ocrstat strong{display:block;font-size:21px;line-height:1.25;font-weight:850;font-variant-numeric:tabular-nums}
+.ocrstat em{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ocralert{margin-top:12px;padding:11px 13px;border-radius:12px;background:var(--warn-soft);border-left:4px solid var(--warn);font-size:12.5px;line-height:1.62;word-break:keep-all}
+.ocralert b{font-weight:800}
+.ocralert .lead{display:block;margin-bottom:2px}
+.ocralert span{display:block;color:var(--muted)}
+.ocralert span.fix{margin-top:4px}
+.ocralert span b{display:inline;font-weight:800;color:var(--text)}
+.ocrvals{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
+.ocrval{padding:9px 11px;border-radius:11px;border:1px solid var(--line);background:var(--panel);min-width:0}
+.ocrval .k{font-size:11px;color:var(--muted);font-weight:750}
+.ocrval .v{font-size:16px;font-weight:850;font-variant-numeric:tabular-nums}
+.ocrval .v small{font-size:11px;font-weight:700;color:var(--muted);margin-left:2px}
+.ocrval.check{border-color:var(--warn);background:var(--warn-soft)}
+.ocrval .flag{display:inline-block;margin-top:3px;font-size:10.5px;font-weight:800;color:var(--warn)}
+.ocrterms{margin-top:11px;font-size:11.5px;color:var(--muted);line-height:1.75}
+.ocrterms b{color:var(--text)}
+.ocrterms .term{display:inline-block;margin:0 8px 2px 0;white-space:nowrap}
+
+.ocrfb{margin-top:12px;display:grid;gap:9px}
+.ocrfb-step{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2)}
+.ocrfb-step .num{flex:0 0 auto;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:12px;font-weight:800}
+.ocrfb-step .tx{flex:1 1 auto;min-width:0}
+.ocrfb-step b{font-size:13px}
+.ocrfb-step p{margin:4px 0 0;font-size:12px;line-height:1.65;color:var(--muted);word-break:keep-all}
+.ocrfb-step .actions{margin-top:8px}
+
 /* export */
 #mdPreview{min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.65;white-space:pre;overflow:auto;font-weight:400}
 .memo{min-height:78px;resize:vertical;font-weight:400;font-size:13.5px;white-space:pre-wrap}
@@ -648,7 +704,7 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
 
       <p class="privacy">
         <span class="lock" aria-hidden="true">🔒</span>
-        <span><b>내 폰 안에서만 읽고, 서버로는 절대 전송하지 않습니다.</b> PDF는 이 브라우저 메모리에서만 열립니다. 인식 엔진(pdf.js)만 인터넷에서 한 번 내려받고, 파일 내용은 어디에도 보내지 않습니다.</span>
+        <span><b>내 폰 안에서만 읽고, 서버로는 절대 전송하지 않습니다.</b> PDF는 이 브라우저 메모리에서만 열립니다. 인식 엔진(pdf.js)만 인터넷에서 한 번 내려받고, 파일 내용은 어디에도 보내지 않습니다. 글자가 없는 그림 PDF는 같은 방식으로 <b>글자 인식(OCR)</b> 엔진·언어 데이터만 내려받아 이 기기 안에서 숫자를 읽습니다.</span>
       </p>
 
       <div class="drop" id="pdfDrop" role="button" tabindex="0" aria-label="성적 PDF 선택 또는 끌어다 놓기">
@@ -797,7 +853,7 @@ html[data-theme="dark"] .toast{background:#e8eef6;color:#0b0f14}
 
   <footer class="foot">
     <p><b>안내</b> · 본 계산기는 서원대학교 공식 졸업인증제·교육과정 이수 안내를 바탕으로 제작된 비공식 도우미입니다. 입력한 성적 데이터는 서버로 전송되지 않고 내 브라우저에만 저장됩니다.</p>
-    <p><b>개인정보</b> · 성적표를 붙여넣거나 PDF를 넣어도 외부로 전송되지 않고, 자동 저장도 이 브라우저의 로컬 저장소(<code>seowon-grad-calc-public-v1</code>)에만 됩니다. <b>성적 PDF를 넣을 때만</b> 읽기 엔진(pdf.js)을 CDN에서 한 번 내려받으며, 그 요청에 파일 내용은 포함되지 않습니다. 브라우저 저장 데이터를 지우면 입력도 함께 사라집니다.</p>
+    <p><b>개인정보</b> · 성적표를 붙여넣거나 PDF를 넣어도 외부로 전송되지 않고, 자동 저장도 이 브라우저의 로컬 저장소(<code>seowon-grad-calc-public-v1</code>)에만 됩니다. <b>성적 PDF를 넣을 때만</b> 읽기 엔진(pdf.js)을 CDN에서 한 번 내려받고, 글자가 없는 그림 PDF는 글자 인식(OCR) 엔진과 언어 데이터를 한 번 더 내려받습니다. 그 요청에도 파일 내용은 포함되지 않습니다. 브라우저 저장 데이터를 지우면 입력도 함께 사라집니다.</p>
     <p><b>기준</b> · 서원대학교 졸업인증제 기준표(2022·2023학번 / 2024학번 이후 개편). 학번·단과대학을 고르면 총 졸업학점·교양·전공·교직 기준이 자동으로 바뀝니다. 비교과(민주시민·창의인재·실용인 각 1개 + CUKI 150점)와 졸업논문(대체 포함)은 공통입니다.</p>
     <p>학과·입학년도·교육과정 개편에 따라 세부 기준이 다를 수 있습니다. 최종 확인은 학사지원팀 043-299-8016 · 비교과는 교육혁신원 043-299-8287.</p>
   </footer>
@@ -2316,13 +2372,1084 @@ var PdfReader = (function () {
     });
   }
 
+  /* ------------------------------------------- 그림 → 캔버스 (OCR 준비) */
+
+  /**
+   * 각 쪽을 캔버스에 그린다. 글자 층이 없는 PDF를 OCR로 읽기 위한 준비 단계.
+   * · scale 2.4면 A4 가로 한 쪽이 가로 1600px 안팎이 되어 작은 숫자도 살아난다.
+   * · 그림은 이 브라우저 메모리 안에서만 그린다(어디로도 보내지 않는다).
+   * @returns {Promise<Array<{page:number, canvas:HTMLCanvasElement}>>}
+   */
+  function render(file, options) {
+    var opts = options || {};
+    var scale = Math.min(Math.max(opts.scale || 2.4, 1), 4);
+    var maxPages = Math.max(1, Math.min(opts.maxPages || 4, CONFIG.maxPages));
+    var only = null;
+    if (opts.only && opts.only.length) {
+      only = [];
+      for (var o = 0; o < opts.only.length; o++) only.push(opts.only[o]);
+    }
+
+    if (!file) return Promise.reject(failure('read'));
+    if (file.size > CONFIG.maxBytes) return Promise.reject(failure('size'));
+
+    return ensureLibrary().then(function (lib) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onerror = function () { reject(failure('read')); };
+        reader.onload = function () {
+          var bytes = new Uint8Array(reader.result);
+          var canvases = [];
+
+          function drawPages(doc) {
+            var limit = Math.min(doc.numPages, maxPages);
+            var chain = Promise.resolve();
+            for (var p = 1; p <= limit; p++) {
+              if (only && only.indexOf(p) < 0) continue;
+              (function (pageNo) {
+                chain = chain.then(function () {
+                  return doc.getPage(pageNo).then(function (page) {
+                    var viewport = page.getViewport({ scale: scale });
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Math.round(viewport.width);
+                    canvas.height = Math.round(viewport.height);
+                    var ctx = canvas.getContext('2d');
+                    if (!ctx) throw failure('parse');
+                    return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+                      canvases.push({ page: pageNo, canvas: canvas });
+                    });
+                  });
+                });
+              })(p);
+            }
+            return chain.then(function () {
+              try { doc.destroy(); } catch (e) { /* 이미 닫힌 문서 */ }
+              return canvases;
+            });
+          }
+
+          function handleDoc(doc) {
+            drawPages(doc)
+              .then(resolve)
+              .catch(function (err) { reject(failure('parse', err)); });
+          }
+
+          function giveUp(err) {
+            var name = (err && err.name) || '';
+            reject(failure(/password/i.test(name) ? 'password' : 'parse', err));
+          }
+
+          function open(workerless) {
+            var task;
+            try {
+              task = lib.getDocument(documentParams(bytes, workerless));
+            } catch (e) {
+              giveUp(e);
+              return;
+            }
+
+            task.promise.then(handleDoc).catch(function (err) {
+              if (!workerless && !MAIN_THREAD_ONLY && isWorkerFailure(err)) {
+                try { task.destroy(); } catch (e) { /* 정리 실패는 무시 */ }
+                useMainThread(lib);
+                open(true);
+                return;
+              }
+              giveUp(err);
+            });
+          }
+
+          open(MAIN_THREAD_ONLY);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    });
+  }
+
   return {
     MAX_BYTES: CONFIG.maxBytes,
     MIN_TEXT_CHARS: CONFIG.minTextChars,
     read: read,
+    render: render,
     describe: describe
   };
 })();
+</script>
+
+<script id="ocr-src">
+/* ============================================================================
+ * PdfOcr — 그림(도표)만 들어 있는 성적 PDF에서 숫자를 읽는다
+ *
+ *  · 글자 층이 없는 PDF에서만 부릅니다(글자가 있으면 pdf.js가 훨씬 정확합니다).
+ *  · 인식 엔진(tesseract.js)과 한국어·영어 언어 데이터만 CDN에서 한 번 받고,
+ *    페이지 그림은 이 브라우저 안에서만 돌립니다. 파일 내용은 어디로도 가지 않습니다.
+ *  · 그림 속 숫자는 3↔8처럼 잘못 읽힐 수 있어, 읽은 값과 근거(위치·신뢰도)를
+ *    함께 돌려주고 화면에서 대조를 안내합니다.
+ * ========================================================================= */
+var PdfOcr = (function () {
+  'use strict';
+
+  var CONFIG = {
+    libUrl: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+    langs: 'kor+eng',
+    engineTimeoutMs: 30000,
+    renderScale: 2.4,
+    maxPages: 3,
+    minConfidence: 30,
+    /* 이수구분 값이 어긋날 때 원그래프를 다시 읽는 배율 */
+    retryScale: 3.0,
+    /* 이 신뢰도보다 낮으면 화면에서 "확인 필요"로 표시한다 */
+    checkConfidence: 80
+  };
+
+  /* 이수구분 라벨 — OCR이 한 글자쯤 틀려도 받아들이도록 별칭을 둔다.
+     SUMMARY_ALIASES(요약 표 해석기)와 같은 이름을 쓴다. */
+  var AREAS = [
+    { key: 'majorReq',   names: ['전공필수', '전필'] },
+    { key: 'majorElec',  names: ['전공선택', '전선'] },
+    { key: 'libUnknown', names: ['교양필수', '교필'] },
+    { key: 'balance',    names: ['교양선택', '교선'] },
+    { key: 'core',       names: ['중점교양'] },
+    { key: 'common',     names: ['기초학업공통', '기초공통'] },
+    { key: 'fusion',     names: ['기초학업융합'] },
+    { key: 'dept',       names: ['기초학업계열'] },
+    { key: 'etc',        names: ['일반선택', '자유선택'] }
+  ];
+
+  var NUM_RE = /^\d{1,3}(?:[.,]\d{1,2})?$/;
+
+  function failure(code, detail) {
+    var err = new Error(code);
+    err.code = code;
+    if (detail) err.detail = detail;
+    return err;
+  }
+
+  /* --------------------------------------------------------- 문자열 도구 */
+
+  /** 비교용 — 공백·기호를 떼고 한글·영문·숫자만 남긴다 */
+  function norm(text) {
+    return String(text == null ? '' : text).replace(/[^0-9A-Za-z가-힣]/g, '');
+  }
+
+  function editDistance(a, b) {
+    if (a === b) return 0;
+    var la = a.length, lb = b.length;
+    if (!la) return lb;
+    if (!lb) return la;
+    var prev = [], cur = [], i, j;
+    for (j = 0; j <= lb; j++) prev[j] = j;
+    for (i = 1; i <= la; i++) {
+      cur[0] = i;
+      for (j = 1; j <= lb; j++) {
+        var cost = a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      }
+      for (j = 0; j <= lb; j++) prev[j] = cur[j];
+    }
+    return prev[lb];
+  }
+
+  /** OCR이 한두 글자 틀려도 같은 라벨로 본다. 0이면 다른 말. */
+  function likeText(word, target) {
+    if (!word || !target) return 0;
+    if (word === target) return 1;
+    /* 뒤가 잘린 라벨: "전공필" 정도까지 인정 */
+    if (word.length >= 3 && target.indexOf(word) === 0 && target.length - word.length <= 1) return 0.9;
+    var longest = Math.max(word.length, target.length);
+    var d = editDistance(word, target);
+    if (d === 0) return 1;
+    if (d === 1 && longest >= 4) return 0.85;
+    if (d === 2 && longest >= 5) return 0.7;
+    return 0;
+  }
+
+  /** 그림 속 숫자 하나 — O/l/I로 잘못 읽힌 경우를 조금 보정한다 */
+  function num(text) {
+    var raw = String(text == null ? '' : text).replace(/\s/g, '');
+    if (!raw) return null;
+    if (NUM_RE.test(raw)) {
+      var v = parseFloat(raw.replace(/,/g, ''));
+      return (isFinite(v) && v >= 0 && v <= 150) ? { value: v, raw: raw, exact: true } : null;
+    }
+    var guess = raw.replace(/[Ooº°]/g, '0').replace(/[lI|!]/g, '1').replace(/[^\d.,]/g, '');
+    if (guess && NUM_RE.test(guess)) {
+      var g = parseFloat(guess.replace(/,/g, ''));
+      if (isFinite(g) && g >= 0 && g <= 150) return { value: g, raw: raw, exact: false };
+    }
+    return null;
+  }
+
+  /* ------------------------------------------------------- 인식 엔진 준비 */
+
+  function loadEngine() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement('script');
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        reject(failure('network', 'engine-timeout'));
+      }, CONFIG.engineTimeoutMs);
+
+      script.src = CONFIG.libUrl;
+      script.async = true;
+      script.onload = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (window.Tesseract) resolve(window.Tesseract);
+        else reject(failure('network', 'engine-missing'));
+      };
+      script.onerror = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(failure('network', 'engine-blocked'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * 워커를 연다. file://(출처 null)에서도 돌도록 워커 본문은 blob으로 넘기고,
+   * 언어 데이터 캐시(IndexedDB)는 출처가 null인 화면에서 예외를 낼 수 있어 끈다.
+   */
+  function openWorker(Tess, onEvent) {
+    var options = {
+      workerBlobURL: true,
+      cacheMethod: 'none',
+      logger: function (m) { if (onEvent && m) onEvent(m); },
+      errorHandler: function () { /* 워커 내부 경고는 화면에 올리지 않는다 */ }
+    };
+
+    var opening;
+    try {
+      opening = Tess.createWorker(CONFIG.langs, 1, options);
+    } catch (e) {
+      return Promise.reject(failure('worker', String((e && e.message) || e)));
+    }
+
+    return opening.then(function (worker) {
+      if (!worker) throw failure('worker', 'no-worker');
+      var setup = worker.setParameters ? worker.setParameters({ preserve_interword_spaces: '1' }) : Promise.resolve();
+      return Promise.resolve(setup).then(function () { return worker; }, function () { return worker; });
+    });
+  }
+
+  /* ------------------------------------------------------- 그림 전처리 */
+
+  /**
+   * 여백을 잘라 글자 영역만 남긴다(작은 숫자가 상대적으로 커져 인식률이 오른다).
+   * @param {HTMLCanvasElement} canvas
+   * @param {{trim?:boolean}} options
+   */
+  function prepare(canvas, options) {
+    var opts = options || {};
+    if (opts.trim === false) return canvas;
+
+    var w = canvas.width, h = canvas.height;
+    var ctx = canvas.getContext('2d');
+    var data;
+    try {
+      data = ctx.getImageData(0, 0, w, h);
+    } catch (e) {
+      return canvas;                       /* 캔버스를 못 읽으면 원본 그대로 */
+    }
+
+    var px = data.data;
+    var left = w, top = h, right = -1, bottom = -1;
+
+    for (var y = 0; y < h; y++) {
+      var row = y * w * 4;
+      for (var x = 0; x < w; x++) {
+        var i = row + x * 4;
+        var r = px[i], g = px[i + 1], b = px[i + 2];
+        if (r > 246 && g > 246 && b > 246) continue;   /* 아주 밝은 픽셀은 배경 */
+        if (x < left) left = x;
+        if (x > right) right = x;
+        if (y < top) top = y;
+        if (y > bottom) bottom = y;
+      }
+    }
+
+    if (right <= left || bottom <= top) return canvas;
+
+    var pad = Math.round(Math.min(w, h) * 0.012) + 6;
+    left = Math.max(0, left - pad);
+    top = Math.max(0, top - pad);
+    right = Math.min(w - 1, right + pad);
+    bottom = Math.min(h - 1, bottom + pad);
+
+    var cw = right - left + 1, ch = bottom - top + 1;
+    if (cw > w * 0.97 && ch > h * 0.97) return canvas;
+
+    var out = document.createElement('canvas');
+    out.width = cw;
+    out.height = ch;
+    out.getContext('2d').drawImage(canvas, left, top, cw, ch, 0, 0, cw, ch);
+    return out;
+  }
+
+  /* ------------------------------------------------------- 결과 → 단어 */
+
+  /** tesseract 결과(blocks)에서 단어와 위치(px)를 꺼낸다 */
+  function toWords(data, pageNo, pageW, pageH) {
+    var words = [];
+
+    function push(word, lineIndex) {
+      if (!word || !word.text) return;
+      var text = String(word.text).trim();
+      if (!text) return;
+      var bbox = word.bbox || {};
+      words.push({
+        page: pageNo,
+        pageW: pageW,
+        pageH: pageH,
+        text: text,
+        clean: norm(text),
+        conf: typeof word.confidence === 'number' ? word.confidence : 0,
+        line: lineIndex,
+        x0: bbox.x0 || 0,
+        y0: bbox.y0 || 0,
+        x1: bbox.x1 || 0,
+        y1: bbox.y1 || 0
+      });
+    }
+
+    var blocks = (data && data.blocks) || [];
+    for (var b = 0; b < blocks.length; b++) {
+      var paragraphs = (blocks[b] && blocks[b].paragraphs) || [];
+      for (var p = 0; p < paragraphs.length; p++) {
+        var lines = (paragraphs[p] && paragraphs[p].lines) || [];
+        for (var l = 0; l < lines.length; l++) {
+          var lineWords = (lines[l] && lines[l].words) || [];
+          for (var w = 0; w < lineWords.length; w++) push(lineWords[w], l);
+        }
+      }
+    }
+    return words;
+  }
+
+  /* ------------------------------------------------------- 값 읽기 규칙 */
+
+  function boxHeight(word) {
+    return Math.max(8, (word.y1 - word.y0) || 8);
+  }
+
+  function centerX(word) { return (word.x0 + word.x1) / 2; }
+  function centerY(word) { return (word.y0 + word.y1) / 2; }
+
+  /**
+   * 한글은 OCR이 "전 공 필수"처럼 음절 단위로 끊어 놓는 경우가 많다.
+   * 같은 높이(같은 줄)에서 붙어 있는 단어를 다시 이어 붙여 라벨 후보를 만든다.
+   * tesseract의 줄 번호는 같은 줄을 나눠 세는 일이 있어, y 좌표로 직접 묶는다.
+   */
+  function mergeRuns(words) {
+    var out = [];
+    var pages = {};
+    var i;
+
+    for (i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (!pages[w.page]) pages[w.page] = [];
+      pages[w.page].push(w);
+    }
+
+    for (var pg in pages) {
+      if (!pages.hasOwnProperty(pg)) continue;
+      var sorted = pages[pg].slice().sort(function (a, b) { return centerY(a) - centerY(b); });
+      var groups = [];
+      var current = null;
+
+      for (i = 0; i < sorted.length; i++) {
+        var word = sorted[i];
+        var h = boxHeight(word);
+        if (current && Math.abs(centerY(word) - current.y) <= Math.max(5, h * 0.6)) {
+          current.items.push(word);
+          current.y = (current.y * current.n + centerY(word)) / (current.n + 1);
+          current.n += 1;
+        } else {
+          current = { y: centerY(word), n: 1, items: [word] };
+          groups.push(current);
+        }
+      }
+
+      for (var g = 0; g < groups.length; g++) {
+        var line = groups[g].items.slice().sort(function (a, b) { return a.x0 - b.x0; });
+        var run = null;
+
+        for (var j = 0; j < line.length; j++) {
+          var item = line[j];
+          var ih = boxHeight(item);
+          var gap = run ? item.x0 - run.x1 : 0;
+
+          if (run && gap <= ih * 1.35 && gap > -ih * 0.4) {
+            run.text = run.text + ' ' + item.text;
+            run.clean = run.clean + item.clean;
+            run.x1 = Math.max(run.x1, item.x1);
+            run.y0 = Math.min(run.y0, item.y0);
+            run.y1 = Math.max(run.y1, item.y1);
+            run.confSum += item.conf;
+            run.n += 1;
+            run.conf = run.confSum / run.n;
+          } else {
+            run = {
+              page: item.page, pageW: item.pageW, pageH: item.pageH,
+              text: item.text, clean: item.clean, conf: item.conf,
+              confSum: item.conf, n: 1,
+              line: item.line,
+              x0: item.x0, y0: item.y0, x1: item.x1, y1: item.y1
+            };
+            out.push(run);
+          }
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /** 단어 하나가 어떤 이수구분 라벨인지 — 가장 비슷한 키와 점수 */
+  function matchArea(clean) {
+    var best = null;
+    for (var a = 0; a < AREAS.length; a++) {
+      var area = AREAS[a];
+      for (var n = 0; n < area.names.length; n++) {
+        var target = norm(area.names[n]);
+        var score = likeText(clean, target);
+        /* 다른 글자가 붙어 읽혀도 라벨 이름이 그대로 들어 있으면 인정한다 */
+        if (score < 0.95 && target.length >= 3 && clean.indexOf(target) >= 0) score = 0.95;
+        if (score > (best ? best.score : 0)) best = { key: area.key, score: score };
+      }
+    }
+    return best;
+  }
+
+  /** 라벨 상자 근처에서 숫자 하나를 고른다 — 바로 아래, 또는 오른쪽 */
+  function numberNear(label, words) {
+    var h = boxHeight(label);
+    var cx = centerX(label);
+    var cy = centerY(label);
+    var best = null;
+
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (w === label) continue;
+      var n = num(w.text);
+      if (!n) continue;
+
+      var wx = centerX(w), wy = centerY(w);
+      var dy = wy - cy;
+      var dx = wx - cx;
+
+      /* 라벨 아래에 놓인 값(원그래프) */
+      var below = dy > 0 && dy < h * 2.6 && Math.abs(dx) < h * 2.6;
+      /* 라벨 오른쪽에 붙은 값("전공필수 3") */
+      var right = Math.abs(dy) < h * 0.75 && dx > 0 && dx < h * 5.5;
+
+      if (!below && !right) continue;
+
+      var dist = Math.abs(dy) + Math.abs(dx) * 0.6;
+      if (!best || dist < best.dist) {
+        best = { value: n.value, exact: n.exact, dist: dist, conf: w.conf, word: w };
+      }
+    }
+    return best;
+  }
+
+  /**
+   * 이수구분별 학점 — 라벨과 숫자를 가까운 순서로 하나씩 짝지어 준다.
+   * 한 숫자를 두 라벨이 함께 쓰는 일(예: 원그래프의 3)을 막기 위해
+   * 거리가 가까운 짝부터 확정하고, 이미 쓴 숫자는 다시 쓰지 않는다.
+   */
+  function readAreas(rawWords) {
+    var words = mergeRuns(rawWords);
+    var pairs = [];
+    var used = {};
+    var i;
+
+    function wordId(word) {
+      return word.page + ':' + Math.round(word.x0) + ':' + Math.round(word.y0);
+    }
+
+    for (i = 0; i < words.length; i++) {
+      var word = words[i];
+      if (!word.clean) continue;
+      if (word.conf < CONFIG.minConfidence) continue;
+
+      /* "전공필수3"처럼 라벨과 값이 붙어 읽힌 경우 */
+      var attached = word.clean.match(/^([가-힣]{2,8}?)(\d{1,2})$/);
+      if (attached) {
+        var m = matchArea(attached[1]);
+        var av = parseFloat(attached[2]);
+        if (m && m.score >= 0.85 && av >= 0 && av <= 60) {
+          pairs.push({
+            key: m.key, value: av, score: m.score, conf: word.conf,
+            label: word, valueWord: word, dist: -1,
+            attached: true, id: wordId(word)
+          });
+          continue;
+        }
+      }
+
+      var hit = matchArea(word.clean);
+      if (!hit || hit.score < 0.7) continue;
+
+      var pair = numberNear(word, words);
+      if (!pair || pair.value > 60) continue;          /* 학점 범위 밖 */
+      pairs.push({
+        key: hit.key, value: pair.value, score: hit.score, conf: word.conf,
+        label: word, valueWord: pair.word, dist: pair.dist, id: wordId(word)
+      });
+    }
+
+    /* 붙어 읽힌 값 → 가까운 짝 → 먼 짝 순으로 확정 */
+    pairs.sort(function (a, b) {
+      if (a.attached !== b.attached) return a.attached ? -1 : 1;
+      return a.dist - b.dist;
+    });
+
+    var found = {};
+    for (i = 0; i < pairs.length; i++) {
+      var p = pairs[i];
+      if (found[p.key]) continue;
+      var valueId = wordId(p.valueWord);
+      if (!p.attached && used[valueId]) continue;      /* 이미 다른 라벨이 가져간 숫자 */
+      found[p.key] = {
+        value: p.value,
+        conf: p.valueWord.conf,
+        labelText: p.label.text,
+        valueText: p.valueWord.text,
+        label: p.label,
+        valueWord: p.valueWord
+      };
+      used[valueId] = true;
+      used[p.id] = true;
+    }
+
+    return found;
+  }
+
+  /** 학기 라벨("2022-1", "2025-겨울")을 읽는다 */
+  function termOf(clean) {
+    var m = clean.match(/^(20\d{2})([1-4]|겨울|여름|계절)$/);
+    if (m) {
+      var part = m[2];
+      if (part === '겨울') return { year: m[1], part: '겨울', term: m[1] + '-겨울' };
+      if (part === '여름') return { year: m[1], part: '여름', term: m[1] + '-여름' };
+      if (part === '계절') return { year: m[1], part: '계절', term: m[1] + '-계절' };
+      return { year: m[1], part: part, term: m[1] + '-' + part };
+    }
+    /* "2025겨" 처럼 계절 이름이 잘린 경우 */
+    var cut = clean.match(/^(20\d{2})([겨여계])[가-힣]{0,2}$/);
+    if (cut) {
+      var p = cut[2] === '겨' ? '겨울' : (cut[2] === '여' ? '여름' : '계절');
+      return { year: cut[1], part: p, term: cut[1] + '-' + p };
+    }
+    return null;
+  }
+
+  /**
+   * 학기별 막대 도표 — x축 학기 라벨 줄을 찾고, 그 위 막대 끝 숫자를 라벨 열에 맞춰 읽는다.
+   * 라벨 글자가 깨져도 막대 숫자는 별개로 세므로 합계가 틀어지지 않는다.
+   */
+  function readSemesterChart(words) {
+    var runs = mergeRuns(words);
+    var i;
+
+    /* 1) 학기 라벨이 가장 많은 줄 = x축 */
+    var byLine = {};
+    for (i = 0; i < runs.length; i++) {
+      var run = runs[i];
+      if (!/^20\d{2}/.test(run.clean)) continue;
+      var key = run.page + ':' + Math.round(centerY(run) / 6);
+      if (!byLine[key]) byLine[key] = { page: run.page, y: centerY(run), items: [] };
+      byLine[key].items.push(run);
+    }
+
+    var axis = null;
+    for (var k in byLine) {
+      if (!byLine.hasOwnProperty(k)) continue;
+      var group = byLine[k];
+      if (group.items.length < 2) continue;
+      if (!axis || group.items.length > axis.items.length ||
+          (group.items.length === axis.items.length && group.y < axis.y)) {
+        axis = group;
+      }
+    }
+    if (!axis) return { terms: [], values: [], sum: 0 };
+
+    axis.items.sort(function (a, b) { return a.x0 - b.x0; });
+    var pageW = axis.items[0].pageW || 0;
+    var pageH = axis.items[0].pageH || 0;
+
+    /* 축 라벨 줄에서 학기 이름을 읽는다(못 읽은 열도 자리는 남긴다) */
+    var columns = [];
+    for (i = 0; i < axis.items.length; i++) {
+      var label = axis.items[i];
+      var term = termOf(label.clean);
+      columns.push({
+        x: centerX(label),
+        label: label,
+        term: term,
+        credits: null,
+        conf: 0
+      });
+    }
+
+    /* 2) 막대 끝 숫자 — 축 줄 위쪽, 라벨 열 안쪽, y축 눈금(왼쪽)은 제외 */
+    var leftBound = columns[0].x - (pageW ? pageW * 0.03 : 40);
+    var rightBound = columns[columns.length - 1].x + (pageW ? pageW * 0.03 : 40);
+    var heightLimit = pageH ? pageH * 0.32 : 260;
+    var tol = columns.length > 1
+      ? Math.min((columns[1].x - columns[0].x) / 2, pageW * 0.06 || 90)
+      : 90;
+
+    for (i = 0; i < runs.length; i++) {
+      var word = runs[i];
+      if (word.page !== axis.page) continue;
+      var n = num(word.text);
+      if (!n) continue;
+      if (Math.abs(n.value - Math.round(n.value)) > 0.001) continue;  /* 학점은 정수 */
+      if (n.value < 1 || n.value > 30) continue;
+      var wy = centerY(word), wx = centerX(word);
+      if (wy >= axis.y - boxHeight(word) * 0.5) continue;            /* 축 줄 아래·위 아님 */
+      if (axis.y - wy > heightLimit) continue;
+      if (wx < leftBound || wx > rightBound) continue;
+
+      var near = null;
+      for (var c = 0; c < columns.length; c++) {
+        var dx = Math.abs(columns[c].x - wx);
+        if (!near || dx < near.dx) near = { column: columns[c], dx: dx };
+      }
+      if (!near || near.dx > tol) continue;
+      if (near.column.credits !== null) continue;                    /* 한 열에 하나만 */
+
+      near.column.credits = n.value;
+      near.column.conf = word.conf;
+    }
+
+    var terms = [], values = [], sum = 0, missing = 0, unlabeled = [];
+    for (i = 0; i < columns.length; i++) {
+      var col = columns[i];
+      if (col.credits === null) { missing++; continue; }
+      sum += col.credits;
+      values.push({ credits: col.credits, conf: col.conf });
+      if (col.term) terms.push({ term: col.term.term, credits: col.credits, conf: col.conf });
+      else unlabeled.push({ credits: col.credits, conf: col.conf });
+    }
+
+    return {
+      terms: terms, values: values, sum: sum, missing: missing,
+      unlabeled: unlabeled, columns: columns, columnCount: columns.length
+    };
+  }
+
+  /**
+   * 학기 이름을 못 읽은 막대가 있을 때, 다른 쪽 도표의 같은 가로 위치 라벨로 이름을 채운다.
+   * (예: 첫 쪽에서 "2025-겨울"을 못 읽어도 셋째 쪽에서 읽혔다면 그 이름을 쓴다)
+   */
+  function fillTermNames(chart, wordsByPage, order, termPage) {
+    if (!chart || !chart.columns) return;
+
+    var unknown = [];
+    for (var i = 0; i < chart.columns.length; i++) {
+      if (!chart.columns[i].term && chart.columns[i].credits !== null) unknown.push(i);
+    }
+    if (!unknown.length) return;
+
+    var pageW = (chart.columns[0].label && chart.columns[0].label.pageW) || 0;
+    if (!pageW) return;
+
+    for (var o = 0; o < order.length; o++) {
+      var page = order[o];
+      if (page === termPage) continue;
+
+      var runs = mergeRuns(wordsByPage[page] || []);
+      var named = [];
+      for (var r = 0; r < runs.length; r++) {
+        var run = runs[r];
+        if (!/^20\d{2}/.test(run.clean)) continue;
+        var term = termOf(run.clean);
+        if (!term) continue;
+        named.push({ at: centerX(run) / (run.pageW || pageW), term: term });
+      }
+      if (!named.length) continue;
+
+      var filled = 0;
+      for (var u = 0; u < unknown.length; u++) {
+        var col = chart.columns[unknown[u]];
+        var at = col.x / pageW;
+        var best = null;
+        for (var n = 0; n < named.length; n++) {
+          var diff = Math.abs(named[n].at - at);
+          if (!best || diff < best.diff) best = { diff: diff, term: named[n].term };
+        }
+        if (!best || best.diff > 0.02) continue;
+        col.term = best.term;
+        filled++;
+      }
+      if (!filled) continue;
+
+      chart.terms = [];
+      chart.unlabeled = [];
+      for (var c = 0; c < chart.columns.length; c++) {
+        var column = chart.columns[c];
+        if (column.credits === null) continue;
+        if (column.term) chart.terms.push({ term: column.term.term, credits: column.credits, conf: column.conf });
+        else chart.unlabeled.push({ credits: column.credits, conf: column.conf });
+      }
+      return;
+    }
+  }
+
+  /* ----------------------------------------------------------- 메인 흐름 */
+
+  /** 쪽마다 제목(위쪽 12%)을 읽어 어떤 도표인지 가른다 */
+  function pageTitles(wordsByPage) {
+    var titles = {};
+    for (var page in wordsByPage) {
+      if (!wordsByPage.hasOwnProperty(page)) continue;
+      var list = wordsByPage[page];
+      var sample = list[0] || {};
+      var limit = (sample.pageH || 1000) * 0.12;
+      var text = '';
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].y0 > limit) continue;
+        text += list[i].clean;
+      }
+      titles[page] = text;
+    }
+    return titles;
+  }
+
+  function pickPage(titles, pages, test) {
+    for (var i = 0; i < pages.length; i++) {
+      var title = titles[pages[i]] || '';
+      if (test(title)) return pages[i];
+    }
+    return null;
+  }
+
+  function concatAll(wordsByPage, order) {
+    var all = [];
+    for (var i = 0; i < order.length; i++) {
+      var list = wordsByPage[order[i]] || [];
+      for (var k = 0; k < list.length; k++) all.push(list[k]);
+    }
+    return all;
+  }
+
+  /** OCR 결과(쪽별)를 단어장으로 바꾸고, 도표 종류에 따라 어느 쪽을 볼지 정한다 */
+  function extract(results) {
+    var wordsByPage = {}, order = [];
+
+    for (var r = 0; r < results.length; r++) {
+      var item = results[r];
+      wordsByPage[item.page] = toWords(item.data, item.page, item.width, item.height);
+      order.push(item.page);
+    }
+
+    var titles = pageTitles(wordsByPage);
+
+    /* 이수구분: 원그래프 쪽이 있으면 그 쪽만 본다(범례·다른 도표 숫자와 섞이지 않게) */
+    var areaPage = pickPage(titles, order, function (t) {
+      return t.indexOf('이수구분') >= 0 && t.indexOf('학기') < 0;
+    });
+    /* 학기: '학기별 취득학점' 도표 쪽이 있으면 그 쪽만 */
+    var termPage = pickPage(titles, order, function (t) {
+      return t.indexOf('학기별') >= 0 && t.indexOf('이수구분') < 0;
+    });
+
+    var chart = readSemesterChart(termPage ? wordsByPage[termPage] : concatAll(wordsByPage, order));
+    fillTermNames(chart, wordsByPage, order, termPage);
+
+    return {
+      wordsByPage: wordsByPage,
+      order: order,
+      areaPage: areaPage,
+      termPage: termPage,
+      areas: readAreas(areaPage ? wordsByPage[areaPage] : concatAll(wordsByPage, order)),
+      chart: chart
+    };
+  }
+
+  function areaSumOf(areas) {
+    var sum = 0;
+    for (var k in areas) if (areas.hasOwnProperty(k)) sum += areas[k].value;
+    return sum;
+  }
+
+  function areaCountOf(areas) {
+    var n = 0;
+    for (var k in areas) if (areas.hasOwnProperty(k)) n++;
+    return n;
+  }
+
+  /**
+   * 이수구분 값이 학기 합계와 맞는지 — 클수록 믿을 만하다.
+   * 3: 개수·합계 모두 맞음 / 2: 합계만 맞음 / 1: 안 맞음 / 0: 읽은 값 없음
+   */
+  function fitScore(areas, termSum) {
+    var sum = areaSumOf(areas), count = areaCountOf(areas);
+    if (!count) return 0;
+    if (termSum > 0) {
+      if (Math.abs(sum - termSum) < 0.51) return count >= 3 ? 3 : 2;
+      return 1;
+    }
+    return count >= 3 ? 2 : 1;
+  }
+
+  /** 한 번의 OCR — 지정한 배율로 쪽을 그려 읽는다 */
+  function readPass(ctx, renderOptions, stageFrom, stageTo) {
+    return PdfReader.render(ctx.file, renderOptions).then(function (canvases) {
+      if (!canvases || !canvases.length) throw failure('empty', 'no-page');
+
+      var total = canvases.length;
+      var chain = Promise.resolve();
+      var results = [];
+
+      for (var p = 0; p < total; p++) {
+        (function (entry, index) {
+          chain = chain.then(function () {
+            var image = prepare(entry.canvas, { trim: ctx.opts.trim });
+            return ctx.worker.recognize(image, {}, { blocks: true, text: true }).then(function (res) {
+              results.push({
+                page: entry.page,
+                width: image.width,
+                height: image.height,
+                data: (res && res.data) || {}
+              });
+              var at = stageFrom + ((index + 1) / total) * (stageTo - stageFrom);
+              ctx.stage('page', at);
+              ctx.progress(at);
+            });
+          });
+        })(canvases[p], p);
+      }
+
+      return chain.then(function () { return results; });
+    });
+  }
+
+  function closeWorker(ctx) {
+    if (ctx.worker && ctx.worker.terminate) {
+      try { ctx.worker.terminate(); } catch (e) { /* 정리 실패는 무시 */ }
+    }
+    ctx.worker = null;
+  }
+
+  /** 읽은 값을 화면에 넘길 결과로 정리한다 */
+  function buildResult(ctx, ex, started, opts, retried) {
+    var areas = ex.areas;
+    var chart = ex.chart;
+    var fields = {};
+    var areaSum = 0, areaCount = 0, weak = 0;
+
+    for (var key in areas) {
+      if (!areas.hasOwnProperty(key)) continue;
+      fields[key] = areas[key].value;
+      areaSum += areas[key].value;
+      areaCount++;
+      if (areas[key].conf < CONFIG.checkConfidence) weak++;
+    }
+
+    if (!areaCount && !chart.values.length) throw failure('empty', 'no-value');
+
+    var notes = [];
+    if (ex.areaPage && areaCount < 2) notes.push('이수구분별 학점을 일부만 읽었어요.');
+    if (chart.missing) notes.push('학기 막대 ' + chart.missing + '개의 숫자를 읽지 못했어요.');
+    if (chart.unlabeled && chart.unlabeled.length) {
+      var lost = 0;
+      for (var u = 0; u < chart.unlabeled.length; u++) lost += chart.unlabeled[u].credits;
+      notes.push('학기 이름을 못 읽은 막대 ' + chart.unlabeled.length + '개(' + lost + '학점)도 합계에 넣었어요.');
+    }
+
+    var total = null, totalSource = '';
+    if (chart.sum > 0 && (chart.terms.length >= 3 || areaCount < 2)) {
+      total = chart.sum;
+      totalSource = '학기별 합계';
+    } else if (areaCount >= 2) {
+      total = areaSum;
+      totalSource = '이수구분 합계';
+    }
+
+    var consistent = null;
+    if (areaCount >= 2 && chart.sum > 0) consistent = Math.abs(areaSum - chart.sum) < 0.51;
+    if (consistent === false) {
+      notes.push('이수구분별 합(' + areaSum + ')과 학기별 합(' + chart.sum + ')이 달라요. 원본과 대조해 주세요.');
+    }
+
+    var weakItems = [];
+    for (var wk in areas) {
+      if (!areas.hasOwnProperty(wk)) continue;
+      if (areas[wk].conf < CONFIG.checkConfidence) weakItems.push(wk);
+    }
+
+    var out = {
+      ok: true,
+      fields: fields,
+      areas: areas,
+      areaCount: areaCount,
+      areaSum: areaSum,
+      weakCount: weakItems.length,
+      weakItems: weakItems,
+      terms: chart.terms,
+      termCount: chart.terms.length,
+      termSum: chart.sum,
+      total: total,
+      totalSource: totalSource,
+      consistent: consistent,
+      retried: !!retried,
+      notes: notes,
+      pages: ex.order.length,
+      seconds: Math.round((Date.now() - started) / 100) / 10,
+      wordCount: (function () {
+        var n = 0;
+        for (var pg in ex.wordsByPage) if (ex.wordsByPage.hasOwnProperty(pg)) n += ex.wordsByPage[pg].length;
+        return n;
+      })()
+    };
+
+    if (opts.debug) out.raw = ex.wordsByPage;
+    return out;
+  }
+
+  /**
+   * 그림 PDF를 읽어 값을 돌려준다.
+   * @param {File} file
+   * @param {{onStage?:Function, onProgress?:Function, scale?:number, trim?:boolean, maxPages?:number, debug?:boolean}} options
+   * @returns {Promise<Object>} { ok, fields, terms, total, notes, ... }
+   */
+  function analyze(file, options) {
+    var opts = options || {};
+    var started = Date.now();
+    var ctx = {
+      file: file,
+      opts: opts,
+      worker: null,
+      stage: opts.onStage || function () {},
+      progress: opts.onProgress || function () {}
+    };
+    var outcome = { first: null, retried: false };
+
+    ctx.stage('engine', 0.02);
+
+    return loadEngine().then(function (Tess) {
+      ctx.stage('engine', 0.1);
+      return openWorker(Tess, function (m) {
+        if (!m || !m.status) return;
+        if (/loading|initializ/i.test(m.status)) {
+          ctx.stage('engine', 0.1 + (m.progress || 0) * 0.3);
+        }
+      });
+    }).then(function (worker) {
+      ctx.worker = worker;
+      ctx.stage('page', 0.4);
+      return readPass(ctx, {
+        scale: opts.scale || CONFIG.renderScale,
+        maxPages: opts.maxPages || CONFIG.maxPages
+      }, 0.4, 0.9);
+    }).then(function (results) {
+      ctx.stage('pick', 0.93);
+      var ex = extract(results);
+      outcome.first = ex;
+
+      var count = areaCountOf(ex.areas);
+      var target = ex.chart.sum;
+      var fits = target > 0
+        ? Math.abs(areaSumOf(ex.areas) - target) < 0.51
+        : count >= 3;
+
+      if (!ex.areaPage || count >= 4 || fits) return null;
+
+      /* 이수구분 값이 학기 합계와 어긋난다 — 원그래프 쪽만 더 크게 그려 한 번 더 읽는다 */
+      ctx.stage('retry', 0.8);
+      return PdfReader.render(file, {
+        scale: CONFIG.retryScale,
+        maxPages: ex.areaPage,
+        only: [ex.areaPage]
+      }).then(function (canvases) {
+        if (!canvases || !canvases.length) return null;
+        var image = prepare(canvases[0].canvas, { trim: opts.trim });
+        return ctx.worker.recognize(image, {}, { blocks: true, text: true }).then(function (res) {
+          var words = toWords((res && res.data) || {}, canvases[0].page, image.width, image.height);
+          var second = readAreas(words);
+          if (fitScore(second, target) > fitScore(ex.areas, target)) {
+            ex.areas = second;
+            ex.areaPage = canvases[0].page;
+            outcome.retried = true;
+          }
+          ctx.stage('pick', 0.96);
+        });
+      }).catch(function () { /* 다시 읽기 실패는 1차 결과로 넘어간다 */ });
+    }).then(function () {
+      return buildResult(ctx, outcome.first, started, opts, outcome.retried);
+    }).then(function (result) {
+      closeWorker(ctx);
+      return result;
+    }, function (err) {
+      closeWorker(ctx);
+      throw err;
+    });
+  }
+
+  function concatAll(wordsByPage, order) {
+    var all = [];
+    for (var i = 0; i < order.length; i++) {
+      var list = wordsByPage[order[i]] || [];
+      for (var k = 0; k < list.length; k++) all.push(list[k]);
+    }
+    return all;
+  }
+
+  /** 읽은 값을 요약 표 해석기가 알아듣는 줄글로 바꾼다(대시보드 반영용) */
+  function toSummaryText(result) {
+    var lines = [];
+    if (!result) return '';
+    var labels = {
+      majorReq: '전공필수', majorElec: '전공선택', libUnknown: '교양필수', balance: '교양선택',
+      core: '중점교양', common: '기초학업(공통)', fusion: '기초학업(융합)', dept: '기초학업(계열)',
+      etc: '일반선택'
+    };
+    for (var key in labels) {
+      if (!labels.hasOwnProperty(key)) continue;
+      if (result.fields && result.fields[key] !== undefined) lines.push(labels[key] + ' ' + result.fields[key]);
+    }
+    if (result.terms) {
+      for (var i = 0; i < result.terms.length; i++) lines.push(result.terms[i].term + ' ' + result.terms[i].credits);
+    }
+    return lines.join('\n');
+  }
+
+  return {
+    CONFIG: CONFIG,
+    analyze: analyze,
+    toSummaryText: toSummaryText,
+    /* 시험·점검용 내부 함수(화면에서는 쓰지 않는다) */
+    _internals: {
+      norm: norm, num: num, mergeRuns: mergeRuns, matchArea: matchArea,
+      numberNear: numberNear, readAreas: readAreas, readSemesterChart: readSemesterChart
+    },
+    describe: function (err) {
+      var code = (err && err.code) || 'unknown';
+      switch (code) {
+        case 'network':
+          return '인식 엔진(tesseract.js)을 내려받지 못했어요. 인터넷 연결이나 광고 차단 확장 프로그램을 확인한 뒤 다시 시도해 주세요.';
+        case 'worker':
+          return '이 브라우저에서는 글자 인식(OCR)을 시작하지 못했어요. 붙여넣기나 직접 입력을 써 주세요.';
+        case 'empty':
+          return '그림에서 읽을 만한 숫자를 찾지 못했어요. 다른 그림 PDF이거나 화질이 낮은 경우입니다.';
+        default:
+          return '글자를 읽는 중 문제가 생겼어요. 붙여넣기와 직접 입력은 그대로 쓸 수 있습니다.';
+      }
+    }
+  };
+})();
+
 </script>
 
 <script id="app-src">
@@ -3191,28 +4318,242 @@ var Store = (function () {
     });
   }
 
-  /** 글자 층이 없는 PDF — 도표만 그림으로 들어 있는 경우 */
+  /* --------------------------------------------- 그림 PDF · OCR로 읽기 */
+
+  var OCR_STAGE_TEXT = {
+    engine: '글자를 읽는 인식(OCR) 엔진을 준비하고 있어요',
+    page: '도표 안의 숫자를 읽는 중이에요',
+    retry: '값이 조금 어긋나 원그래프를 한 번 더 읽고 있어요',
+    pick: '읽은 값을 정리하고 있어요'
+  };
+
+  var OCR_STEP_ORDER = ['engine', 'page', 'pick'];
+  var OCR_AREA_LABEL = {
+    majorReq: '전공필수', majorElec: '전공선택', libUnknown: '교양필수(미분류)', balance: '교양선택',
+    core: '중점교양', common: '기초학업(공통)', fusion: '기초학업(융합)', dept: '기초학업(계열)', etc: '일반선택'
+  };
+
+  var ocrBusy = false;
+  var ocrToken = 0;
+  var ocrLast = null;                 /* 다시 시도에 쓸 파일·쪽 정보 */
+
+  function pdfMetaLine(result, file, tail) {
+    var parts = [];
+    if (result && result.numPages) parts.push(result.numPages + '쪽');
+    if (result && typeof result.chars === 'number') parts.push('글자 ' + result.chars + '자');
+    if (file && file.name) parts.push(file.name);
+    if (tail) parts.push(tail);
+    return parts.join(' · ');
+  }
+
+  function setOcrStage(name, at) {
+    var pct = Math.max(0, Math.min(100, Math.round((at || 0) * 100)));
+    var fill = el('ocrFill');
+    if (fill) fill.style.width = pct + '%';
+    setText('ocrPct', pct + '%');
+    if (OCR_STAGE_TEXT[name]) setText('ocrSub', OCR_STAGE_TEXT[name]);
+
+    var list = el('ocrSteps');
+    if (!list) return;
+    var items = list.querySelectorAll('li');
+    var active = name === 'retry' ? 1 : Math.max(0, OCR_STEP_ORDER.indexOf(name));
+    for (var i = 0; i < items.length; i++) {
+      items[i].className = i < active ? 'is-done' : (i === active ? 'is-active' : '');
+    }
+  }
+
+  /** 그림 PDF를 만났을 때 — 왜 글자가 없는지 한 줄로 알리고 OCR을 시작한다 */
   function renderPdfWithoutText(result, file) {
-    var html = [
-      '<div class="pdfmsg warn">',
-      '<b>이 PDF에는 글자 정보가 없어요 — 도표(그래프)만 그림으로 들어 있습니다.</b>',
-      '<p>서원대 성적 취득현황 PDF는 <b>표 대신 그래프 이미지로 저장되는 경우가 많아</b> 자동 인식이 되지 않을 수 있어요. 그림 속 숫자는 글자가 아니라서 어떤 인식기도 읽어 내지 못합니다.</p>',
-      '<p class="pdfmeta">이 파일: ' + result.numPages + '쪽 · 글자 <b>' + result.chars + '자</b>'
-        + (file && file.name ? ' · ' + esc(file.name) : '') + '</p>',
+    ocrLast = { file: file, result: result };
+
+    pdfOutput([
+      '<div class="ocrpanel" role="status" aria-live="polite">',
+      '<div class="ocrhead">',
+      '<span class="ocrico" aria-hidden="true">🔍</span>',
+      '<div class="t">',
+      '<b>그림 PDF예요 — 숫자를 읽어 볼게요</b>',
+      '<span id="ocrSub">글자를 읽는 인식(OCR) 엔진을 준비하고 있어요</span>',
       '</div>',
-      '<div class="pdfmsg">',
-      '<b>이 파일은 이렇게 넣어 주세요</b>',
-      '<ol>',
-      '<li>종합정보시스템 → <b>성적 취득현황</b>(또는 <b>전체성적조회</b>) 화면에서 표를 드래그해 복사(<b>Ctrl+C</b>)한 뒤 아래 <b>성적 취득현황 붙여넣기</b>에 넣고 <b>[분석]</b>을 누르세요.</li>',
-      '<li>또는 <b>② 직접 입력 · 대시보드</b> 탭에서 내 학점 숫자만 10초 만에 입력해도 바로 계산됩니다.</li>',
+      '<span class="ocrpct" id="ocrPct">0%</span>',
+      '</div>',
+      '<div class="ocrbar" aria-hidden="true"><i id="ocrFill"></i></div>',
+      '<ol class="ocrsteps" id="ocrSteps">',
+      '<li class="is-active"><span class="dot" aria-hidden="true"></span>인식 엔진 준비</li>',
+      '<li><span class="dot" aria-hidden="true"></span>도표에서 숫자 읽기</li>',
+      '<li><span class="dot" aria-hidden="true"></span>값 정리</li>',
       '</ol>',
+      '<p class="ocrnote">' + esc(pdfMetaLine(result, file, '이 화면 안에서만 읽습니다 · 10~20초 걸릴 수 있어요')) + '</p>',
+      '</div>'
+    ].join(''));
+
+    startPdfOcr(file, result);
+  }
+
+  function startPdfOcr(file, result) {
+    if (ocrBusy) return;
+
+    if (!window.PdfOcr) {
+      renderOcrFallback({ code: 'unsupported' }, result, file);
+      return;
+    }
+
+    ocrBusy = true;
+    var token = ++ocrToken;
+
+    PdfOcr.analyze(file, {
+      onStage: function (name, at) { if (token === ocrToken) setOcrStage(name, at); },
+      onProgress: function (at) { if (token === ocrToken) setOcrStage('page', at); }
+    }).then(function (out) {
+      if (token !== ocrToken) return;
+      ocrBusy = false;
+      renderOcrResult(out, result, file);
+    }).catch(function (err) {
+      if (token !== ocrToken) return;
+      ocrBusy = false;
+      renderOcrFallback(err, result, file);
+    });
+  }
+
+  /** 이수구분 값 → 전공·교양 합계 */
+  function ocrTotals(fields) {
+    var major = (fields.majorReq || 0) + (fields.majorElec || 0);
+    var liberal = (fields.core || 0) + (fields.common || 0) + (fields.fusion || 0) +
+      (fields.dept || 0) + (fields.libUnknown || 0) + (fields.balance || 0);
+    return { major: major, liberal: liberal };
+  }
+
+  function renderOcrResult(out, result, file) {
+    var previous = snapshotState();
+    var summaryText = PdfOcr.toSummaryText(out);
+    var summary = Transcript.parseSummary(summaryText);
+    applySummary(summary);
+    updateAll();
+    saveNow();
+    if (hasData(previous)) showUndo(previous, 'OCR로 읽은 값을 반영했어요 · 이전 입력으로 되돌릴 수 있어요');
+
+    var totals = ocrTotals(out.fields);
+    var applied = Object.keys(out.fields).length;
+
+    /* 큰 숫자 3개 — 총 취득학점 / 전공 / 교양 */
+    var stats = [
+      '<div class="ocrstat"><span>총 취득학점</span><strong>' + (out.total !== null ? esc(String(out.total)) : '—') + '</strong><em>' + esc(out.totalSource || '읽은 값') + '</em></div>',
+      '<div class="ocrstat"><span>전공</span><strong>' + totals.major + '</strong><em>전필 ' + (out.fields.majorReq || 0) + ' · 전선 ' + (out.fields.majorElec || 0) + '</em></div>',
+      '<div class="ocrstat"><span>교양</span><strong>' + totals.liberal + '</strong><em>' + (out.fields.libUnknown !== undefined
+        ? '교필 ' + out.fields.libUnknown + ' · 교선 ' + (out.fields.balance || 0)
+        : '교선 ' + (out.fields.balance || 0)) + '</em></div>'
+    ].join('');
+
+    /* 읽은 값 — 신뢰도가 낮은 항목은 '확인 필요'로 표시 */
+    var chips = [];
+    var weak = {};
+    for (var w = 0; w < (out.weakItems || []).length; w++) weak[out.weakItems[w]] = true;
+    for (var key in OCR_AREA_LABEL) {
+      if (!OCR_AREA_LABEL.hasOwnProperty(key)) continue;
+      if (out.fields[key] === undefined) continue;
+      var needCheck = weak[key] ? true : false;
+      chips.push(
+        '<div class="ocrval' + (needCheck ? ' check' : '') + '">' +
+        '<div class="k">' + esc(OCR_AREA_LABEL[key]) + '</div>' +
+        '<div class="v">' + esc(String(out.fields[key])) + '<small>학점</small></div>' +
+        (needCheck ? '<span class="flag">확인 필요</span>' : '') +
+        '</div>'
+      );
+    }
+
+    var termHtml = '';
+    if (out.terms && out.terms.length) {
+      var parts = [];
+      for (var t = 0; t < out.terms.length; t++) {
+        parts.push('<span class="term">' + esc(out.terms[t].term) + ' <b>' + esc(String(out.terms[t].credits)) + '</b></span>');
+      }
+      termHtml = '<div class="ocrterms"><b>학기별 취득학점</b> · ' + parts.join('') + '</div>';
+    }
+
+    var noteLines = (out.notes || []).slice();
+    if (out.fields.libUnknown !== undefined && out.fields.core === undefined &&
+        out.fields.common === undefined && out.fields.dept === undefined) {
+      noteLines.push('교양 세부(중점·기초·계열)는 그림에 따로 없어 <b>교양필수(미분류)</b>로 넣었어요. 영역별 학점은 ② 탭에서 확인해 주세요.');
+    }
+    noteLines.push('평점은 학기별 값만 있어 누적 평점으로 넣지 않았어요 — ② 탭에서 직접 입력해 주세요.');
+
+    var notes = '';
+    if (noteLines.length) {
+      notes = '<div class="ocrterms">' + noteLines.map(function (line) {
+        return '<p style="margin:4px 0 0">· ' + line + '</p>';
+      }).join('') + '</div>';
+    }
+
+    var html = [
+      '<div class="ocrres">',
+      '<div class="ocrres-head">',
+      '<span class="ocrbadge">OCR</span>',
+      '<div class="t"><b>그림에서 숫자를 읽었어요</b>',
+      '<span>' + esc(pdfMetaLine(result, file, out.seconds + '초 · 값 ' + applied + '개')) + '</span></div>',
+      '</div>',
+      '<div class="ocrstats">' + stats + '</div>',
+
+      '<div class="ocralert">',
+      '<b class="lead">⚠️ 그림에서 읽은 값이라 3 ↔ 8 처럼 숫자가 바뀌어 읽힐 수 있어요.</b>',
+      '<span>아래 숫자를 원본 성적표와 꼭 한 번 대조해 주세요.</span>',
+      '<span class="fix">틀린 항목은 <b>② 직접 입력 · 대시보드</b> 탭에서 고칠 수 있어요.</span>',
+      '</div>',
+
+      chips.length ? '<div class="ocrvals">' + chips.join('') + '</div>' : '',
+      termHtml,
+      notes,
+
       '<div class="actions">',
-      '<button class="btn sm" type="button" data-pdf-paste>표 붙여넣기로 이동</button>',
-      '<button class="btn sm ghost" type="button" data-pdf-go>② 대시보드로 이동</button>',
+      '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>',
+      '<button class="btn sm ghost" type="button" data-pdf-paste>표 붙여넣기로 확인</button>',
+      '<button class="btn sm ghost" type="button" data-pdf-clear>결과 지우기</button>',
       '</div>',
       '</div>'
     ].join('');
+
     pdfOutput(html);
+    toast('그림 PDF에서 ' + applied + '개 값을 읽어 대시보드에 넣었어요 · 숫자를 꼭 대조해 주세요');
+  }
+
+  /** OCR이 안 됐을 때 — 서원대 포털에 맞춘 두 가지 대안을 눈에 띄게 보여 준다 */
+  function renderOcrFallback(err, result, file) {
+    var reason = window.PdfOcr ? PdfOcr.describe(err) : '이 브라우저에서는 글자 인식을 쓸 수 없어요.';
+    var code = (err && err.code) || 'unknown';
+    var offline = code === 'network';
+
+    var html = [
+      '<div class="pdfmsg warn">',
+      '<b>그림 PDF라 숫자를 자동으로 읽지 못했어요.</b>',
+      '<p>' + esc(reason) + '</p>',
+      '<p class="pdfmeta">' + esc(pdfMetaLine(result, file, null)) + '</p>',
+      '</div>',
+
+      '<div class="ocrfb">',
+      '<div class="ocrfb-step">',
+      '<span class="num" aria-hidden="true">1</span>',
+      '<div class="tx">',
+      '<b>표를 드래그해 복사 → 붙여넣기 → [분석]</b>',
+      '<p>종합정보시스템 → <b>성적 취득현황</b>(또는 <b>전체성적조회</b>) 화면에서 표를 드래그해 복사(<b>Ctrl+C</b>)한 뒤 아래 <b>성적 취득현황 붙여넣기</b>에 넣고 <b>[분석]</b>을 누르세요.</p>',
+      '<div class="actions"><button class="btn sm" type="button" data-pdf-paste>표 붙여넣기로 이동</button></div>',
+      '</div>',
+      '</div>',
+      '<div class="ocrfb-step">',
+      '<span class="num" aria-hidden="true">2</span>',
+      '<div class="tx">',
+      '<b>내 학점 숫자만 10초 만에 입력</b>',
+      '<p><b>② 직접 입력 · 대시보드</b> 탭에서 학점 숫자만 넣어도 바로 계산됩니다.</p>',
+      '<div class="actions"><button class="btn sm" type="button" data-pdf-go>② 대시보드로 이동</button></div>',
+      '</div>',
+      '</div>',
+      '</div>',
+
+      '<div class="actions">',
+      (offline ? '<button class="btn sm ghost" type="button" data-ocr-retry>인터넷 연결 후 다시 시도</button>' : '<button class="btn sm ghost" type="button" data-ocr-retry>OCR 다시 시도</button>'),
+      '<button class="btn sm ghost" type="button" data-pdf-clear>안내 닫기</button>',
+      '</div>'
+    ].join('');
+
+    pdfOutput(html);
+    ocrBusy = false;
   }
 
   /** 글자 층이 있는 PDF — 과목 표와 요약 표를 함께 읽는다 */
@@ -3515,12 +4856,14 @@ var Store = (function () {
     var out = el('pdfOut');
     if (out) {
       out.addEventListener('click', function (event) {
-        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear]') : null;
+        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry]') : null;
         if (!target) return;
         if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
         else if (target.hasAttribute('data-pdf-paste')) {
           var box = el('pasteBox');
           if (box) { box.focus(); box.scrollIntoView({ block: 'center' }); }
+        } else if (target.hasAttribute('data-ocr-retry')) {
+          if (ocrLast && ocrLast.file) renderPdfWithoutText(ocrLast.result, ocrLast.file);
         } else if (target.hasAttribute('data-pdf-clear')) {
           pdfOutput('');
         }
