@@ -718,9 +718,10 @@ button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:fo
         <span><b>내 폰 안에서만 읽고, 서버로는 절대 전송하지 않습니다.</b> PDF는 이 브라우저 메모리에서만 열립니다. 인식 엔진(pdf.js)만 인터넷에서 한 번 내려받고, 파일 내용은 어디에도 보내지 않습니다. 글자가 없는 그림 PDF는 같은 방식으로 <b>글자 인식(OCR)</b> 엔진·언어 데이터만 내려받아 이 기기 안에서 숫자를 읽습니다.</span>
       </p>
 
-      <p class="tip">기본은 앞 3쪽을 읽습니다. 3·8이 포함된 숫자는 확대 원본과 흑백 보정본으로 추가 대조합니다. 작은 숫자는 정밀 모드로 확대 재인식할 수 있어요. 흐릿한 원본은 확대해도 복원되지 않을 수 있습니다.</p>
-      <label class="check"><input type="checkbox" id="ocrFine"> 작은 숫자 정밀 인식 (3/8 확대 대조 · 느릴 수 있음)</label>
-      <p class="tip">CDN에서 엔진·언어 파일을 받으므로 인터넷이 필요하며, 해당 서비스에 IP 등 접속 정보가 전달될 수 있습니다. 성적·PDF 내용은 업로드하지 않습니다.</p>
+      <p class="tip">기본은 앞 3쪽을 읽습니다. 숫자가 유난히 작거나 흐리게 읽히면 <b>고해상도 정밀 인식</b>을 켜고 한 번 더 넣어 보세요.</p>
+      <label class="check"><input type="checkbox" id="ocrFine"> 고해상도 정밀 인식 (더 느리지만 작은 숫자에 강함)</label>
+      <p class="tip">CDN에서 엔진·언어 파일(약 3MB)을 받으므로 인터넷이 필요하며, 해당 서비스에 IP 등 접속 정보가 전달될 수 있습니다. 성적·PDF 내용은 업로드하지 않습니다.</p>
+      <p class="tip" id="fileProtoTip" hidden>지금은 <b>내 PC 파일(file://)</b>로 열려 있어요. 글자 인식(OCR)은 웹 주소에서 가장 빠르고 안정적입니다 — <a href="https://abeldaria.github.io/Seowon-credit-calc/" target="_blank" rel="noopener">같은 계산기를 웹에서 열기</a> (성적이 서버로 가지 않는 점은 같습니다)</p>
       <button type="button" class="btn sm hidden" id="cancelPdfBtn">PDF/OCR 중단</button>
       <div class="drop" id="pdfDrop" role="button" tabindex="0" aria-label="성적 PDF 선택 또는 끌어다 놓기">
         <input type="file" id="pdfFile" class="visually-hidden" accept=".pdf,application/pdf">
@@ -2069,6 +2070,14 @@ var PdfReader = (function () {
 
   var libPromise = null;
 
+  /* 기기별 캔버스 픽셀 한도 — 아이폰 Safari는 캔버스 메모리가 좁다 */
+  var MAX_PIXELS = (function () {
+    try {
+      var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      return coarse ? 3900000 : 6500000;
+    } catch (e) { return 6500000; }
+  })();
+
   /* ------------------------------------------------------- 실행 환경 */
 
   /**
@@ -2380,7 +2389,8 @@ var PdfReader = (function () {
         chain = chain.then(function () { return doc.getPage(pageNo); }).then(function (page) {
           var base = page.getViewport({ scale: 1 });
           var region = opts.region || { y: 0, height: 1 };
-          var scale = Math.min(opts.scale || 3, 6, Math.sqrt(6000000 / (base.width * base.height * region.height)), 4096 / Math.max(base.width, base.height * region.height));
+          var budget = opts.maxPixels || MAX_PIXELS;
+          var scale = Math.min(opts.scale || 3, 6, Math.sqrt(budget / (base.width * base.height * region.height)), 4096 / Math.max(base.width, base.height * region.height));
           var viewport = page.getViewport({ scale: scale });
           var canvas = document.createElement('canvas');
           canvas.width = Math.max(1, Math.floor(viewport.width));
@@ -2421,13 +2431,25 @@ var PdfOcr = (function () {
 
   var CONFIG = {
     libUrl: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+    /* 언어 데이터는 'fast' 판(영 1.9MB · 한 1.1MB)을 쓴다.
+       기본 경로(4.0.0)는 17MB가 넘어, 모바일·file:// 화면에서 준비 단계가
+       멈춘 것처럼 보였다. 인쇄된 숫자를 읽는 데는 fast 판으로 충분하다. */
+    langPath: 'https://tessdata.projectnaptha.com/4.0.0_fast',
     langs: 'kor+eng',
     engineTimeoutMs: 30000,
-    renderScale: 2.4,
+    /* 언어 데이터(약 3MB)를 내려받는 데 기다려 주는 시간 */
+    languageTimeoutMs: 75000,
+    /* 한 쪽을 읽는 데 기다려 주는 시간 — 넘으면 그때까지 읽은 값으로 넘어간다 */
+    pageTimeoutMs: 90000,
+    /* 서원대 성적 PDF의 도표는 2970px 그림이다. 2.4배(2020px)로 줄여 그리면
+       작은 숫자가 뭉개져 3/51/24 같은 값이 통째로 빠졌다 — 원본에 가깝게 그린다. */
+    renderScale: 3.2,
+    /* 정밀 모드 — 작은 숫자를 위해 원본보다 조금 더 크게 그린다 */
+    fineScale: 4.0,
     maxPages: 3,
-    minConfidence: 30,
+    minConfidence: 22,
     /* 이수구분 값이 어긋날 때 원그래프를 다시 읽는 배율 */
-    retryScale: 3.0,
+    retryScale: 4.0,
     /* 이 신뢰도보다 낮으면 화면에서 "확인 필요"로 표시한다 */
     checkConfidence: 80
   };
@@ -2543,30 +2565,71 @@ var PdfOcr = (function () {
     });
   }
 
-  /**
-   * 워커를 연다. file://(출처 null)에서도 돌도록 워커 본문은 blob으로 넘기고,
-   * 언어 데이터 캐시(IndexedDB)는 출처가 null인 화면에서 예외를 낼 수 있어 끈다.
-   */
-  function openWorker(Tess, onEvent) {
-    var options = {
-      workerBlobURL: true,
-      cacheMethod: 'none',
+  /** 이 화면의 출처가 null(file://)인지 — 그곳에서는 IndexedDB 저장을 쓸 수 없다 */
+  var OPAQUE_ORIGIN = (function () {
+    try {
+      var loc = window.location;
+      if (!loc) return false;
+      if (loc.protocol === 'file:') return true;
+      return !loc.origin || loc.origin === 'null' || loc.origin === 'undefined';
+    } catch (e) { return false; }
+  })();
+
+  /** 기다림에 한도를 둔다 — 한도가 없으면 화면이 영원히 "준비 중"에 멈춘다 */
+  function withTimeout(promise, ms, code) {
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        reject(failure(code || 'timeout'));
+      }, ms);
+      promise.then(function (value) {
+        if (done) return; done = true; clearTimeout(timer); resolve(value);
+      }, function (err) {
+        if (done) return; done = true; clearTimeout(timer); reject(err);
+      });
+    });
+  }
+
+  function workerOptions(onEvent, useBlob) {
+    return {
+      workerBlobURL: useBlob !== false,
+      /* file:// 에서는 저장소가 예외를 내므로 끄고,
+         https 배포본에서는 언어·엔진을 브라우저에 저장해 두 번째부터 빠르게 연다 */
+      cacheMethod: OPAQUE_ORIGIN ? 'none' : 'write',
+      langPath: CONFIG.langPath,
       logger: function (m) { if (onEvent && m) onEvent(m); },
       errorHandler: function () { /* 워커 내부 경고는 화면에 올리지 않는다 */ }
     };
+  }
 
-    var opening;
-    try {
-      opening = Tess.createWorker(CONFIG.langs, 1, options);
-    } catch (e) {
-      return Promise.reject(failure('worker', String((e && e.message) || e)));
+  /**
+   * 워커를 연다.
+   *  · file://(출처 null)에서도 돌도록 워커 본문은 blob으로 넘긴다.
+   *  · 언어 데이터 내려받기에 한도를 둔다(3MB, 보통 3~10초).
+   *  · blob 워커를 막는 환경이면 직접 워커로 한 번만 더 시도한다.
+   */
+  function openWorker(Tess, onEvent) {
+    function attempt(options) {
+      var opening;
+      try {
+        opening = Tess.createWorker(CONFIG.langs, 1, options);
+      } catch (e) {
+        return Promise.reject(failure('worker', String((e && e.message) || e)));
+      }
+      return opening.then(function (worker) {
+        if (!worker) throw failure('worker', 'no-worker');
+        var setup = worker.setParameters ? worker.setParameters({ preserve_interword_spaces: '1' }) : Promise.resolve();
+        return Promise.resolve(setup).then(function () { return worker; }, function () { return worker; });
+      });
     }
 
-    return opening.then(function (worker) {
-      if (!worker) throw failure('worker', 'no-worker');
-      var setup = worker.setParameters ? worker.setParameters({ preserve_interword_spaces: '1' }) : Promise.resolve();
-      return Promise.resolve(setup).then(function () { return worker; }, function () { return worker; });
-    });
+    return withTimeout(attempt(workerOptions(onEvent, true)), CONFIG.languageTimeoutMs, 'timeout')
+      .catch(function (err) {
+        if (err && err.code === 'timeout') throw err;
+        return withTimeout(attempt(workerOptions(onEvent, false)), CONFIG.languageTimeoutMs, 'timeout');
+      });
   }
 
   /* ------------------------------------------------------- 그림 전처리 */
@@ -3056,6 +3119,24 @@ var PdfOcr = (function () {
     return titles;
   }
 
+  /** 이수구분 라벨이 가장 많이 읽힌 쪽 — 도표가 있는 쪽을 제목 없이도 찾는다 */
+  function areaPageByLabels(wordsByPage, order) {
+    var best = null;
+    for (var i = 0; i < order.length; i++) {
+      var page = order[i];
+      var runs = mergeRuns(wordsByPage[page] || []);
+      var hits = 0;
+      for (var r = 0; r < runs.length; r++) {
+        var run = runs[r];
+        if (!run.clean || run.conf < CONFIG.minConfidence) continue;
+        var hit = matchArea(run.clean);
+        if (hit && hit.score >= 0.8) hits++;
+      }
+      if (!best || hits > best.hits) best = { page: page, hits: hits };
+    }
+    return best && best.hits >= 2 ? best.page : null;
+  }
+
   function pickPage(titles, pages, test) {
     for (var i = 0; i < pages.length; i++) {
       var title = titles[pages[i]] || '';
@@ -3085,8 +3166,9 @@ var PdfOcr = (function () {
 
     var titles = pageTitles(wordsByPage);
 
-    /* 이수구분: 원그래프 쪽이 있으면 그 쪽만 본다(범례·다른 도표 숫자와 섞이지 않게) */
-    var areaPage = pickPage(titles, order, function (t) {
+    /* 이수구분: 라벨(전공필수·교양선택…)이 가장 많이 보이는 쪽을 고른다.
+       제목 글자가 흔들려도 도표 쪽을 찾도록 제목·라벨 두 단서를 함께 쓴다. */
+    var areaPage = areaPageByLabels(wordsByPage, order) || pickPage(titles, order, function (t) {
       return t.indexOf('이수구분') >= 0 && t.indexOf('학기') < 0;
     });
     /* 학기: '학기별 취득학점' 도표 쪽이 있으면 그 쪽만 */
@@ -3133,35 +3215,75 @@ var PdfOcr = (function () {
     return count >= 3 ? 2 : 1;
   }
 
-  /** 한 번의 OCR — 지정한 배율로 쪽을 그려 읽는다 */
+  /** 다 쓴 캔버스를 즉시 버린다 — 아이폰·모바일의 캔버스 메모리를 아낀다 */
+  function releaseCanvas(canvas) {
+    if (!canvas) return;
+    try { canvas.width = 0; canvas.height = 0; } catch (e) { /* 이미 해제됨 */ }
+  }
+
+  /**
+   * 쪽 하나를 그리고(render) 읽는다(recognize). 쪽 단위로 처리하므로
+   * 3쪽짜리 PDF도 캔버스를 한 장씩만 들고 있다 — 모바일 메모리 부담이 3분의 1.
+   */
+  function readOnePage(ctx, pageNo, scale) {
+    return PdfReader.render(ctx.file, { scale: scale, maxPages: pageNo, only: [pageNo] })
+      .then(function (canvases) {
+        if (!canvases || !canvases.length) return null;
+        var entry = canvases[0];
+        var image = prepare(entry.canvas, { trim: ctx.opts.trim });
+        var width = image.width, height = image.height;
+
+        return withTimeout(
+          ctx.worker.recognize(image, {}, { blocks: true, text: true }),
+          CONFIG.pageTimeoutMs, 'timeout'
+        ).then(function (res) {
+          return { page: pageNo, width: width, height: height, data: (res && res.data) || {} };
+        }).then(function (value) {
+          if (image !== entry.canvas) releaseCanvas(image);
+          releaseCanvas(entry.canvas);
+          return value;
+        }, function (err) {
+          if (image !== entry.canvas) releaseCanvas(image);
+          releaseCanvas(entry.canvas);
+          throw err;
+        });
+      });
+  }
+
+  /**
+   * 앞에서부터 쪽마다 읽는다. 뒤쪽 쪽에서 실패해도 그때까지 읽은 값으로 넘어가
+   * "아무것도 못 읽었다"로 끝나지 않게 한다.
+   */
   function readPass(ctx, renderOptions, stageFrom, stageTo) {
-    return PdfReader.render(ctx.file, renderOptions).then(function (canvases) {
-      if (!canvases || !canvases.length) throw failure('empty', 'no-page');
+    var total = Math.max(1, Math.min(renderOptions.maxPages || CONFIG.maxPages, CONFIG.maxPages));
+    var scale = renderOptions.scale || CONFIG.renderScale;
+    var chain = Promise.resolve();
+    var results = [];
+    var stop = false;
 
-      var total = canvases.length;
-      var chain = Promise.resolve();
-      var results = [];
-
-      for (var p = 0; p < total; p++) {
-        (function (entry, index) {
-          chain = chain.then(function () {
-            var image = prepare(entry.canvas, { trim: ctx.opts.trim });
-            return ctx.worker.recognize(image, {}, { blocks: true, text: true }).then(function (res) {
-              results.push({
-                page: entry.page,
-                width: image.width,
-                height: image.height,
-                data: (res && res.data) || {}
-              });
-              var at = stageFrom + ((index + 1) / total) * (stageTo - stageFrom);
-              ctx.stage('page', at);
-              ctx.progress(at);
-            });
+    for (var p = 1; p <= total; p++) {
+      (function (pageNo, index) {
+        chain = chain.then(function () {
+          if (stop) return null;
+          if (ctx.isCancelled()) throw failure('cancelled');
+          return readOnePage(ctx, pageNo, scale).then(function (entry) {
+            if (entry) results.push(entry);
+            var at = stageFrom + ((index + 1) / total) * (stageTo - stageFrom);
+            ctx.stage('page', at);
+            ctx.progress(at);
+          }, function (err) {
+            if ((err && err.code) === 'cancelled') throw err;
+            if (!results.length) throw err;      /* 첫 쪽부터 실패하면 그대로 알린다 */
+            stop = true;
+            ctx.partial = true;
           });
-        })(canvases[p], p);
-      }
+        });
+      })(p, p - 1);
+    }
 
-      return chain.then(function () { return results; });
+    return chain.then(function () {
+      if (!results.length) throw failure('empty', 'no-page');
+      return results;
     });
   }
 
@@ -3170,6 +3292,21 @@ var PdfOcr = (function () {
       try { ctx.worker.terminate(); } catch (e) { /* 정리 실패는 무시 */ }
     }
     ctx.worker = null;
+  }
+
+  /* 지금 돌고 있는 인식 작업 — 중단 버튼이 이 값을 본다 */
+  var current = null;
+
+  /** 중단 — 워커를 끄고 다음 단계에서 'cancelled'로 끝낸다 */
+  function cancel() {
+    if (!current) return;
+    current.cancelled = true;
+    var ctx = current.ctx;
+    if (ctx && ctx.worker && ctx.worker.terminate) {
+      try { ctx.worker.terminate(); } catch (e) { /* 이미 끝남 */ }
+      ctx.worker = null;
+    }
+    try { PdfReader.cancel(); } catch (e) { /* 무시 */ }
   }
 
   /** 읽은 값을 화면에 넘길 결과로 정리한다 */
@@ -3261,29 +3398,39 @@ var PdfOcr = (function () {
       file: file,
       opts: opts,
       worker: null,
+      partial: false,
       stage: opts.onStage || function () {},
-      progress: opts.onProgress || function () {}
+      progress: opts.onProgress || function () {},
+      isCancelled: function () { return current !== null && current.cancelled; }
     };
     var outcome = { first: null, retried: false };
+    current = { cancelled: false, ctx: ctx };
 
     ctx.stage('engine', 0.02);
 
+    var scale = opts.scale || (opts.fine ? CONFIG.fineScale : CONFIG.renderScale);
+
     return loadEngine().then(function (Tess) {
-      ctx.stage('engine', 0.1);
+      if (ctx.isCancelled()) throw failure('cancelled');
+      ctx.stage('engine', 0.08);
       return openWorker(Tess, function (m) {
         if (!m || !m.status) return;
-        if (/loading|initializ/i.test(m.status)) {
-          ctx.stage('engine', 0.1 + (m.progress || 0) * 0.3);
-        }
+        if (!/loading|initializ|recogniz/i.test(m.status)) return;
+        var part = typeof m.progress === 'number' ? m.progress : 0;
+        /* 언어 데이터·엔진 준비 중에는 8%→40% 사이를 천천히 채운다 */
+        if (/recogniz/i.test(m.status)) return;
+        ctx.stage('engine', 0.08 + part * 0.32);
       });
     }).then(function (worker) {
+      if (ctx.isCancelled()) { try { worker.terminate(); } catch (e) { /* 무시 */ } throw failure('cancelled'); }
       ctx.worker = worker;
       ctx.stage('page', 0.4);
       return readPass(ctx, {
-        scale: opts.scale || CONFIG.renderScale,
+        scale: scale,
         maxPages: opts.maxPages || CONFIG.maxPages
       }, 0.4, 0.9);
     }).then(function (results) {
+      if (ctx.isCancelled()) throw failure('cancelled');
       ctx.stage('pick', 0.93);
       var ex = extract(results);
       outcome.first = ex;
@@ -3294,35 +3441,40 @@ var PdfOcr = (function () {
         ? Math.abs(areaSumOf(ex.areas) - target) < 0.51
         : count >= 3;
 
-      if (!ex.areaPage || count >= 4 || fits) return null;
+      if (count >= 4 || (fits && count >= 3)) return null;      /* 충분히 읽혔으면 다시 읽지 않는다 */
 
-      /* 이수구분 값이 학기 합계와 어긋난다 — 원그래프 쪽만 더 크게 그려 한 번 더 읽는다 */
-      ctx.stage('retry', 0.8);
-      return PdfReader.render(file, {
-        scale: CONFIG.retryScale,
-        maxPages: ex.areaPage,
-        only: [ex.areaPage]
-      }).then(function (canvases) {
-        if (!canvases || !canvases.length) return null;
-        var image = prepare(canvases[0].canvas, { trim: opts.trim });
-        return ctx.worker.recognize(image, {}, { blocks: true, text: true }).then(function (res) {
-          var words = toWords((res && res.data) || {}, canvases[0].page, image.width, image.height);
-          var second = readAreas(words);
-          if (fitScore(second, target) > fitScore(ex.areas, target)) {
-            ex.areas = second;
-            ex.areaPage = canvases[0].page;
+      /* 값이 모자라거나 학기 합계와 어긋난다 — 원본에 더 가깝게 키워 한 번 더 읽고,
+         두 번의 결과 중 잘 읽힌 쪽을 쓴다. */
+      ctx.stage('retry', 0.82);
+      return readPass(ctx, { scale: CONFIG.retryScale, maxPages: CONFIG.maxPages }, 0.82, 0.95)
+        .then(function (again) {
+          var second = extract(again);
+          var betterAreas = areaCountOf(second.areas) > count ||
+            (areaCountOf(second.areas) === count && fitScore(second.areas, target) > fitScore(ex.areas, target));
+          if (betterAreas) {
+            ex.areas = second.areas;
+            ex.areaPage = second.areaPage || ex.areaPage;
+            outcome.retried = true;
+          }
+          if ((second.chart.terms || []).length > (ex.chart.terms || []).length) {
+            ex.chart = second.chart;
             outcome.retried = true;
           }
           ctx.stage('pick', 0.96);
-        });
-      }).catch(function () { /* 다시 읽기 실패는 1차 결과로 넘어간다 */ });
+        })
+        .catch(function () { /* 다시 읽기 실패는 1차 결과로 넘어간다 */ });
     }).then(function () {
-      return buildResult(ctx, outcome.first, started, opts, outcome.retried);
+      if (ctx.isCancelled()) throw failure('cancelled');
+      var result = buildResult(ctx, outcome.first, started, opts, outcome.retried);
+      result.partial = !!ctx.partial;
+      return result;
     }).then(function (result) {
       closeWorker(ctx);
+      current = null;
       return result;
     }, function (err) {
       closeWorker(ctx);
+      current = null;
       throw err;
     });
   }
@@ -3358,7 +3510,8 @@ var PdfOcr = (function () {
   return {
     CONFIG: CONFIG,
     analyze: analyze,
-    cancel: function () { },
+    cancel: cancel,
+    isOpaqueOrigin: function () { return OPAQUE_ORIGIN; },
     toSummaryText: toSummaryText,
     /* 시험·점검용 내부 함수(화면에서는 쓰지 않는다) */
     _internals: {
@@ -3370,6 +3523,10 @@ var PdfOcr = (function () {
       switch (code) {
         case 'network':
           return '인식 엔진(tesseract.js)을 내려받지 못했어요. 인터넷 연결이나 광고 차단 확장 프로그램을 확인한 뒤 다시 시도해 주세요.';
+        case 'timeout':
+          return '인식 엔진·언어 데이터 내려받기가 너무 늦어요. 인터넷이 느리거나 CDN이 막혀 있을 수 있어요. 잠시 뒤 다시 시도하거나, 아래 붙여넣기 방법을 써 주세요.';
+        case 'cancelled':
+          return '인식을 중단했어요.';
         case 'worker':
           return '이 브라우저에서는 글자 인식(OCR)을 시작하지 못했어요. 붙여넣기나 직접 입력을 써 주세요.';
         case 'empty':
@@ -4231,6 +4388,25 @@ var Store = (function () {
     box.classList.toggle('hidden', !html);
   }
 
+  /** 지금 화면이 내 PC 파일(file://)로 열렸는지 */
+  function isLocalFile() {
+    try { return window.location.protocol === 'file:'; } catch (e) { return false; }
+  }
+
+  /** 결과 카드를 화면 안으로 끌어온다 — 모바일에서 카드가 화면 밖에 생겨 "안 됐다"고 느끼던 문제 */
+  function scrollToOutput() {
+    var box = el('pdfOut');
+    if (!box || box.classList.contains('hidden')) return;
+    setTimeout(function () {
+      try {
+        var top = box.getBoundingClientRect().top + window.pageYOffset - 64;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      } catch (e) {
+        try { box.scrollIntoView(); } catch (e2) { /* 무시 */ }
+      }
+    }, 60);
+  }
+
   function pdfChip(label, value, kind) {
     return '<div class="pf ' + (kind || 'hit') + '"><div class="k">' + esc(label) + '</div><div class="v">' + esc(value) + '</div></div>';
   }
@@ -4363,20 +4539,37 @@ var Store = (function () {
     ocrBusy = true;
     show('cancelPdfBtn', true);
     var token = ++ocrToken;
+    var started = Date.now();
+    var ticker = setInterval(function () {
+      if (token !== ocrToken) { clearInterval(ticker); return; }
+      var sub = el('ocrSub');
+      if (!sub) return;
+      var base = sub.getAttribute('data-base');
+      if (!base) { base = sub.textContent; sub.setAttribute('data-base', base); }
+      sub.textContent = base + ' · ' + Math.round((Date.now() - started) / 1000) + '초';
+    }, 1000);
 
     PdfOcr.analyze(file, {
       fine: el('ocrFine').checked,
-      onStage: function (name, at) { if (token === ocrToken) setOcrStage(name, at); },
+      onStage: function (name, at) {
+        if (token !== ocrToken) return;
+        setOcrStage(name, at);
+        var sub = el('ocrSub');
+        if (sub) sub.removeAttribute('data-base');   /* 단계가 바뀌면 기준 문구도 새로 */
+      },
       onProgress: function (at) { if (token === ocrToken) setOcrStage('page', at); }
     }).then(function (out) {
+      clearInterval(ticker);
       if (token !== ocrToken) return;
       ocrBusy = false;
       show('cancelPdfBtn', false);
       renderOcrResult(out, result, file);
     }).catch(function (err) {
+      clearInterval(ticker);
       if (token !== ocrToken) return;
       ocrBusy = false;
       show('cancelPdfBtn', false);
+      if (err && err.code === 'cancelled') return;    /* 중단 안내는 중단 버튼이 한다 */
       renderOcrFallback(err, result, file);
     });
   }
@@ -4391,6 +4584,20 @@ var Store = (function () {
 
   function renderOcrResult(out, result, file) {
     pendingOcr = out;
+
+    /* 예시 화면과 같은 방식 — 읽은 값을 바로 대시보드에 넣고, 되돌리기를 함께 준다.
+       "확인 후 적용" 단계만 있으면 아무 일도 일어나지 않은 것처럼 보였다. */
+    var previous = snapshotState();
+    var appliedToState = false;
+    try {
+      applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(out)));
+      updateAll();
+      saveNow();
+      appliedToState = true;
+    } catch (e) { appliedToState = false; }
+    if (appliedToState && hasData(previous)) {
+      showUndo(previous, 'OCR로 읽은 값을 반영했어요 · 이전 입력으로 되돌릴 수 있어요');
+    }
 
     var totals = ocrTotals(out.fields);
     var applied = Object.keys(out.fields).length;
@@ -4455,7 +4662,9 @@ var Store = (function () {
 
       '<div class="ocralert">',
       '<b class="lead">⚠️ 그림에서 읽은 값이라 3 ↔ 8 처럼 숫자가 바뀌어 읽힐 수 있어요.</b>',
-      '<span>아직 반영하지 않았어요. 아래 숫자를 원본과 대조한 뒤 적용하세요. 적용하면 기존 학점·평점·과목 목록·교양 영역을 교체합니다. 비교과 체크는 유지됩니다.</span>',
+      '<span>' + (appliedToState
+        ? '읽은 값을 <b>대시보드에 바로 넣었어요.</b> 아래 숫자를 원본 성적표와 한 번 대조하고, 틀린 값은 ② 탭에서 고치면 됩니다.'
+        : '아래 숫자를 원본 성적표와 대조한 뒤 <b>대시보드에서 확인</b>하세요.') + '</span>',
       '<span class="fix">틀린 항목은 <b>② 직접 입력 · 대시보드</b> 탭에서 고칠 수 있어요.</span>',
       '</div>',
 
@@ -4464,15 +4673,16 @@ var Store = (function () {
       notes,
 
       '<div class="actions">',
-      '<button class="btn sm primary" type="button" data-ocr-apply>숫자 확인 완료 · 학점 교체 적용</button>',
+      '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>',
       '<button class="btn sm ghost" type="button" data-pdf-paste>표 붙여넣기로 확인</button>',
-      '<button class="btn sm ghost" type="button" data-pdf-clear>안내 닫기</button>',
+      '<button class="btn sm ghost" type="button" data-pdf-clear>결과 지우기</button>',
       '</div>',
       '</div>'
     ].join('');
 
     pdfOutput(html);
-    toast('그림 PDF에서 ' + applied + '개 값을 읽었어요 · 확인 후 적용하세요');
+    scrollToOutput();
+    toast('그림 PDF에서 ' + applied + '개 값을 읽어 대시보드에 넣었어요 · 숫자를 꼭 대조해 주세요');
   }
 
   /** OCR이 안 됐을 때 — 서원대 포털에 맞춘 두 가지 대안을 눈에 띄게 보여 준다 */
@@ -4480,6 +4690,7 @@ var Store = (function () {
     var reason = window.PdfOcr ? PdfOcr.describe(err) : '이 브라우저에서는 글자 인식을 쓸 수 없어요.';
     var code = (err && err.code) || 'unknown';
     var offline = code === 'network';
+    var local = isLocalFile();
 
     var html = [
       '<div class="pdfmsg warn">',
@@ -4487,6 +4698,7 @@ var Store = (function () {
       '<p>서원대 성적 취득현황 PDF는 <b>표 대신 그래프 이미지로 저장되는 경우가 많아</b> 자동 인식이 되지 않을 수 있어요.</p>',
       '<p>' + esc(reason) + '</p>',
       '<p class="pdfmeta">' + esc(pdfMetaLine(result, file, null)) + '</p>',
+      local ? '<p class="pdfmeta">지금은 <b>file://</b>(내 PC에 저장한 파일)로 열려 있어요. 글자 인식은 웹 주소에서 가장 안정적입니다 — <a href="https://abeldaria.github.io/Seowon-credit-calc/" target="_blank" rel="noopener">웹 버전에서 같은 PDF 넣어 보기</a></p>' : '',
       '</div>',
 
       '<div class="ocrfb">',
@@ -4827,17 +5039,9 @@ var Store = (function () {
     var out = el('pdfOut');
     if (out) {
       out.addEventListener('click', function (event) {
-        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry], [data-ocr-apply]') : null;
+        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry]') : null;
         if (!target) return;
-        if (target.hasAttribute('data-ocr-apply')) {
-          if (!pendingOcr) return;
-          var previous = snapshotState();
-          clearImportedCredits(); state.pasteText = '';
-          applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(pendingOcr)));
-          pendingOcr = null; renderAll(); saveNow(); showTab('input');
-          showUndo(previous, 'OCR 학점을 적용했어요 · 이전 입력으로 되돌리기');
-          target.disabled = true; target.textContent = '적용 완료';
-        } else if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
+        if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
         else if (target.hasAttribute('data-pdf-paste')) {
           var box = el('pasteBox');
           if (box) { box.focus(); box.scrollIntoView({ block: 'center' }); }
@@ -4977,7 +5181,16 @@ var Store = (function () {
 
     window.addEventListener('pagehide', function () { clearTimeout(saveTimer); saveNow(); });
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') { clearTimeout(saveTimer); saveNow(); } });
-    el('cancelPdfBtn').addEventListener('click', function () { cancelImport(); pdfOutput(''); toast('인식을 중단했어요'); });
+    el('cancelPdfBtn').addEventListener('click', function () {
+      var wasOcr = ocrBusy;
+      cancelImport();
+      if (wasOcr) {
+        pdfOutput('<div class="pdfmsg warn"><b>인식을 중단했어요.</b><p>중간에 멈춰서 이번 파일은 반영하지 않았어요. 다시 하려면 같은 PDF를 한 번 더 넣어 주세요.</p></div>');
+      } else {
+        pdfOutput('');
+      }
+      toast('인식을 중단했어요');
+    });
     bindPdfDropzone();
   }
 
@@ -5092,6 +5305,12 @@ var Store = (function () {
     safe(bindEvents);
     renderAll();
     safe(function () { showTab(state.tab || 'input'); });
+    /* file:// 로 열었으면 OCR 안내를 먼저 보여 준다 */
+    safe(function () {
+      if (!isLocalFile()) return;
+      var tip = el('fileProtoTip');
+      if (tip) tip.hidden = false;
+    });
     if (state.pasteText && Store.available) safe(function () { setText('saveState', '이전 기록을 불러왔어요'); });
     hideJsWarn();
   }
