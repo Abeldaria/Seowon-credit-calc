@@ -1499,11 +1499,11 @@ var Rules = (function () {
     return out;
   }
 
-  /** 학번·학과에 해당하는 [별표1] 행 */
+  /** 학번·학과에 해당하는 [별표1] 행 (없으면 null — 다른 학과 값을 대신 쓰지 않는다) */
   function findRow(year, dept) {
     var rows = rowsFor(year);
     for (var i = 0; i < rows.length; i++) if (rows[i][2] === dept) return rows[i];
-    return rows.length ? rows[0] : null;
+    return null;
   }
 
   /** 학과·학번의 전공필수 정보 */
@@ -1521,7 +1521,8 @@ var Rules = (function () {
 
   /** 학번·학과의 요건 객체 */
   function resolveReq(year, dept) {
-    var row = findRow(year, dept) || [0, '', '', 130, 40, 9, 4, 6, 2, 19, 0, 0, 60];
+    var row = findRow(year, dept) || findRow('2026', dept) ||
+      rowsFor(year)[0] || [0, '', '', 130, 40, 9, 4, 6, 2, 19, 0, 0, 60];
     var teaching = row[11] || 0;
     var flexLib = !!(FLEX_LIB[row[2]] && String(year) >= '2026');
     var commonCr = row[6] || 0, fusionCr = row[8] || 0;
@@ -1551,7 +1552,6 @@ var Rules = (function () {
 
   /** 화면에 띄울 학과 이름과 주의 문구 */
   function profileMeta(year, dept) {
-    var row = findRow(year, dept);
     var r = resolveReq(year, dept);
     var notice = '';
     if (r.est) notice = '2027학번 교육과정지침은 아직 공개되지 않아 2026학번 기준으로 계산합니다. ';
@@ -1559,7 +1559,7 @@ var Rules = (function () {
     if (r.jp.s === 'na') notice += '학과 전필 자료를 찾지 못했습니다. ';
     if (r.flexLib) notice += '이 학과는 영어회화Ⅰ을 편성하지 않아 기초학업(공통) 2학점을 기초학업(융합)에서 이수합니다 — 두 영역 합계 6학점으로 계산합니다. ';
     notice += '전공 최소학점은 학과별 [별표1], 전필은 학과 교과과정표 기준입니다.';
-    return { school: row ? row[1] : '', dept: row ? row[2] : '', notice: notice };
+    return { school: r.college || '', dept: r.deptName || '', notice: notice };
   }
 
   /* ---------------------------------------------------------------- helpers */
