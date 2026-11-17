@@ -4620,18 +4620,22 @@ var Store = (function () {
     pendingOcr = out;
 
     /* 예시 화면과 같은 방식 — 읽은 값을 바로 대시보드에 넣고, 되돌리기를 함께 준다.
-       "확인 후 적용" 단계만 있으면 아무 일도 일어나지 않은 것처럼 보였다. */
+       다만 값이 일부만 읽혔거나 합이 어긋나면 기존 입력을 덮어쓰지 않고
+       "이 값으로 반영" 버튼을 눌러야 반영한다(멀쩡한 입력을 나쁜 값으로 바꾸지 않게). */
+    var uncertain = out.areaCount < 3 || out.consistent === false || out.partial === true;
     var previous = snapshotState();
     var appliedToState = false;
-    try {
-      /* 이전 입력이 남아 합계를 부풀리지 않도록 학점·과목만 비우고 새 값으로 채운다 */
-      clearImportedCredits();
-      state.pasteText = '';
-      applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(out)));
-      updateAll();
-      saveNow();
-      appliedToState = true;
-    } catch (e) { appliedToState = false; }
+    if (!uncertain) {
+      try {
+        /* 이전 입력이 남아 합계를 부풀리지 않도록 학점·과목만 비우고 새 값으로 채운다 */
+        clearImportedCredits();
+        state.pasteText = '';
+        applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(out)));
+        updateAll();
+        saveNow();
+        appliedToState = true;
+      } catch (e) { appliedToState = false; }
+    }
     if (appliedToState && hasData(previous)) {
       showUndo(previous, 'OCR로 읽은 값을 반영했어요 · 이전 입력으로 되돌릴 수 있어요');
     }
@@ -4701,7 +4705,9 @@ var Store = (function () {
       '<b class="lead">⚠️ 그림에서 읽은 값이라 3 ↔ 8 처럼 숫자가 바뀌어 읽힐 수 있어요.</b>',
       '<span>' + (appliedToState
         ? '읽은 값을 <b>대시보드에 바로 넣었어요.</b> 아래 숫자를 원본 성적표와 한 번 대조하고, 틀린 값은 ② 탭에서 고치면 됩니다.'
-        : '아래 숫자를 원본 성적표와 대조한 뒤 <b>대시보드에서 확인</b>하세요.') + '</span>',
+        : (uncertain
+          ? '값을 일부만 읽었거나 합이 맞지 않아 <b>아직 반영하지 않았어요.</b> 원본과 대조한 뒤 맞으면 아래 <b>이 값으로 반영</b>을 눌러 주세요.'
+          : '아래 숫자를 원본 성적표와 대조한 뒤 <b>대시보드에서 확인</b>하세요.')) + '</span>',
       '<span class="fix">틀린 항목은 <b>② 직접 입력 · 대시보드</b> 탭에서 고칠 수 있어요.</span>',
       '</div>',
 
@@ -4710,7 +4716,9 @@ var Store = (function () {
       notes,
 
       '<div class="actions">',
-      '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>',
+      (uncertain
+        ? '<button class="btn sm primary" type="button" data-ocr-apply>이 값으로 반영</button>'
+        : '<button class="btn sm primary" type="button" data-pdf-go>② 대시보드에서 확인</button>'),
       '<button class="btn sm ghost" type="button" data-pdf-paste>표 붙여넣기로 확인</button>',
       '<button class="btn sm ghost" type="button" data-pdf-clear>결과 지우기</button>',
       '</div>',
@@ -4719,7 +4727,9 @@ var Store = (function () {
 
     pdfOutput(html);
     scrollToOutput();
-    toast('그림 PDF에서 ' + applied + '개 값을 읽어 대시보드에 넣었어요 · 숫자를 꼭 대조해 주세요');
+    toast(appliedToState
+      ? '그림 PDF에서 ' + applied + '개 값을 읽어 대시보드에 넣었어요 · 숫자를 꼭 대조해 주세요'
+      : '그림 PDF에서 ' + applied + '개 값을 읽었어요 · 원본과 대조한 뒤 반영해 주세요');
   }
 
   /** OCR이 안 됐을 때 — 서원대 포털에 맞춘 두 가지 대안을 눈에 띄게 보여 준다 */
@@ -5076,9 +5086,17 @@ var Store = (function () {
     var out = el('pdfOut');
     if (out) {
       out.addEventListener('click', function (event) {
-        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry]') : null;
+        var target = event.target && event.target.closest ? event.target.closest('[data-pdf-go], [data-pdf-paste], [data-pdf-clear], [data-ocr-retry], [data-ocr-apply]') : null;
         if (!target) return;
-        if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
+        if (target.hasAttribute('data-ocr-apply')) {
+          if (!pendingOcr) return;
+          var prev = snapshotState();
+          clearImportedCredits(); state.pasteText = '';
+          try { applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(pendingOcr))); } catch (e) { /* 무시 */ }
+          pendingOcr = null; renderAll(); saveNow(); showTab('input');
+          showUndo(prev, 'OCR 학점을 적용했어요 · 이전 입력으로 되돌리기');
+          target.disabled = true; target.textContent = '반영 완료';
+        } else if (target.hasAttribute('data-pdf-go')) { showTab('input'); scrollTop(); toast('대시보드에서 확인해 보세요'); }
         else if (target.hasAttribute('data-pdf-paste')) {
           var box = el('pasteBox');
           if (box) { box.focus(); box.scrollIntoView({ block: 'center' }); }
