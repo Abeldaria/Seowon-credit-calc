@@ -2441,15 +2441,16 @@ var PdfOcr = (function () {
     languageTimeoutMs: 75000,
     /* 한 쪽을 읽는 데 기다려 주는 시간 — 넘으면 그때까지 읽은 값으로 넘어간다 */
     pageTimeoutMs: 90000,
-    /* 서원대 성적 PDF의 도표는 2970px 그림이다. 2.4배(2020px)로 줄여 그리면
-       작은 숫자가 뭉개져 3/51/24 같은 값이 통째로 빠졌다 — 원본에 가깝게 그린다. */
-    renderScale: 3.2,
+    /* 서원대 성적 PDF의 도표는 2970px 그림이다. 한 배율만 쓰면 어느 배율에서는
+       3처럼 작은 숫자가 빠지고 다른 배율에서는 큰 숫자가 흔들린다 —
+       기본 배율로 한 번, 값이 모자라면 더 큰 배율로 한 번 더 읽어 합친다. */
+    renderScale: 2.8,
     /* 정밀 모드 — 작은 숫자를 위해 원본보다 조금 더 크게 그린다 */
     fineScale: 4.0,
     maxPages: 3,
     minConfidence: 22,
-    /* 이수구분 값이 어긋날 때 원그래프를 다시 읽는 배율 */
-    retryScale: 4.0,
+    /* 값이 모자랄 때 한 번 더 읽는 배율 */
+    retryScale: 3.6,
     /* 이 신뢰도보다 낮으면 화면에서 "확인 필요"로 표시한다 */
     checkConfidence: 80
   };
@@ -3441,7 +3442,7 @@ var PdfOcr = (function () {
         ? Math.abs(areaSumOf(ex.areas) - target) < 0.51
         : count >= 3;
 
-      if (count >= 4 || (fits && count >= 3)) return null;      /* 충분히 읽혔으면 다시 읽지 않는다 */
+      if (count >= 4 && fits) return null;      /* 값이 다 읽히고 합도 맞으면 다시 읽지 않는다 */
 
       /* 값이 모자라거나 학기 합계와 어긋난다 — 원본에 더 가깝게 키워 한 번 더 읽고,
          두 번의 결과 중 잘 읽힌 쪽을 쓴다. */
@@ -3449,11 +3450,18 @@ var PdfOcr = (function () {
       return readPass(ctx, { scale: CONFIG.retryScale, maxPages: CONFIG.maxPages }, 0.82, 0.95)
         .then(function (again) {
           var second = extract(again);
-          var betterAreas = areaCountOf(second.areas) > count ||
-            (areaCountOf(second.areas) === count && fitScore(second.areas, target) > fitScore(ex.areas, target));
-          if (betterAreas) {
-            ex.areas = second.areas;
-            ex.areaPage = second.areaPage || ex.areaPage;
+          /* 두 번의 결과를 합친다 — 한 배율에서 놓친 라벨을 다른 배율이 채운다 */
+          var merged = false;
+          for (var key in second.areas) {
+            if (!second.areas.hasOwnProperty(key)) continue;
+            var old = ex.areas[key];
+            if (!old || second.areas[key].conf > old.conf) {
+              ex.areas[key] = second.areas[key];
+              merged = true;
+            }
+          }
+          if (merged) {
+            ex.areaPage = ex.areaPage || second.areaPage;
             outcome.retried = true;
           }
           if ((second.chart.terms || []).length > (ex.chart.terms || []).length) {
