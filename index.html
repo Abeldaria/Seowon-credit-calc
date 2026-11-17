@@ -2332,7 +2332,10 @@ var Grader = (function (Rules) {
     if (R.balance > 0) add('balance', '균형교양', R.balance, balance, '학점', balance >= R.balance);
     if (R.areas > 0) add('areas', '균형교양 영역', R.areas, areaCount, '개 영역', areaCount >= R.areas, 'credit', balance > 0 && areaCount === 0);
     add('major', '전공 합계', R.majorMin, major, '학점', major >= R.majorMin);
-    add('majorAll', '전공필수 지정과목', 1, fields.majorAll ? 1 : 0, '', !!fields.majorAll, 'check');
+    var jpLabel = (fields._jp && fields._jp.known)
+      ? ('전공필수(전필) ' + fields._jp.n + '/' + fields._jp.need + '과목')
+      : '전공필수 지정과목';
+    add('majorAll', jpLabel, 1, fields.majorAll ? 1 : 0, '', !!fields.majorAll, 'check');
     if (R.teaching > 0) add('teaching', '교직' + (R.teachingOpt ? '(교직이수자)' : ''), R.teaching, teaching, '학점',
       teaching >= R.teaching || (R.teachingOpt && teaching === 0));
     add('progDem', '민주시민 프로그램', 1, fields.progDem ? 1 : 0, '', !!fields.progDem, 'check');
