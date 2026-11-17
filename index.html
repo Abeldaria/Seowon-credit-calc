@@ -3196,19 +3196,19 @@ var Store = (function () {
     var html = [
       '<div class="pdfmsg warn">',
       '<b>이 PDF에는 글자 정보가 없어요 — 도표(그래프)만 그림으로 들어 있습니다.</b>',
-      '<p>서원대 성적 취득현황을 휴대폰에서 인쇄하면 <b>표는 빠지고 그래프만 이미지로</b> 남는 경우가 있습니다. 그림 속 숫자는 글자가 아니라서 어떤 자동 인식기도 읽을 수 없어요.</p>',
+      '<p>서원대 성적 취득현황 PDF는 <b>표 대신 그래프 이미지로 저장되는 경우가 많아</b> 자동 인식이 되지 않을 수 있어요. 그림 속 숫자는 글자가 아니라서 어떤 인식기도 읽어 내지 못합니다.</p>',
       '<p class="pdfmeta">이 파일: ' + result.numPages + '쪽 · 글자 <b>' + result.chars + '자</b>'
         + (file && file.name ? ' · ' + esc(file.name) : '') + '</p>',
       '</div>',
       '<div class="pdfmsg">',
-      '<b>자동 인식이 되게 하려면</b>',
+      '<b>이 파일은 이렇게 넣어 주세요</b>',
       '<ol>',
-      '<li>PC(크롬·엣지·사파리)에서 종합정보시스템 → <b>성적 취득현황</b> → <b>인쇄 → PDF로 저장</b> — 표까지 함께 저장됩니다.</li>',
-      '<li>또는 표를 드래그해 복사한 뒤 아래 <b>성적 취득현황 붙여넣기</b>에 붙여넣고 <b>[분석]</b>을 누르세요.</li>',
+      '<li>종합정보시스템 → <b>성적 취득현황</b>(또는 <b>전체성적조회</b>) 화면에서 표를 드래그해 복사(<b>Ctrl+C</b>)한 뒤 아래 <b>성적 취득현황 붙여넣기</b>에 넣고 <b>[분석]</b>을 누르세요.</li>',
+      '<li>또는 <b>② 직접 입력 · 대시보드</b> 탭에서 내 학점 숫자만 10초 만에 입력해도 바로 계산됩니다.</li>',
       '</ol>',
       '<div class="actions">',
       '<button class="btn sm" type="button" data-pdf-paste>표 붙여넣기로 이동</button>',
-      '<button class="btn sm ghost" type="button" data-pdf-go>② 직접 입력으로 이동</button>',
+      '<button class="btn sm ghost" type="button" data-pdf-go>② 대시보드로 이동</button>',
       '</div>',
       '</div>'
     ].join('');
