@@ -3450,17 +3450,41 @@ var PdfOcr = (function () {
       return readPass(ctx, { scale: CONFIG.retryScale, maxPages: CONFIG.maxPages }, 0.82, 0.95)
         .then(function (again) {
           var second = extract(again);
-          /* 두 번의 결과를 합친다 — 한 배율에서 놓친 라벨을 다른 배율이 채운다 */
-          var merged = false;
-          for (var key in second.areas) {
-            if (!second.areas.hasOwnProperty(key)) continue;
-            var old = ex.areas[key];
-            if (!old || second.areas[key].conf > old.conf) {
-              ex.areas[key] = second.areas[key];
-              merged = true;
+          var firstSum = areaSumOf(ex.areas), secondSum = areaSumOf(second.areas);
+          var best = null;
+
+          /* 한 번의 결과가 학기 합계와 정확히 맞으면 그 결과를 그대로 쓴다 */
+          if (target > 0 && Math.abs(secondSum - target) < 0.51 && Math.abs(firstSum - target) > 0.51) {
+            best = second.areas;
+          } else {
+            /* 아니면 두 번의 라벨을 합치고, 같은 라벨은 신뢰도가 높은 값을 쓴다 */
+            var keys = {}, key;
+            for (key in ex.areas) if (ex.areas.hasOwnProperty(key)) keys[key] = 1;
+            for (key in second.areas) if (second.areas.hasOwnProperty(key)) keys[key] = 1;
+            best = {};
+            for (key in keys) {
+              var a = ex.areas[key], b = second.areas[key];
+              best[key] = !a ? b : (!b ? a : ((b.conf > a.conf) ? b : a));
+            }
+            /* 그래도 합이 어긋나면, 값이 갈린 라벨 하나를 바꿔 합이 맞는지 본다 */
+            if (target > 0) {
+              var sum = areaSumOf(best);
+              if (Math.abs(sum - target) > 0.51) {
+                for (key in keys) {
+                  var x = ex.areas[key], y = second.areas[key];
+                  if (!x || !y || x.value === y.value) continue;
+                  if (Math.abs(sum - x.value + y.value - target) < 0.51) {
+                    best[key] = y;
+                    break;
+                  }
+                }
+              }
             }
           }
-          if (merged) {
+
+          var changed = areaSumOf(best) !== areaSumOf(ex.areas) || areaCountOf(best) !== areaCountOf(ex.areas);
+          if (changed) {
+            ex.areas = best;
             ex.areaPage = ex.areaPage || second.areaPage;
             outcome.retried = true;
           }
