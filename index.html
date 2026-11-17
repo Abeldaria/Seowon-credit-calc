@@ -1988,7 +1988,6 @@ var PdfReader = (function () {
   };
 
   var libPromise = null;
-  var workerBlobUrl = null;
 
   /* ------------------------------------------------------------- 오류 */
 
@@ -2065,8 +2064,7 @@ var PdfReader = (function () {
         return res.text();
       })
       .then(function (code) {
-        workerBlobUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
-        lib.GlobalWorkerOptions.workerSrc = workerBlobUrl;
+        lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
       })
       .catch(function () { fallback(); });
   }
