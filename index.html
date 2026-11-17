@@ -3190,9 +3190,13 @@ var Store = (function () {
       if (summary.fields[fieldKey] === undefined) missing.push(PDF_VALUE_FIELDS[m][1]);
     }
 
+    var headline;
+    if (chips.length && included) headline = 'PDF에서 <b>' + chips.length + '개 항목</b>과 <b>' + included + '과목</b>을 읽었어요.';
+    else if (chips.length) headline = 'PDF에서 <b>' + chips.length + '개 항목</b>을 읽었어요. 과목 목록은 없어 요약 값만 채웠습니다.';
+    else headline = '<b>' + included + '과목</b>을 읽어 합계를 계산했어요. 요약 표는 없었습니다.';
+
     var html = ['<div class="pdfmsg ok">',
-      '<b>PDF에서 ' + chips.length + '개 항목을 읽었어요.</b>'
-      + (included ? ' 과목 목록도 <b>' + included + '과목</b> 읽어 미리보기에 넣었습니다.' : ' 과목 목록은 없어 요약 값만 채웠습니다.'),
+      headline,
       '<div class="pfgrid">' + chips.join('') + '</div>'];
 
     if (missing.length) {
@@ -3211,7 +3215,7 @@ var Store = (function () {
       '</div></div>');
 
     pdfOutput(html.join(''));
-    toast(chips.length ? ('PDF에서 ' + chips.length + '개 항목을 읽었어요') : ('과목 ' + included + '개를 읽었어요'));
+    toast(chips.length ? ('PDF에서 ' + chips.length + '개 항목을 읽어 채웠어요') : (included + '과목을 읽어 합계를 계산했어요'));
   }
 
   /** 요약 표에서 읽은 값을 대시보드 입력값에 반영한다. @returns 채운 항목 수 */
