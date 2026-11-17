@@ -4598,6 +4598,9 @@ var Store = (function () {
     var previous = snapshotState();
     var appliedToState = false;
     try {
+      /* 이전 입력이 남아 합계를 부풀리지 않도록 학점·과목만 비우고 새 값으로 채운다 */
+      clearImportedCredits();
+      state.pasteText = '';
       applySummary(Transcript.parseSummary(PdfOcr.toSummaryText(out)));
       updateAll();
       saveNow();
