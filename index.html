@@ -3447,7 +3447,9 @@ var PdfOcr = (function () {
       /* 값이 모자라거나 학기 합계와 어긋난다 — 원본에 더 가깝게 키워 한 번 더 읽고,
          두 번의 결과 중 잘 읽힌 쪽을 쓴다. */
       ctx.stage('retry', 0.82);
-      return readPass(ctx, { scale: CONFIG.retryScale, maxPages: CONFIG.maxPages }, 0.82, 0.95)
+      /* 정밀 모드로 읽었으면 두 번째는 기본 배율로 — 서로 다른 배율이 서로의 실수를 메운다 */
+      var secondScale = (Math.abs(scale - CONFIG.renderScale) < 0.01) ? CONFIG.retryScale : CONFIG.renderScale;
+      return readPass(ctx, { scale: secondScale, maxPages: CONFIG.maxPages }, 0.82, 0.95)
         .then(function (again) {
           var second = extract(again);
           var firstSum = areaSumOf(ex.areas), secondSum = areaSumOf(second.areas);
